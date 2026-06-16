@@ -1,16 +1,26 @@
 "use client";
 
-import { useState, KeyboardEvent } from "react";
+import { useState, KeyboardEvent, useEffect } from "react";
 import { useAdmin } from "../../../features/auth/auth";
-import { JobInfo, Patron, PATRONS, Message, INIT_MESSAGES } from "../../../features/patrons/constants";
+import { Patron, Message, INIT_MESSAGES } from "../../../features/patrons/constants";
+import { usePatrons } from "../../../features/patrons/queries";
 
 export default function PatronsPage() {
-  const { admin, loading } = useAdmin();
-  const [selected, setSelected] = useState<Patron | null>(PATRONS[0]);
+  const { admin, loading: adminLoading } = useAdmin();
+  const { data: patrons, isLoading: patronsLoading } = usePatrons();
+  const [selected, setSelected] = useState<Patron | null>(null);
   const [messages, setMessages] = useState<Message[]>(INIT_MESSAGES);
   const [draft, setDraft] = useState("");
 
-  if (loading) return <div style={{ padding: 40, fontFamily: "Outfit, sans-serif" }}>Loading...</div>;
+  useEffect(() => {
+    if (patrons && patrons.length > 0 && !selected) {
+      setSelected(patrons[0]);
+    }
+  }, [patrons, selected]);
+
+  if (adminLoading || patronsLoading) {
+    return <div style={{ padding: 40, fontFamily: "Outfit, sans-serif" }}>Loading patrons...</div>;
+  }
 
   function sendMessage() {
     if (!draft.trim()) return;
@@ -21,7 +31,7 @@ export default function PatronsPage() {
   return (
     <>
       <div className="topbar">
-        <div className="topbar-title">Patrons <span style={{ color: "#aaa", fontWeight: 400, fontSize: 13, marginLeft: 6 }}>318 total</span></div>
+        <div className="topbar-title">Patrons <span style={{ color: "#aaa", fontWeight: 400, fontSize: 13, marginLeft: 6 }}>{patrons?.length || 0} total</span></div>
       </div>
 
       <div className="workspace" style={{ height: "calc(100vh - 57px)" }}>
@@ -30,7 +40,7 @@ export default function PatronsPage() {
           <div style={{ padding: 12 }}>
             <input className="search-input" placeholder="🔍  Search patrons..." />
           </div>
-          {PATRONS.map((p) => (
+          {patrons?.map((p) => (
             <div key={p.id} className={`patron-row${selected?.id === p.id ? " active" : ""}`} onClick={() => setSelected(p)}>
               <div style={{ width: 38, height: 38, borderRadius: "50%", background: p.avBg, color: p.avColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{p.initials}</div>
               <div style={{ flex: 1, minWidth: 0 }}>

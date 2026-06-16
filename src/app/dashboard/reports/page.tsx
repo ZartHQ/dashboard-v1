@@ -1,11 +1,17 @@
 "use client";
 
 import { useAdmin } from "../../../features/auth/auth";
-import { Category, CATEGORIES, TopArtisan, TOP_ARTISANS } from "../../../features/reports/constants";
+import { useReports } from "../../../features/reports/queries";
 
 export default function ReportsPage() {
-  const { admin, loading } = useAdmin();
-  if (loading) return <div style={{ padding: 40, fontFamily: "Outfit, sans-serif" }}>Loading...</div>;
+  const { admin, loading: adminLoading } = useAdmin();
+  const { data: reports, isLoading: reportsLoading } = useReports();
+
+  if (adminLoading || reportsLoading) {
+    return <div style={{ padding: 40, fontFamily: "Outfit, sans-serif" }}>Loading reports...</div>;
+  }
+
+  const { categories, topArtisans } = reports || { categories: [], topArtisans: [] };
 
   return (
     <>
@@ -31,7 +37,7 @@ export default function ReportsPage() {
               <span style={{ fontSize: 11, color: "#aaa" }}>This week</span>
             </div>
             <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {CATEGORIES.map((c) => (
+              {categories.map((c) => (
                 <div key={c.label} className="bar-row">
                   <span className="bar-label">{c.label}</span>
                   <div className="bar-track"><div className="bar-fill" style={{ width: `${c.pct}%`, background: c.color }} /></div>
@@ -48,7 +54,7 @@ export default function ReportsPage() {
               <span style={{ fontSize: 11, color: "#aaa" }}>By jobs completed</span>
             </div>
             <div>
-              {TOP_ARTISANS.map((a) => (
+              {topArtisans.map((a) => (
                 <div key={a.rank} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 16px", borderBottom: "1px solid #f8f8f8" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <span style={{ fontSize: 12, fontWeight: 700, color: "#aaa", width: 18 }}>{a.rank}</span>

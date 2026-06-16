@@ -1,29 +1,18 @@
-import { API_BASE_URL } from "./config";
+import axios from "axios";
 
-export const api = {
-  get: async (endpoint: string, options: RequestInit = {}) => {
-    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers,
-      },
-    });
-    if (!res.ok) throw new Error(`API error: ${res.statusText}`);
-    return res.json();
+export const api = axios.create({
+  baseURL: (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000") + "/v1",
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
   },
+});
 
-  post: async (endpoint: string, data: any, options: RequestInit = {}) => {
-    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...options,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers,
-      },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) throw new Error(`API error: ${res.statusText}`);
-    return res.json();
-  },
-};
+// Optional: Add interceptors for token handling or error logging
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Handle global errors like 401 Unauthorized
+    return Promise.reject(error);
+  }
+);

@@ -1,11 +1,16 @@
 "use client";
 
 import { useAdmin } from "../../../features/auth/auth";
-import { Payment, PAYMENTS, BADGE } from "../../../features/payments/constants";
+import { BADGE } from "../../../features/payments/constants";
+import { usePayments } from "../../../features/payments/queries";
 
 export default function PaymentsPage() {
-  const { admin, loading } = useAdmin();
-  if (loading) return <div style={{ padding: 40, fontFamily: "Outfit, sans-serif" }}>Loading...</div>;
+  const { admin, loading: adminLoading } = useAdmin();
+  const { data: payments, isLoading: paymentsLoading } = usePayments();
+
+  if (adminLoading || paymentsLoading) {
+    return <div style={{ padding: 40, fontFamily: "Outfit, sans-serif" }}>Loading payments...</div>;
+  }
 
   return (
     <>
@@ -39,7 +44,7 @@ export default function PaymentsPage() {
               </tr>
             </thead>
             <tbody>
-              {PAYMENTS.map((p) => (
+              {payments?.map((p) => (
                 <tr key={p.id}>
                   <td><div style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a" }}>{p.job}</div><div style={{ fontSize: 11, color: "#aaa", marginTop: 2 }}>#{p.id}</div></td>
                   <td>{p.patron}</td>
@@ -61,7 +66,7 @@ export default function PaymentsPage() {
             </tbody>
           </table>
           <div className="pagination">
-            <span className="page-info">Showing 5 of 128 transactions</span>
+            <span className="page-info">Showing {payments?.length || 0} of 128 transactions</span>
             <div className="page-btns">
               {["1", "2", "3", "→"].map((p, i) => <button key={p} className={`page-btn${i === 0 ? " active-pg" : ""}`}>{p}</button>)}
             </div>

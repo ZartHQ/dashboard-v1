@@ -1,27 +1,11 @@
 "use client";
 
-import { useState, FormEvent, ChangeEvent, MouseEvent } from "react";
-import { useRouter } from "next/navigation";
-import { ADMINS, authenticate } from "../features/auth/admins";
-import { saveSession } from "../features/auth/auth";
+import { ADMINS } from "../features/auth/admins";
+import { useLoginForm } from "../features/auth/hooks";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
-  function handleLogin(e: FormEvent) {
-    e.preventDefault();
-    setError("");
-    const admin = authenticate(email, password);
-    if (admin) {
-      saveSession(admin);
-      router.push("/dashboard/requests");
-    } else {
-      setError("Incorrect email or password. Please try again.");
-    }
-  }
+  const { form, onSubmit, isLoading, error } = useLoginForm();
+  const { register, formState: { errors } } = form;
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: "100vh" }}>
@@ -82,7 +66,7 @@ export default function LoginPage() {
             Sign in to the Zart admin dashboard
           </p>
 
-          {error && (
+          {(error || Object.keys(errors).length > 0) && (
             <div
               style={{
                 background: "#fff0ec", border: "1px solid #FA4812",
@@ -90,30 +74,28 @@ export default function LoginPage() {
                 fontSize: 13, color: "#FA4812", marginBottom: 16,
               }}
             >
-              {error}
+              {error || "Please check your credentials"}
             </div>
           )}
 
-          <form onSubmit={handleLogin}>
+          <form onSubmit={onSubmit}>
             <div style={{ marginBottom: 20 }}>
               <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#333", marginBottom: 6 }}>
                 Email address
               </label>
               <input
                 type="email"
-                required
-                value={email}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                {...register("email")}
                 placeholder="you@zart.ng"
+                disabled={isLoading}
                 style={{
-                  width: "100%", border: "1.5px solid #e0e0e0",
+                  width: "100%", border: errors.email ? "1.5px solid #FA4812" : "1.5px solid #e0e0e0",
                   borderRadius: 10, padding: "12px 16px",
                   fontSize: 14, color: "#1a1a1a",
                   outline: "none",
                 }}
-                onFocus={(e: ChangeEvent<HTMLInputElement>) => (e.target.style.borderColor = "#115746")}
-                onBlur={(e: ChangeEvent<HTMLInputElement>) => (e.target.style.borderColor = "#e0e0e0")}
               />
+              {errors.email && <p style={{ color: "#FA4812", fontSize: 12, marginTop: 4 }}>{errors.email.message}</p>}
             </div>
 
             <div style={{ marginBottom: 24 }}>
@@ -122,33 +104,31 @@ export default function LoginPage() {
               </label>
               <input
                 type="password"
-                required
-                value={password}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                {...register("password")}
                 placeholder="Enter your password"
+                disabled={isLoading}
                 style={{
-                  width: "100%", border: "1.5px solid #e0e0e0",
+                  width: "100%", border: errors.password ? "1.5px solid #FA4812" : "1.5px solid #e0e0e0",
                   borderRadius: 10, padding: "12px 16px",
                   fontSize: 14, color: "#1a1a1a",
                   outline: "none",
                 }}
-                onFocus={(e: ChangeEvent<HTMLInputElement>) => (e.target.style.borderColor = "#115746")}
-                onBlur={(e: ChangeEvent<HTMLInputElement>) => (e.target.style.borderColor = "#e0e0e0")}
               />
+              {errors.password && <p style={{ color: "#FA4812", fontSize: 12, marginTop: 4 }}>{errors.password.message}</p>}
             </div>
 
             <button
               type="submit"
+              disabled={isLoading}
               style={{
                 width: "100%", background: "#115746", color: "#fff",
                 border: "none", borderRadius: 10, padding: 14,
                 fontSize: 15, fontWeight: 600,
-                cursor: "pointer",
+                cursor: isLoading ? "not-allowed" : "pointer",
+                opacity: isLoading ? 0.7 : 1,
               }}
-              onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.background = "#0d4035")}
-              onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.background = "#115746")}
             >
-              Sign in
+              {isLoading ? "Signing in..." : "Sign in"}
             </button>
           </form>
 

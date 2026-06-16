@@ -1,56 +1,50 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Admin } from "./admins";
+import { useAdminProfile } from "./queries";
+import { authApi } from "./api";
 
 export interface SessionAdmin {
-  id: number;
+  id: string;
   name: string;
   initials: string;
   role: string;
   color: string;
 }
 
-/** Save admin session to sessionStorage */
-export function saveSession(admin: Admin) {
-  if (typeof window === "undefined") return;
-  sessionStorage.setItem(
-    "zart_admin",
-    JSON.stringify({ id: admin.id, name: admin.name, initials: admin.initials, role: admin.roleLabel, color: admin.color })
-  );
-}
+/** 
+ * Hook: returns current admin profile or redirects to login if unauthenticated.
+ * This is the primary way to protect admin routes.
+ */
+export function useAdmin() {
+  const router = useRouter();
+  const { data: admin, isLoading, isError } = useAdminProfile();
 
-/** Read admin session from sessionStorage */
-export function getSession(): SessionAdmin | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = sessionStorage.getItem("zart_admin");
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
+  useEffect(() => {
+    if (!isLoading && (isError || !admin)) {
+      router.replace("/");
+    }
+  }, [admin, isLoading, isError, router]);
+
+  return { 
+    admin: admin ? {
+      ...admin,
+      initials: admin.initials || admin.name.substring(0, 2).toUpperCase(),
+      color: admin.color || "#115746"
+    } as SessionAdmin : null, 
+    loading: isLoading 
+  };
 }
 
 /** Clear session (logout) */
-export function clearSession() {
-  if (typeof window === "undefined") return;
-  sessionStorage.removeItem("zart_admin");
-}
-
-/** Hook: returns current admin or redirects to login */
-export function useAdmin() {
-  const router = useRouter();
-  const [admin, setAdmin] = useState<SessionAdmin | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const session = getSession();
-    if (!session) {
-      router.replace("/");
-    } else {
-      setAdmin(session);
-      setLoading(false);
+export async function clearSession() {
+  try {
+    await authApi.logout();
+  } catch (err) {
+    console.error("Logout failed", err);
+  } finally {
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("zart_admin");
+      window.location.href = "/";
     }
-  }, [router]);
-
-  return { admin, loading };
+  }
 }

@@ -1,12 +1,19 @@
 "use client";
 
-import { ARTISANS, STATUS_PILL } from "../../../features/artisans/constants";
+import { STATUS_PILL } from "../../../features/artisans/constants";
+import { useArtisans } from "../../../features/artisans/queries";
 
 export default function ArtisansPage() {
+  const { data: artisans, isLoading } = useArtisans();
+
+  if (isLoading) {
+    return <div style={{ padding: 40, fontFamily: "Outfit, sans-serif" }}>Loading artisans...</div>;
+  }
+
   return (
     <>
       <div className="topbar">
-        <div className="topbar-title">Artisans <span style={{ color: "#aaa", fontWeight: 400, fontSize: 13, marginLeft: 6 }}>34 total</span></div>
+        <div className="topbar-title">Artisans <span style={{ color: "#aaa", fontWeight: 400, fontSize: 13, marginLeft: 6 }}>{artisans?.length || 0} total</span></div>
         <button className="btn btn-primary">+ Add artisan</button>
       </div>
       <div className="content">
@@ -21,7 +28,7 @@ export default function ArtisansPage() {
           ))}
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 14 }}>
-          {ARTISANS.map((a) => (
+          {artisans?.map((a) => (
             <div key={a.id} className="card" style={{ opacity: a.status === "suspended" ? 0.65 : 1 }}>
               <div style={{ padding: 16, display: "flex", alignItems: "flex-start", gap: 12, borderBottom: "1px solid #f0f0f0" }}>
                 <div style={{ width: 46, height: 46, borderRadius: "50%", background: a.avBg, color: a.avColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, flexShrink: 0 }}>{a.initials}</div>
