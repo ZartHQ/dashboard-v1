@@ -1,0 +1,25 @@
+export interface FlagPerson {
+  initials: string;
+  bg: string;
+  color: string;
+  name: string;
+}
+
+export interface Flag {
+  id: number;
+  title: string;
+  sub: string;
+  priority: 'high' | 'medium' | 'low';
+  status: string;
+  time: string;
+  desc: string;
+  artisan: FlagPerson;
+  patron: FlagPerson;
+  actions: string[];
+}
+
+export const FLAGS: Flag[] = [
+  { id: 1, title: "Off-platform solicitation", sub: "Job #ZRT-0038 · Wiring repair · Surulere", priority: "high", status: "open", time: "2h ago", desc: "Artisan Emeka Eze sent a message asking patron Grace Okonkwo to complete the transaction outside Zart via WhatsApp, offering a discount. Auto-detected by keyword scan. Conversation is preserved as evidence.", artisan: { initials: "EE", bg: "#ffe8e8", color: "#c41c1c", name: "Emeka Eze" }, patron: { initials: "GO", bg: "#e8f5e8", color: "#166534", name: "Grace Okonkwo" }, actions: ["View chat", "Suspend Emeka", "Mark resolved", "Dismiss"] },
+  { id: 2, title: "Price dispute reported by patron", sub: "Job #ZRT-0041 · AC repair · Lekki", priority: "medium", status: "open", time: "5h ago", desc: "Patron Amaka Obi was quoted ₦20,000 but charged ₦35,000 after the job. Artisan claims extra parts were needed. No pre-approval was obtained before adding costs.", artisan: { initials: "NK", bg: "#f0eaff", color: "#5a3d8a", name: "Nkechi Kalu" }, patron: { initials: "AO", bg: "#fff3e0", color: "#c2410c", name: "Amaka Obi" }, actions: ["View chat", "View job", "Mark resolved", "Dismiss"] },
+  { id: 3, title: "1-star review — possible retaliation", sub: "Job #ZRT-0036 · Painting · Ajah", priority: "medium", status: "open", time: "Yesterday", desc: "Patron Kunle Adeyemi left a 1-star review after artisan Chidi Bosah (4.8 rating, 30+ jobs) declined a last-minute discount request. Pattern suggests retaliatory review.", artisan: { initials: "CB", bg: "#FDF4D7", color: "#8a6f00", name: "Chidi Bosah" }, patron: { initials: "KA", bg: "#f5f5f5", color: "#888", name: "Kunle Adeyemi" }, actions: ["View review", "View chat", "Remove review", "Mark resolved"] },
+];

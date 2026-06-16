@@ -1,6 +1,8 @@
+"use client";
+
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { clearSession, SessionAdmin } from "../lib/auth";
+import { useRouter, usePathname } from "next/navigation";
+import { clearSession, SessionAdmin } from "../../features/auth/auth";
 
 interface NavItem {
   href: string;
@@ -26,6 +28,7 @@ interface SidebarProps {
 
 export default function Sidebar({ admin }: SidebarProps) {
   const router = useRouter();
+  const pathname = usePathname();
 
   function logout() {
     clearSession();
@@ -53,7 +56,7 @@ export default function Sidebar({ admin }: SidebarProps) {
       {NAV.map((item, i) => {
         const showSection = item.section && item.section !== lastSection;
         if (item.section) lastSection = item.section;
-        const isActive = router.pathname === item.href;
+        const isActive = pathname === item.href;
         return (
           <div key={i}>
             {showSection && typeof item.section === 'string' && <div className="nav-section">{item.section}</div>}
