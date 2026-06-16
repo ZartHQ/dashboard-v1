@@ -1,10 +1,8 @@
 "use client";
 
-import { ADMINS } from "../features/auth/admins";
 import { useLoginForm } from "../features/auth/hooks";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 
 export default function LoginPage() {
@@ -92,21 +90,6 @@ export default function LoginPage() {
           </form>
 
           <hr className="border-none border-t border-gray-100 my-7" />
-
-          <p className="text-[12px] text-gray-400 text-center leading-relaxed">
-            <strong className="text-gray-600">Access is restricted to authorised Zart team members.</strong>
-          </p>
-          <div className="flex flex-wrap gap-1.5 justify-center mt-[10px]">
-            {ADMINS.map((a) => (
-              <Badge
-                key={a.id}
-                variant="pending"
-                className="px-[10px] py-[3px] rounded-[20px] text-[#115746] border-[#e0d5b0]"
-              >
-                {a.name}
-              </Badge>
-            ))}
-          </div>
         </div>
       </div>
     </div>
