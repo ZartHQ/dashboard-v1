@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { cn } from "@/lib/utils";
+import { PageLoader } from "@/components/ui/PageLoader";
 
 export default function PatronsPage() {
   const { data: patrons, isLoading: patronsLoading } = usePatrons();
@@ -21,7 +22,7 @@ export default function PatronsPage() {
   }, [patrons, selected]);
 
   if (patronsLoading) {
-    return <div className="p-10 font-outfit">Loading patrons...</div>;
+    return <PageLoader />;
   }
 
   function sendMessage() {

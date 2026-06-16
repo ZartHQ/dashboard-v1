@@ -19,6 +19,15 @@ module.exports = {
       },
       fontFamily: {
         outfit: ["var(--font-outfit)", "sans-serif"],
+      },
+      keyframes: {
+        "zoom-pulse": {
+          "0%, 100%": { transform: "scale(1)", opacity: 1 },
+          "50%": { transform: "scale(1.15)", opacity: 0.8 },
+        }
+      },
+      animation: {
+        "zoom-pulse": "zoom-pulse 1.5s ease-in-out infinite",
       }
     },
   },

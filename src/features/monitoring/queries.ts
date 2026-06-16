@@ -5,7 +5,7 @@ export function useQueueStats() {
   return useQuery({
     queryKey: ["queues", "stats"],
     queryFn: monitoringApi.getStats,
-    refetchInterval: 10000, 
+    refetchInterval: 10000,
   });
 }
 

@@ -1,4 +1,5 @@
 import { api } from "@/lib/api";
+import { FLAGS, Flag } from "./constants";
 
 export interface QueueStats {
   waiting: number;
@@ -39,8 +40,8 @@ export const monitoringApi = {
     return response.data;
   },
   
-  getFlags: async () => {
-    const response = await api.get("/admin/flags").catch(() => ({ data: [] }));
-    return response.data;
+  getFlags: async (): Promise<Flag[]> => {
+    // Returning dummy data for flags for now
+    return new Promise((resolve) => setTimeout(() => resolve(FLAGS), 500));
   }
 };

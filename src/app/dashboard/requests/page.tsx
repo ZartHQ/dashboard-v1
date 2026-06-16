@@ -1,20 +1,34 @@
 "use client";
 
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 import { STATUS_LABELS } from "../../../features/requests/constants";
-import { useRequests } from "../../../features/requests/queries";
+import { useRequests, useRequestDetail } from "../../../features/requests/queries";
 import { ServiceRequestStatus } from "@/types/api";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
-import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
+import { PageLoader } from "@/components/ui/PageLoader";
 
 export default function RequestsPage() {
-  const { data: requests, isLoading } = useRequests();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const { data: requests, isLoading: isListLoading } = useRequests({
+    status: filter !== "all" ? filter : undefined,
+    search: debouncedSearch || undefined,
+  });
+
+  const { data: selectedDetail, isLoading: isDetailLoading } = useRequestDetail(selectedId);
+  
   const [note, setNote] = useState("");
   const [notes, setNotes] = useState([
     { text: "Looks urgent — water damage visible in photos. Prioritise today.", by: "Mia", time: "9:35 AM" }
@@ -22,20 +36,27 @@ export default function RequestsPage() {
   const [subtotal, setSubtotal] = useState(12000);
 
   const requestsList = requests?.data || [];
-  const selected = requestsList.find(r => r.id.toString() === selectedId) || requestsList[0] || null;
+  const selectedListItem = requestsList.find(r => r.id.toString() === selectedId) || requestsList[0] || null;
+  const selected = selectedDetail || selectedListItem;
+
   const [reqStatus, setReqStatus] = useState<ServiceRequestStatus>((selected?.status as ServiceRequestStatus) || "pending");
+
+  useEffect(() => {
+    if (selectedDetail?.status) {
+      setReqStatus(selectedDetail.status as ServiceRequestStatus);
+    }
+  }, [selectedDetail?.status]);
 
   const feePercent = subtotal >= 400000 ? 0.08 : 0.1;
   const fee = Math.round(subtotal * feePercent);
   const total = subtotal + fee;
   const feeLabel = `Zart service fee (${subtotal >= 400000 ? "8%" : "10%"})`;
 
-  if (isLoading) {
-    return <div className="p-10 font-outfit">Loading requests...</div>;
+  if (isListLoading && !requestsList.length) {
+    return <PageLoader />;
   }
 
-  const filtered = filter === "all" ? requestsList : requestsList.filter((r) => r.status === filter);
-
+  const filtered = requestsList;
 
   function addNote() {
     if (!note.trim()) return;
@@ -56,12 +77,12 @@ export default function RequestsPage() {
         </div>
         <div className="flex gap-1.5 flex-wrap">
           {["all", "pending", "assigned", "progress", "done"].map((f) => (
-            <button 
-              key={f} 
+            <button
+              key={f}
               className={cn(
                 "text-[12px] p-[5px_14px] rounded-[20px] border-[1.5px] border-[#e0e0e0] text-[#888] font-medium transition-all hover:border-[#115746] hover:text-[#115746]",
                 filter === f && "bg-[#115746] text-white border-[#115746]"
-              )} 
+              )}
               onClick={() => setFilter(f)}
             >
               {f === "all" ? "All (32)" : f === "pending" ? "Pending (7)" : f === "assigned" ? "Assigned (5)" : f === "progress" ? "In progress (8)" : "Completed (12)"}
@@ -71,25 +92,38 @@ export default function RequestsPage() {
       </div>
 
       {/* Split workspace */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden min-h-0">
         {/* Request list */}
-        <div className="w-[340px] flex-shrink-0 border-r border-[#e8e8e8] bg-white flex flex-col overflow-hidden">
-          <div className="p-3">
-            <Input className="h-9" placeholder="🔍  Search requests..." />
+        <div className="w-[340px] flex-shrink-0 border-r border-[#e8e8e8] bg-white flex flex-col overflow-hidden min-h-0">
+          <div className="p-3 shrink-0">
+            <Input 
+              className="h-9" 
+              placeholder="🔍  Search requests..." 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto min-h-0 relative">
+            {isListLoading && (
+              <div className="absolute inset-0 bg-white/60 z-10 flex justify-center pt-10">
+                <div className="w-6 h-6 border-[2px] border-[#115746] border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
+            {requestsList.length === 0 && !isListLoading && (
+              <div className="p-10 text-center text-[13px] text-[#aaa]">No requests found.</div>
+            )}
             {filtered.map((r) => (
-              <div 
-                key={r.id} 
+              <div
+                key={r.id}
                 className={cn(
                   "p-[14px_16px] border-b border-[#f0f0f0] cursor-pointer border-l-[3px] border-transparent transition-all hover:bg-[#fafafa]",
                   selected?.id === r.id && "bg-[#e8f5f0] border-l-[#115746]"
-                )} 
+                )}
                 onClick={() => { setSelectedId(r.id.toString()); setReqStatus(r.status); }}
               >
                 <div className="flex items-start justify-between mb-1">
                   <div className="text-[13px] font-semibold text-[#1a1a1a] flex-1 mr-2 leading-tight">{r.title}</div>
-                  <div className={cn("w-[9px] h-[9px] rounded-full mt-1 shrink-0", `bg-${r.status}`, 
+                  <div className={cn("w-[9px] h-[9px] rounded-full mt-1 shrink-0", `bg-${r.status}`,
                     r.status === 'pending' && "bg-[#FFC92A]",
                     r.status === 'assigned' && "bg-[#115746]",
                     r.status === 'in_progress' && "bg-[#FA4812]",
@@ -118,7 +152,12 @@ export default function RequestsPage() {
 
         {/* Detail panel */}
         {selected ? (
-          <div className="flex-1 flex flex-col overflow-hidden bg-[#f9f9f9]">
+          <div className="flex-1 flex flex-col overflow-hidden bg-[#f9f9f9] min-h-0 relative">
+            {isDetailLoading && (
+              <div className="absolute inset-0 bg-white/50 z-10 flex items-center justify-center">
+                <PageLoader />
+              </div>
+            )}
             <div className="bg-white border-b border-[#e8e8e8] p-[16px_24px] flex items-center justify-between shrink-0">
               <div>
                 <div className="text-[17px] font-bold text-[#115746] mb-1">{selected.title}</div>
@@ -219,10 +258,10 @@ export default function RequestsPage() {
                     <div className="grid grid-cols-[1fr_80px_90px] gap-1.5 mb-1.5">
                       <Input className="h-8 text-[12px] border-[#e8d98a]" defaultValue="Sink leak repair — labour" />
                       <Input className="h-8 text-[12px] border-[#e8d98a]" defaultValue="1" />
-                      <Input 
-                        className="h-8 text-[12px] border-[#e8d98a]" 
-                        value={`₦${subtotal.toLocaleString()}`} 
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => { const v = parseInt(e.target.value.replace(/[^0-9]/g, "")) || 0; setSubtotal(v); }} 
+                      <Input
+                        className="h-8 text-[12px] border-[#e8d98a]"
+                        value={`₦${subtotal.toLocaleString()}`}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => { const v = parseInt(e.target.value.replace(/[^0-9]/g, "")) || 0; setSubtotal(v); }}
                       />
                     </div>
                     <div className="grid grid-cols-[1fr_80px_90px] gap-1.5">

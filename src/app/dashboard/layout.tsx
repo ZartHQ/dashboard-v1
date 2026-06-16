@@ -2,6 +2,7 @@
 
 import Sidebar from "../../components/layout/Sidebar";
 import { useAdmin } from "../../features/auth/auth";
+import { PageLoader } from "@/components/ui/PageLoader";
 
 export default function DashboardLayout({
   children,
@@ -12,8 +13,8 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="p-10 font-outfit">
-        Loading...
+      <div className="flex items-center justify-center min-h-screen">
+        <PageLoader />
       </div>
     );
   }

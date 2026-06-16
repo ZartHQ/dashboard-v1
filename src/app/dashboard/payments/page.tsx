@@ -8,13 +8,14 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
+import { PageLoader } from "@/components/ui/PageLoader";
 
 export default function PaymentsPage() {
   const { admin, loading: adminLoading } = useAdmin();
   const { data: payments, isLoading: paymentsLoading } = usePayments();
 
   if (adminLoading || paymentsLoading) {
-    return <div className="p-10 font-outfit">Loading payments...</div>;
+    return <PageLoader />;
   }
 
   return (

@@ -12,7 +12,7 @@ export default function LoginPage() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen">
       {/* Brand side */}
-      <div className="bg-[#115746] flex flex-col justify-between p-12 relative overflow-hidden hidden md:flex">
+      <div className="bg-[#115746] flex-col justify-between p-12 relative overflow-hidden hidden md:flex">
         {/* Logo */}
         <div className="flex items-center gap-3">
           <img src="/zart-logo.png" alt="Zart" className="w-11 h-11 object-contain" />

@@ -7,12 +7,13 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { Select } from "@/components/ui/Select";
+import { PageLoader } from "@/components/ui/PageLoader";
 
 export default function ArtisansPage() {
   const { data: artisans, isLoading } = useArtisans();
 
   if (isLoading) {
-    return <div style={{ padding: 40, fontFamily: "Outfit, sans-serif" }}>Loading artisans...</div>;
+    return <PageLoader />;
   }
 
   return (

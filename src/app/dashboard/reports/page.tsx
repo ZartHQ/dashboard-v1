@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Select } from "@/components/ui/Select";
 import { cn } from "@/lib/utils";
+import { PageLoader } from "@/components/ui/PageLoader";
 
 export default function ReportsPage() {
   const { admin, loading: adminLoading } = useAdmin();
   const { data: reports, isLoading: reportsLoading } = useReports();
 
   if (adminLoading || reportsLoading) {
-    return <div className="p-10 font-outfit">Loading reports...</div>;
+    return <PageLoader />;
   }
 
   const { categories, topArtisans } = reports || { categories: [], topArtisans: [] };
