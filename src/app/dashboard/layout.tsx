@@ -12,16 +12,18 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div style={{ padding: 40, fontFamily: "Outfit, sans-serif" }}>
+      <div className="p-10 font-outfit">
         Loading...
       </div>
     );
   }
 
   return (
-    <div className="layout">
+    <div className="flex min-h-screen">
       <Sidebar admin={admin} />
-      <div className="main">{children}</div>
+      <div className="flex-1 flex flex-col ml-[220px] min-h-screen overflow-hidden">
+        {children}
+      </div>
     </div>
   );
 }

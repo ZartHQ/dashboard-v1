@@ -2,6 +2,10 @@
 
 import { useFlags, useQueueStats } from "../../../features/monitoring/queries";
 import { useRetryFailedMutation } from "../../../features/monitoring/mutations";
+import { Button } from "@/components/ui/Button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { cn } from "@/lib/utils";
 
 export default function FlagsPage() {
   const { data: flags, isLoading: isFlagsLoading } = useFlags();
@@ -11,77 +15,106 @@ export default function FlagsPage() {
   const isLoading = isFlagsLoading || isStatsLoading;
 
   if (isLoading) {
-    return <div style={{ padding: 40, fontFamily: "Outfit, sans-serif" }}>Loading monitoring data...</div>;
+    return <div className="p-10 font-outfit">Loading monitoring data...</div>;
   }
 
   return (
     <>
-      <div className="topbar">
-        <div className="topbar-title">Monitoring &amp; Queue Stats</div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button 
-            className="btn btn-orange" 
-            onClick={() => retryMutation.mutate()}
-            disabled={retryMutation.isPending}
-            style={{ fontSize: 12 }}
-          >
-            {retryMutation.isPending ? "Retrying..." : "Retry Failed Queues"}
-          </button>
-        </div>
+      <div className="bg-white border-b border-[#e8e8e8] p-[14px_24px] flex items-center justify-between sticky top-0 z-50">
+        <div className="text-[16px] font-bold text-[#115746]">Monitoring &amp; Queue Stats</div>
+        <Button 
+          variant="orange" 
+          onClick={() => retryMutation.mutate()}
+          disabled={retryMutation.isPending}
+          size="sm"
+        >
+          {retryMutation.isPending ? "Retrying..." : "Retry Failed Queues"}
+        </Button>
       </div>
-      <div className="content">
-        <div className="metrics" style={{ marginBottom: 16 }}>
+      <div className="p-6 overflow-y-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           {[
             { label: "Queued", val: stats?.waiting.toString() || "0", sub: "Waiting", subColor: "#aaa" },
             { label: "Active", val: stats?.active.toString() || "0", sub: "Processing", subColor: "#166534" },
             { label: "Failed", val: stats?.failed.toString() || "0", sub: "Needs retry", subColor: "#c2410c" },
             { label: "Completed", val: stats?.completed.toString() || "0", sub: "All time", subColor: "#166534" }
           ].map((m) => (
-            <div key={m.label} className="metric">
-              <div className="metric-label">{m.label}</div>
-              <div className="metric-value" style={{ color: m.label === "Failed" ? "#FA4812" : "#115746" }}>{m.val}</div>
-              <div className="metric-sub" style={{ color: m.subColor }}>{m.sub}</div>
-            </div>
+            <Card key={m.label} className="p-[14px_16px]">
+              <div className="text-[11px] text-[#aaa] mb-1.5 uppercase tracking-wider font-semibold">{m.label}</div>
+              <div className={cn("text-[26px] font-bold", m.label === "Failed" ? "text-[#FA4812]" : "text-[#115746]")}>{m.val}</div>
+              <div className="text-[11px] mt-1 font-medium" style={{ color: m.subColor }}>{m.sub}</div>
+            </Card>
           ))}
         </div>
 
-        <div className="topbar-title" style={{ margin: "24px 0 16px", fontSize: 16 }}>Flags &amp; Alerts</div>
-        <div className="chips" style={{ marginBottom: 16 }}>
-          {["Open", "Resolved", "All time"].map((c, i) => <button key={c} className={`chip${i === 0 ? " active" : ""}`}>{c}</button>)}
+        <div className="text-[16px] font-bold text-[#115746] mt-6 mb-4">Flags &amp; Alerts</div>
+        <div className="flex gap-1.5 mb-4">
+          {["Open", "Resolved", "All time"].map((c, i) => (
+            <button 
+              key={c} 
+              className={cn(
+                "text-[12px] p-[5px_14px] rounded-[20px] border-[1.5px] border-[#e0e0e0] text-[#888] font-medium transition-all hover:border-[#115746] hover:text-[#115746]",
+                i === 0 && "bg-[#115746] text-white border-[#115746]"
+              )}
+            >
+              {c}
+            </button>
+          ))}
         </div>
-        {flags?.map((f: any) => (
-          <div key={f.id} className={`flag-card${f.priority === "high" ? " high" : ""}`} style={{ marginBottom: 14 }}>
-            <div className={`flag-head${f.priority === "high" ? " high-bg" : ""}`}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, background: f.priority === "high" ? "#ffe8e8" : "#fff3e0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>{f.priority === "high" ? "⚠️" : f.id === 3 ? "⭐" : "💬"}</div>
-                <div><div style={{ fontSize: 14, fontWeight: 700, color: "#1a1a1a" }}>{f.title}</div><div style={{ fontSize: 11, color: "#aaa", marginTop: 2 }}>{f.sub}</div></div>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span className="badge" style={f.priority === "high" ? { background: "#ffe8e8", color: "#c41c1c", border: "1px solid #fecaca" } : { background: "#fff3e0", color: "#c2410c", border: "1px solid #fed7aa" }}>{f.priority === "high" ? "High priority" : "Medium"}</span>
-                <span className="badge badge-pending">Open</span>
-                <span style={{ fontSize: 11, color: "#bbb" }}>{f.time}</span>
-              </div>
-            </div>
-            <div className="flag-body">
-              <p style={{ fontSize: 13, color: "#555", lineHeight: 1.7, flex: 1 }}>{f.desc}</p>
-              <div style={{ display: "flex", gap: 20, flexShrink: 0 }}>
-                {[f.artisan, f.patron].map((p: any, i: number) => (
-                  <div key={i} style={{ textAlign: "center" }}>
-                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: p?.bg || "#eee", color: p?.color || "#888", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, margin: "0 auto 5px" }}>{p?.initials || "??"}</div>
-                    <div style={{ fontSize: 10, color: "#aaa" }}>{i === 0 ? "Artisan" : "Patron"}</div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: "#1a1a1a" }}>{p?.name || "Unknown"}</div>
+        
+        <div className="flex flex-col gap-3.5">
+          {flags?.map((f: any) => (
+            <Card key={f.id} className={cn(f.priority === "high" && "border-[#FA4812]")}>
+              <div className={cn("p-[14px_18px] border-b border-[#f0f0f0] flex items-center justify-between", f.priority === "high" && "bg-[#fff8f6]")}>
+                <div className="flex items-center gap-3">
+                  <div className={cn("w-9 h-9 rounded-[10px] flex items-center justify-center text-[16px]", f.priority === "high" ? "bg-[#ffe8e8]" : "bg-[#fff3e0]")}>
+                    {f.priority === "high" ? "⚠️" : f.id === 3 ? "⭐" : "💬"}
                   </div>
+                  <div>
+                    <div className="text-[14px] font-bold text-[#1a1a1a]">{f.title}</div>
+                    <div className="text-[11px] text-[#aaa] mt-0.5">{f.sub}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant={f.priority === "high" ? "disputed" : "invoiced"}>
+                    {f.priority === "high" ? "High priority" : "Medium"}
+                  </Badge>
+                  <Badge variant="pending">Open</Badge>
+                  <span className="text-[11px] text-[#bbb]">{f.time}</span>
+                </div>
+              </div>
+              <div className="p-[16px_18px] flex gap-5 items-start">
+                <p className="text-[13px] text-[#555] leading-relaxed flex-1">{f.desc}</p>
+                <div className="flex gap-5 shrink-0">
+                  {[f.artisan, f.patron].map((p: any, i: number) => (
+                    <div key={i} className="text-center">
+                      <div 
+                        className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-bold text-white mb-1.5 mx-auto"
+                        style={{ background: p?.bg || "#eee", color: p?.color || "#888" }}
+                      >
+                        {p?.initials || "??"}
+                      </div>
+                      <div className="text-[10px] text-[#aaa]">{i === 0 ? "Artisan" : "Patron"}</div>
+                      <div className="text-[12px] font-semibold text-[#1a1a1a]">{p?.name || "Unknown"}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="p-[12px_18px] border-t border-[#f0f0f0] bg-[#f9f9f9] flex gap-2 flex-wrap">
+                {f.actions?.map((a: string, i: number) => (
+                  <Button 
+                    key={a} 
+                    variant={i === 1 ? "danger" : i === 2 ? "outline" : "plain"} 
+                    className="text-[12px] h-8"
+                  >
+                    {a}
+                  </Button>
                 ))}
               </div>
-            </div>
-            <div className="flag-actions">
-              {f.actions?.map((a: string, i: number) => (
-                <button key={a} className={`btn ${i === 1 ? "btn-danger" : i === 2 ? "btn btn-outline" : "btn btn-plain"}`} style={{ fontSize: 12 }}>{a}</button>
-              ))}
-            </div>
-          </div>
-        ))}
-        {flags?.length === 0 && <p style={{ textAlign: "center", color: "#aaa", padding: 20 }}>No flags detected.</p>}
+            </Card>
+          ))}
+        </div>
+        {flags?.length === 0 && <p className="text-center text-[#aaa] py-5 font-outfit text-sm">No flags detected.</p>}
       </div>
     </>
   );

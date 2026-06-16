@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { clearSession, SessionAdmin } from "../../features/auth/auth";
+import { cn } from "@/lib/utils";
 
 interface NavItem {
   href: string;
@@ -38,57 +39,72 @@ export default function Sidebar({ admin }: SidebarProps) {
   let lastSection: string | boolean | null = null;
 
   return (
-    <aside className="sidebar">
+    <aside className="w-[220px] bg-[#115746] flex flex-col flex-shrink-0 min-h-screen fixed top-0 left-0 z-[100]">
       {/* Logo */}
-      <div className="logo-wrap">
-        <div className="logo-row">
+      <div className="p-[20px_20px_18px] border-b border-white/10">
+        <div className="flex items-center gap-[10px]">
           <img
             src="/zart-logo.png"
             alt="Zart"
-            style={{ width: 28, height: 28, objectFit: "contain", flexShrink: 0 }}
+            className="w-[28px] h-[28px] object-contain flex-shrink-0"
           />
-          <span className="logo-text">Zart</span>
+          <span className="text-[20px] font-bold text-[#FDF4D7] tracking-[-0.5px]">Zart</span>
         </div>
-        <div className="logo-tagline">Operations dashboard</div>
+        <div className="text-[10px] color-white/50 mt-[3px] pl-[38px] text-[#FDF4D7]/50">Operations dashboard</div>
       </div>
 
       {/* Navigation */}
-      {NAV.map((item, i) => {
-        const showSection = item.section && item.section !== lastSection;
-        if (item.section) lastSection = item.section;
-        const isActive = pathname === item.href;
-        return (
-          <div key={i}>
-            {showSection && typeof item.section === 'string' && <div className="nav-section">{item.section}</div>}
-            <Link href={item.href} className={`nav-item${isActive ? " active" : ""}`}>
-              <span>{item.icon}</span>
-              <span>{item.label}</span>
-              {item.badge && (
-                <span className={`nav-badge${item.badgeWarn ? " warn" : ""}`}>
-                  {item.badge}
-                </span>
+      <div className="flex-1 overflow-y-auto">
+        {NAV.map((item, i) => {
+          const showSection = item.section && item.section !== lastSection;
+          if (item.section) lastSection = item.section;
+          const isActive = pathname === item.href;
+          return (
+            <div key={i}>
+              {showSection && typeof item.section === 'string' && (
+                <div className="p-[16px_16px_6px] text-[10px] text-[#FDF4D7]/40 uppercase tracking-[0.6px] font-semibold">
+                  {item.section}
+                </div>
               )}
-            </Link>
-          </div>
-        );
-      })}
+              <Link 
+                href={item.href} 
+                className={cn(
+                  "flex items-center gap-[10px] p-[9px_16px] text-[13px] text-[#FDF4D7]/75 cursor-pointer border-l-[3px] border-transparent transition-all hover:bg-white/5 hover:text-[#FDF4D7] no-underline",
+                  isActive && "bg-white/12 text-[#FDF4D7] border-l-[#FA4812] font-semibold"
+                )}
+              >
+                <span>{item.icon}</span>
+                <span>{item.label}</span>
+                {item.badge && (
+                  <span className={cn(
+                    "ml-auto text-[10px] p-[2px_7px] rounded-[10px] font-semibold bg-[#FA4812] text-white",
+                    item.badgeWarn && "bg-[#FFC92A] text-[#1a1a1a]"
+                  )}>
+                    {item.badge}
+                  </span>
+                )}
+              </Link>
+            </div>
+          );
+        })}
+      </div>
 
       {/* Admin footer */}
-      <div className="sidebar-footer">
-        <div className="admin-row">
+      <div className="mt-auto p-[16px] border-t border-white/10">
+        <div className="flex items-center gap-[10px]">
           <div
-            className="admin-av"
+            className="w-[34px] h-[34px] rounded-full flex items-center justify-center text-[12px] font-bold text-white flex-shrink-0"
             style={{ background: admin?.color || "#FA4812" }}
           >
             {admin?.initials || "MI"}
           </div>
-          <div style={{ flex: 1 }}>
-            <div className="admin-name">{admin?.name || "Admin"}</div>
-            <div className="admin-role">{admin?.role || "Admin"}</div>
+          <div className="flex-1">
+            <div className="text-[13px] font-semibold text-[#FDF4D7]">{admin?.name || "Admin"}</div>
+            <div className="text-[10px] text-[#FDF4D7]/50">{admin?.role || "Admin"}</div>
           </div>
           <button
             onClick={logout}
-            style={{ background: "none", border: "none", color: "rgba(253,244,215,0.5)", cursor: "pointer", fontSize: 18 }}
+            className="bg-none border-none text-[#FDF4D7]/50 cursor-pointer text-[18px]"
             title="Log out"
           >
             ↩

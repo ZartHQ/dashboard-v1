@@ -4,14 +4,14 @@ import { useAdminProfile } from "./queries";
 import { authApi } from "./api";
 
 export interface SessionAdmin {
-  id: string;
+  id: number;
   name: string;
   initials: string;
   role: string;
   color: string;
 }
 
-/** 
+/**
  * Hook: returns current admin profile or redirects to login if unauthenticated.
  * This is the primary way to protect admin routes.
  */
@@ -25,13 +25,17 @@ export function useAdmin() {
     }
   }, [admin, isLoading, isError, router]);
 
-  return { 
+  const name = admin ? `${admin.firstName} ${admin.lastName}` : "Admin";
+  
+  return {
     admin: admin ? {
+      name,
+      initials: admin.image ? "" : name.substring(0, 2).toUpperCase(),
+      role: admin.roles && admin.roles.length > 0 ? admin.roles[0].name : "Admin",
+      color: "#115746",
       ...admin,
-      initials: admin.initials || admin.name.substring(0, 2).toUpperCase(),
-      color: admin.color || "#115746"
-    } as SessionAdmin : null, 
-    loading: isLoading 
+    } as SessionAdmin : null,
+    loading: isLoading
   };
 }
 
@@ -44,6 +48,7 @@ export async function clearSession() {
   } finally {
     if (typeof window !== "undefined") {
       sessionStorage.removeItem("zart_admin");
+      sessionStorage.removeItem("zart_access_token");
       window.location.href = "/";
     }
   }

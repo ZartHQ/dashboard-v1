@@ -9,8 +9,12 @@ export function useAdminSignin() {
 
   return useMutation({
     mutationFn: authApi.signin,
-    onSuccess: (admin) => {
-      queryClient.setQueryData(AUTH_QUERY_KEY, admin);
+    onSuccess: (data) => {
+      // Assuming data is LoginData containing user and accessToken
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("zart_access_token", data.accessToken);
+      }
+      queryClient.setQueryData(AUTH_QUERY_KEY, data.user);
       router.push("/dashboard/requests");
     },
   });
