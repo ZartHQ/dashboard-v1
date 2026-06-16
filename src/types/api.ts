@@ -41,7 +41,7 @@ export type MediaType = 'image' | 'video' | 'audio' | 'document';
 
 export interface Media {
   id: number;
-  url: string;
+  mediaUrl: string;
   mediaType: MediaType;
   createdAt: string;
 }
@@ -73,7 +73,7 @@ export type AdminProfileResponse = ApiResponse<AdminProfile>;
 
 // --- SERVICE REQUEST TYPES ---
 
-export type ServiceRequestStatus = 
+export type ServiceRequestStatus =
   | 'pending'
   | 'assigned'
   | 'in_progress'

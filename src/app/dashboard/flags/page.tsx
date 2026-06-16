@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
+import { PageLoader } from "@/components/ui/PageLoader";
 
 export default function FlagsPage() {
   const { data: flags, isLoading: isFlagsLoading } = useFlags();
@@ -15,7 +16,7 @@ export default function FlagsPage() {
   const isLoading = isFlagsLoading || isStatsLoading;
 
   if (isLoading) {
-    return <div className="p-10 font-outfit">Loading monitoring data...</div>;
+    return <PageLoader />;
   }
 
   return (
@@ -63,7 +64,7 @@ export default function FlagsPage() {
         </div>
         
         <div className="flex flex-col gap-3.5">
-          {flags?.map((f: any) => (
+          {(Array.isArray(flags) ? flags : [])?.map((f: any) => (
             <Card key={f.id} className={cn(f.priority === "high" && "border-[#FA4812]")}>
               <div className={cn("p-[14px_18px] border-b border-[#f0f0f0] flex items-center justify-between", f.priority === "high" && "bg-[#fff8f6]")}>
                 <div className="flex items-center gap-3">

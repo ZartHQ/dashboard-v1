@@ -1,4 +1,3 @@
-import { api } from "@/lib/api";
 import { FLAGS, Flag } from "./constants";
 
 export interface QueueStats {
@@ -16,32 +15,35 @@ export interface QueueHealth {
 
 export const monitoringApi = {
   getStats: async (): Promise<QueueStats> => {
-    const response = await api.get("/queues/stats");
-    return response.data;
+    return new Promise((resolve) => setTimeout(() => resolve({
+      waiting: 42,
+      active: 12,
+      completed: 1250,
+      failed: 3,
+      delayed: 0
+    }), 500));
   },
 
   getQueueHealth: async (): Promise<QueueHealth> => {
-    const response = await api.get("/queues/health");
-    return response.data;
+    return new Promise((resolve) => setTimeout(() => resolve({
+      status: 'ok',
+      details: 'All queues operational'
+    }), 500));
   },
   
   getSystemHealth: async (): Promise<{ status: string }> => {
-    const response = await api.get("/health");
-    return response.data;
+    return new Promise((resolve) => setTimeout(() => resolve({ status: 'healthy' }), 500));
   },
 
   getLiveHealth: async (): Promise<{ status: string }> => {
-    const response = await api.get("/health/live");
-    return response.data;
+    return new Promise((resolve) => setTimeout(() => resolve({ status: 'live' }), 500));
   },
   
   retryFailed: async () => {
-    const response = await api.post("/queues/retry-failed");
-    return response.data;
+    return new Promise((resolve) => setTimeout(() => resolve({ success: true }), 800));
   },
   
   getFlags: async (): Promise<Flag[]> => {
-    // Returning dummy data for flags for now
     return new Promise((resolve) => setTimeout(() => resolve(FLAGS), 500));
   }
 };

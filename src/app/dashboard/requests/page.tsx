@@ -28,7 +28,7 @@ export default function RequestsPage() {
   });
 
   const { data: selectedDetail, isLoading: isDetailLoading } = useRequestDetail(selectedId);
-  
+
   const [note, setNote] = useState("");
   const [notes, setNotes] = useState([
     { text: "Looks urgent — water damage visible in photos. Prioritise today.", by: "Mia", time: "9:35 AM" }
@@ -46,6 +46,8 @@ export default function RequestsPage() {
       setReqStatus(selectedDetail.status as ServiceRequestStatus);
     }
   }, [selectedDetail?.status]);
+
+  console.log(selectedDetail);
 
   const feePercent = subtotal >= 400000 ? 0.08 : 0.1;
   const fee = Math.round(subtotal * feePercent);
@@ -96,9 +98,9 @@ export default function RequestsPage() {
         {/* Request list */}
         <div className="w-[340px] flex-shrink-0 border-r border-[#e8e8e8] bg-white flex flex-col overflow-hidden min-h-0">
           <div className="p-3 shrink-0">
-            <Input 
-              className="h-9" 
-              placeholder="🔍  Search requests..." 
+            <Input
+              className="h-9"
+              placeholder="🔍  Search requests..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -204,10 +206,20 @@ export default function RequestsPage() {
                   <p className="text-[13px] text-[#555] leading-relaxed mb-3">
                     {selected.description}
                   </p>
-                  <div className="flex gap-2 mb-3.5">
-                    {[1, 2, 3].map((n) => (
-                      <div key={n} className="w-16 h-16 bg-[#f5f5f5] rounded-lg border-[1.5px] border-[#e8e8e8] flex items-center justify-center text-[22px] cursor-pointer">📷</div>
-                    ))}
+                  <div className="flex gap-2 mb-3.5 flex-wrap">
+                    {selected.media && selected.media.length > 0 ? (
+                      selected.media.map((m) => (
+                        <a key={m.id} href={m.mediaUrl} target="_blank" rel="noopener noreferrer" className="w-16 h-16 bg-[#f5f5f5] rounded-lg border-[1.5px] border-[#e8e8e8] flex items-center justify-center cursor-pointer overflow-hidden hover:opacity-90 transition-opacity">
+                          {m.mediaType === 'image' ? (
+                            <img src={m.mediaUrl} alt="Request media" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="text-[22px]">📁</div>
+                          )}
+                        </a>
+                      ))
+                    ) : (
+                      <div className="text-[12px] text-[#aaa] italic py-2">No media attached</div>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     <Button variant="outline" className="flex-1">📞 Call patron</Button>
@@ -230,10 +242,10 @@ export default function RequestsPage() {
                     <div className="flex items-center gap-1.5 bg-[#FDF4D7] border border-[#e8d98a] rounded-[6px] p-[7px_10px] text-[12px] text-[#8a6f00]">
                       🤖 AI suggests <strong className="ml-1">John Mensah</strong> — highest rated {selected.artisanType?.name?.toLowerCase() || 'artisan'} closest to {selected.patron?.homeAddress || 'location'}
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
+                    {/*<div className="grid grid-cols-2 gap-2">
                       <Input placeholder="Scheduled date & time" />
                       <Input placeholder="Est. duration e.g. 2 hrs" />
-                    </div>
+                    </div>*/}
                     <Button variant="primary" className="w-full">Assign artisan &amp; notify patron via app</Button>
                   </div>
                 </CardContent>
