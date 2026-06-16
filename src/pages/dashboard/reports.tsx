@@ -2,7 +2,14 @@ import Head from "next/head";
 import Sidebar from "../../components/Sidebar";
 import { useAdmin } from "../../lib/auth";
 
-const CATEGORIES = [
+interface Category {
+  label: string;
+  pct: number;
+  jobs: number;
+  color: string;
+}
+
+const CATEGORIES: Category[] = [
   { label: "Plumbing",   pct: 72, jobs: 42, color: "#115746" },
   { label: "Electrical", pct: 55, jobs: 32, color: "#FA4812" },
   { label: "Carpentry",  pct: 36, jobs: 21, color: "#FFC92A" },
@@ -11,7 +18,18 @@ const CATEGORIES = [
   { label: "Cleaning",   pct: 17, jobs: 10, color: "#EDB4CA" },
 ];
 
-const TOP_ARTISANS = [
+interface TopArtisan {
+  rank: number;
+  initials: string;
+  bg: string;
+  color: string;
+  name: string;
+  type: string;
+  jobs: number;
+  rating: number;
+}
+
+const TOP_ARTISANS: TopArtisan[] = [
   { rank: 1, initials: "JM", bg: "#e8f5f0", color: "#115746", name: "John Mensah", type: "Plumber · Lekki", jobs: 12, rating: 4.9 },
   { rank: 2, initials: "AK", bg: "#fff3e0", color: "#c2410c", name: "Akin Kolade", type: "Electrician · VI", jobs: 9, rating: 4.8 },
   { rank: 3, initials: "CB", bg: "#FDF4D7", color: "#8a6f00", name: "Chidi Bosah", type: "Carpenter · Ikeja", jobs: 7, rating: 4.7 },

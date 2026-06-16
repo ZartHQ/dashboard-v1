@@ -9,7 +9,18 @@
  * In production, migrate this to your Supabase `admins` table.
  */
 
-export const ADMINS = [
+export interface Admin {
+  id: number;
+  name: string;
+  initials: string;
+  email: string;
+  password?: string;
+  role: string;
+  roleLabel: string;
+  color: string;
+}
+
+export const ADMINS: Admin[] = [
   {
     id: 1,
     name: "Mia",
@@ -30,21 +41,10 @@ export const ADMINS = [
     roleLabel: "Admin",
     color: "#FA4812",
   },
-  // ── ADD NEW ADMINS BELOW ──────────────────────────────────────
-  // {
-  //   id: 3,
-  //   name: "New Person",
-  //   initials: "NP",
-  //   email: "newperson@zart.ng",
-  //   password: "their_password",
-  //   role: "admin",
-  //   roleLabel: "Admin",
-  //   color: "#FFC92A",
-  // },
 ];
 
 /** Find an admin by email + password. Returns admin object or null. */
-export function authenticate(email, password) {
+export function authenticate(email: string, password: string): Admin | null {
   return (
     ADMINS.find(
       (a) =>
@@ -55,7 +55,7 @@ export function authenticate(email, password) {
 }
 
 /** Check if a stored session matches a known admin. */
-export function getAdminFromSession(sessionData) {
+export function getAdminFromSession(sessionData: any): Admin | null {
   if (!sessionData) return null;
   return ADMINS.find((a) => a.id === sessionData.id) || null;
 }

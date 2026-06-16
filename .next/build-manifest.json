@@ -22,10 +22,10 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/dashboard/reports": [
+    "/dashboard/flags": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/dashboard/reports.js"
+      "static/chunks/pages/dashboard/flags.js"
     ],
     "/dashboard/requests": [
       "static/chunks/webpack.js",

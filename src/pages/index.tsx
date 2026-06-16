@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, FormEvent, ChangeEvent, MouseEvent } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { ADMINS, authenticate } from "../lib/admins";
@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  function handleLogin(e) {
+  function handleLogin(e: FormEvent) {
     e.preventDefault();
     setError("");
     const admin = authenticate(email, password);
@@ -111,7 +111,7 @@ export default function LoginPage() {
                   type="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                   placeholder="you@zart.ng"
                   style={{
                     width: "100%", border: "1.5px solid #e0e0e0",
@@ -119,8 +119,8 @@ export default function LoginPage() {
                     fontSize: 14, fontFamily: "Outfit, sans-serif", color: "#1a1a1a",
                     outline: "none",
                   }}
-                  onFocus={(e) => (e.target.style.borderColor = "#115746")}
-                  onBlur={(e) => (e.target.style.borderColor = "#e0e0e0")}
+                  onFocus={(e: ChangeEvent<HTMLInputElement>) => (e.target.style.borderColor = "#115746")}
+                  onBlur={(e: ChangeEvent<HTMLInputElement>) => (e.target.style.borderColor = "#e0e0e0")}
                 />
               </div>
 
@@ -132,7 +132,7 @@ export default function LoginPage() {
                   type="password"
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   style={{
                     width: "100%", border: "1.5px solid #e0e0e0",
@@ -140,8 +140,8 @@ export default function LoginPage() {
                     fontSize: 14, fontFamily: "Outfit, sans-serif", color: "#1a1a1a",
                     outline: "none",
                   }}
-                  onFocus={(e) => (e.target.style.borderColor = "#115746")}
-                  onBlur={(e) => (e.target.style.borderColor = "#e0e0e0")}
+                  onFocus={(e: ChangeEvent<HTMLInputElement>) => (e.target.style.borderColor = "#115746")}
+                  onBlur={(e: ChangeEvent<HTMLInputElement>) => (e.target.style.borderColor = "#e0e0e0")}
                 />
               </div>
 
@@ -153,8 +153,8 @@ export default function LoginPage() {
                   fontSize: 15, fontWeight: 600, fontFamily: "Outfit, sans-serif",
                   cursor: "pointer",
                 }}
-                onMouseEnter={(e) => (e.target.style.background = "#0d4035")}
-                onMouseLeave={(e) => (e.target.style.background = "#115746")}
+                onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.background = "#0d4035")}
+                onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.background = "#115746")}
               >
                 Sign in
               </button>

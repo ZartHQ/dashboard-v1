@@ -1,9 +1,32 @@
-import { useState } from "react";
+import { useState, KeyboardEvent } from "react";
 import Head from "next/head";
 import Sidebar from "../../components/Sidebar";
 import { useAdmin } from "../../lib/auth";
 
-const PATRONS = [
+interface JobInfo {
+  title: string;
+  id: string;
+  status?: string;
+}
+
+interface Patron {
+  id: number;
+  name: string;
+  initials: string;
+  avBg: string;
+  avColor: string;
+  preview: string;
+  time: string;
+  unread: boolean;
+  loc: string;
+  bookings: number;
+  joined: string;
+  spent: string;
+  activeJob: JobInfo | null;
+  pastJobs: JobInfo[];
+}
+
+const PATRONS: Patron[] = [
   { id: 1, name: "John Doe", initials: "JD", avBg: "#e8f5f0", avColor: "#115746", preview: "Thanks for the update!", time: "9:41 AM", unread: true, loc: "Lekki Phase 1", bookings: 8, joined: "March 2025", spent: "₦94,000", activeJob: { title: "Fix leaking sink", id: "ZRT-0042", status: "Pending" }, pastJobs: [{ title: "Toilet flush repair", id: "ZRT-0031" }, { title: "Bathroom tile grouting", id: "ZRT-0024" }] },
   { id: 2, name: "Amaka Obi", initials: "AO", avBg: "#fff3e0", avColor: "#c2410c", preview: "What time will he arrive?", time: "8:50 AM", unread: false, loc: "Ikeja GRA", bookings: 14, joined: "January 2025", spent: "₦142,000", activeJob: { title: "Install ceiling fan", id: "ZRT-0041", status: "Assigned" }, pastJobs: [] },
   { id: 3, name: "Tunde Bello", initials: "TB", avBg: "#FDF4D7", avColor: "#8a6f00", preview: "Job is done, very happy!", time: "Yesterday", unread: false, loc: "Victoria Island", bookings: 5, joined: "February 2025", spent: "₦58,000", activeJob: null, pastJobs: [{ title: "Fix wardrobe door", id: "ZRT-0040" }] },
@@ -11,7 +34,13 @@ const PATRONS = [
   { id: 5, name: "Grace Okonkwo", initials: "GO", avBg: "#e8f5e8", avColor: "#166534", preview: "Excellent service, thank you!", time: "2 days ago", unread: false, loc: "Lekki Phase 2", bookings: 6, joined: "January 2025", spent: "₦72,000", activeJob: null, pastJobs: [] },
 ];
 
-const INIT_MESSAGES = [
+interface Message {
+  from: 'patron' | 'admin';
+  text: string;
+  time: string;
+}
+
+const INIT_MESSAGES: Message[] = [
   { from: "patron", text: "Hi, I submitted a plumbing request this morning. Just checking if anyone has been assigned yet?", time: "9:30 AM" },
   { from: "admin", text: "Hi John! Yes, we've reviewed your request. We're assigning John Mensah, one of our top-rated plumbers in Lekki. He'll reach out shortly to confirm timing.", time: "9:38 AM" },
   { from: "patron", text: "Thanks for the update! What time should I expect him?", time: "9:41 AM" },
@@ -19,8 +48,8 @@ const INIT_MESSAGES = [
 
 export default function PatronsPage() {
   const { admin, loading } = useAdmin();
-  const [selected, setSelected] = useState(PATRONS[0]);
-  const [messages, setMessages] = useState(INIT_MESSAGES);
+  const [selected, setSelected] = useState<Patron | null>(PATRONS[0]);
+  const [messages, setMessages] = useState<Message[]>(INIT_MESSAGES);
   const [draft, setDraft] = useState("");
 
   if (loading) return <div style={{ padding: 40, fontFamily: "Outfit, sans-serif" }}>Loading...</div>;
@@ -100,7 +129,7 @@ export default function PatronsPage() {
                         <textarea
                           value={draft}
                           onChange={(e) => setDraft(e.target.value)}
-                          onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+                          onKeyDown={(e: KeyboardEvent<HTMLTextAreaElement>) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                           placeholder={`Message ${selected.name}...`}
                           rows={1}
                           style={{ flex: 1, background: "#f5f5f5", border: "1.5px solid #e0e0e0", borderRadius: 10, padding: "10px 14px", fontSize: 13, fontFamily: "Outfit, sans-serif", color: "#333", resize: "none", lineHeight: 1.4 }}

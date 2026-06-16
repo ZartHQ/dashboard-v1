@@ -1,9 +1,20 @@
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import Head from "next/head";
 import Sidebar from "../../components/Sidebar";
 import { useAdmin } from "../../lib/auth";
 
-const REQUESTS = [
+interface Request {
+  id: string;
+  title: string;
+  cat: string;
+  catKey: string;
+  patron: string;
+  loc: string;
+  time: string;
+  status: string;
+}
+
+const REQUESTS: Request[] = [
   { id: "ZRT-0042", title: "Fix leaking sink in kitchen", cat: "Plumbing", catKey: "plumb", patron: "John Doe", loc: "Lekki Phase 1", time: "9:30 AM · Today", status: "pending" },
   { id: "ZRT-0041", title: "Install ceiling fan — 2 rooms", cat: "Electrical", catKey: "elec", patron: "Amaka Obi", loc: "Ikeja GRA", time: "8:15 AM · Today", status: "assigned" },
   { id: "ZRT-0040", title: "Fix wardrobe door hinge", cat: "Carpentry", catKey: "carp", patron: "Tunde Bello", loc: "Victoria Island", time: "Yesterday", status: "progress" },
@@ -12,14 +23,20 @@ const REQUESTS = [
   { id: "ZRT-0037", title: "Deep clean 3 bedroom flat", cat: "Cleaning", catKey: "clean", patron: "Grace Okonkwo", loc: "Lekki Phase 2", time: "2 days ago", status: "done" },
 ];
 
-const STATUS_LABELS = { pending: "Pending", assigned: "Assigned", progress: "In progress", done: "Completed", cancelled: "Cancelled" };
+const STATUS_LABELS: Record<string, string> = { pending: "Pending", assigned: "Assigned", progress: "In progress", done: "Completed", cancelled: "Cancelled" };
+
+interface Note {
+  text: string;
+  by: string;
+  time: string;
+}
 
 export default function RequestsPage() {
   const { admin, loading } = useAdmin();
-  const [selected, setSelected] = useState(REQUESTS[0]);
+  const [selected, setSelected] = useState<Request | null>(REQUESTS[0]);
   const [filter, setFilter] = useState("all");
   const [note, setNote] = useState("");
-  const [notes, setNotes] = useState([{ text: "Looks urgent — water damage visible in photos. Prioritise today.", by: "Mia", time: "9:35 AM" }]);
+  const [notes, setNotes] = useState<Note[]>([{ text: "Looks urgent — water damage visible in photos. Prioritise today.", by: "Mia", time: "9:35 AM" }]);
   const [reqStatus, setReqStatus] = useState("pending");
   const [subtotal, setSubtotal] = useState(12000);
   const feePercent = subtotal >= 400000 ? 0.08 : 0.1;
@@ -94,7 +111,7 @@ export default function RequestsPage() {
                       <span className={`cat cat-${selected.catKey}`}>{selected.cat}</span>
                     </div>
                   </div>
-                  <select className="sel" value={reqStatus} onChange={(e) => setReqStatus(e.target.value)}>
+                  <select className="sel" value={reqStatus} onChange={(e: ChangeEvent<HTMLSelectElement>) => setReqStatus(e.target.value)}>
                     {Object.entries(STATUS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                   </select>
                 </div>
@@ -165,7 +182,7 @@ export default function RequestsPage() {
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 90px", gap: 6, marginBottom: 6 }}>
                           <input className="inv-input" defaultValue="Sink leak repair — labour" />
                           <input className="inv-input" defaultValue="1" />
-                          <input className="inv-input" value={`₦${subtotal.toLocaleString()}`} onChange={(e) => { const v = parseInt(e.target.value.replace(/[^0-9]/g, "")) || 0; setSubtotal(v); }} />
+                          <input className="inv-input" value={`₦${subtotal.toLocaleString()}`} onChange={(e: ChangeEvent<HTMLInputElement>) => { const v = parseInt(e.target.value.replace(/[^0-9]/g, "")) || 0; setSubtotal(v); }} />
                         </div>
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 90px", gap: 6 }}>
                           <input className="inv-input" placeholder="Additional item..." />
@@ -207,7 +224,7 @@ export default function RequestsPage() {
                       ))}
                       <textarea
                         value={note}
-                        onChange={(e) => setNote(e.target.value)}
+                        onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setNote(e.target.value)}
                         placeholder="Add an internal note (e.g. 'called patron, no answer')..."
                         style={{ width: "100%", background: "#f9f9f9", border: "1.5px solid #e0e0e0", borderRadius: 8, padding: "10px 12px", fontSize: 13, fontFamily: "Outfit, sans-serif", color: "#333", resize: "none", height: 72 }}
                       />

@@ -1,8 +1,17 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { clearSession } from "../lib/auth";
+import { clearSession, SessionAdmin } from "../lib/auth";
 
-const NAV = [
+interface NavItem {
+  href: string;
+  label: string;
+  icon: string;
+  badge?: string;
+  badgeWarn?: boolean;
+  section?: string | boolean;
+}
+
+const NAV: NavItem[] = [
   { href: "/dashboard/requests", label: "Requests", icon: "📋", badge: "7", section: "Operations" },
   { href: "/dashboard/artisans", label: "Artisans", icon: "🔧", section: false },
   { href: "/dashboard/patrons",  label: "Patrons",  icon: "👤", section: false },
@@ -11,7 +20,11 @@ const NAV = [
   { href: "/dashboard/reports",  label: "Reports",  icon: "📊", section: false },
 ];
 
-export default function Sidebar({ admin }) {
+interface SidebarProps {
+  admin: SessionAdmin | null;
+}
+
+export default function Sidebar({ admin }: SidebarProps) {
   const router = useRouter();
 
   function logout() {
@@ -19,7 +32,7 @@ export default function Sidebar({ admin }) {
     router.push("/");
   }
 
-  let lastSection = null;
+  let lastSection: string | boolean | null = null;
 
   return (
     <aside className="sidebar">
@@ -43,7 +56,7 @@ export default function Sidebar({ admin }) {
         const isActive = router.pathname === item.href;
         return (
           <div key={i}>
-            {showSection && <div className="nav-section">{item.section}</div>}
+            {showSection && typeof item.section === 'string' && <div className="nav-section">{item.section}</div>}
             <Link href={item.href} className={`nav-item${isActive ? " active" : ""}`}>
               <span>{item.icon}</span>
               <span>{item.label}</span>
