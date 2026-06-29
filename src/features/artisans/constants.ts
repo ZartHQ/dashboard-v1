@@ -1,20 +1,4 @@
-export interface Artisan {
-  id: number;
-  name: string;
-  initials: string;
-  type: string;
-  loc: string;
-  phone: string;
-  status: 'online' | 'busy' | 'offline' | 'suspended';
-  vetted: boolean;
-  jobs: number;
-  rating: number | null;
-  completion: number | null;
-  skills: string[];
-  avBg: string;
-  avColor: string;
-  warning?: string;
-}
+import { Artisan } from "@/types/artisans";
 
 export const ARTISANS: Artisan[] = [
   { id: 1, name: "John Mensah", initials: "JM", type: "Plumber", loc: "Lekki", phone: "0801 XXX XXXX", status: "online", vetted: true, jobs: 57, rating: 4.9, completion: 98, skills: ["Pipe fitting", "Sink repair", "Drainage", "Water heater"], avBg: "#e8f5f0", avColor: "#115746" },

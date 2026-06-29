@@ -18,7 +18,7 @@ export const REQUESTS: Request[] = [
   { id: "ZRT-0037", title: "Deep clean 3 bedroom flat", cat: "Cleaning", catKey: "clean", patron: "Grace Okonkwo", loc: "Lekki Phase 2", time: "2 days ago", status: "done" },
 ];
 
-export const STATUS_LABELS: Record<string, string> = { pending: "Pending", assigned: "Assigned", progress: "In progress", done: "Completed", cancelled: "Cancelled" };
+export const STATUS_LABELS: Record<string, string> = { pending: "Pending", assigned: "Assigned", in_progress: "In progress", completed: "Completed", cancelled: "Cancelled" };
 
 export interface Note {
   text: string;

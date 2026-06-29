@@ -1,13 +1,4 @@
-export interface Payment {
-  id: string;
-  job: string;
-  patron: string;
-  artisan: string;
-  amount: number;
-  fee: number | null;
-  status: 'paid' | 'pending' | 'disputed' | 'invoiced' | 'refunded';
-  date: string;
-}
+import { Payment } from "@/types/payments";
 
 export const PAYMENTS: Payment[] = [
   { id: "ZRT-0042", job: "Fix leaking sink", patron: "John Doe", artisan: "John Mensah", amount: 15000, fee: 1200, status: "invoiced", date: "Today" },

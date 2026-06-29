@@ -1,5 +1,6 @@
 import { api } from "@/lib/api";
-import { CATEGORIES, TOP_ARTISANS, Category, TopArtisan } from "./constants";
+import { CATEGORIES, TOP_ARTISANS } from "./constants";
+import { Category, TopArtisan } from "@/types/reports";
 
 export interface ReportsData {
   categories: Category[];

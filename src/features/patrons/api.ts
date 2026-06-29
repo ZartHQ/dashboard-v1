@@ -1,5 +1,6 @@
 import { api } from "@/lib/api";
-import { PATRONS, Patron } from "./constants";
+import { PATRONS } from "./constants";
+import { Patron } from "@/types/patrons";
 
 export const patronsApi = {
   getPatrons: async (): Promise<Patron[]> => {

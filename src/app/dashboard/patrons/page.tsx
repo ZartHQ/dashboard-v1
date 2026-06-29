@@ -1,7 +1,13 @@
 "use client";
 
-import { useState, KeyboardEvent, useEffect } from "react";
-import { Patron, Message, INIT_MESSAGES } from "../../../features/patrons/constants";
+import { useState, KeyboardEvent, useEffect, useRef } from "react";
+import { MOCK_PATRON_CHATS } from "../../../features/patrons/constants";
+import { Patron, Message } from "@/types/patrons";
+
+interface LocalMessage extends Message {
+  id?: number;
+  sending?: boolean;
+}
 import { usePatrons } from "../../../features/patrons/queries";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
@@ -12,8 +18,11 @@ import { PageLoader } from "@/components/ui/PageLoader";
 export default function PatronsPage() {
   const { data: patrons, isLoading: patronsLoading } = usePatrons();
   const [selected, setSelected] = useState<Patron | null>(null);
-  const [messages, setMessages] = useState<Message[]>(INIT_MESSAGES);
+  const [chats, setChats] = useState<Record<number, LocalMessage[]>>(MOCK_PATRON_CHATS as any);
   const [draft, setDraft] = useState("");
+  const [isMobileDetailActive, setIsMobileDetailActive] = useState(false);
+  const [typingPatronId, setTypingPatronId] = useState<number | null>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (patrons && patrons.length > 0 && !selected) {
@@ -21,14 +30,79 @@ export default function PatronsPage() {
     }
   }, [patrons, selected]);
 
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chats, typingPatronId, selected]);
+
   if (patronsLoading) {
     return <PageLoader />;
   }
 
+  const messages = selected ? chats[selected.id] || [] : [];
+
   function sendMessage() {
-    if (!draft.trim()) return;
-    setMessages((prev) => [...prev, { from: "admin", text: draft, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }]);
+    if (!draft.trim() || !selected) return;
+    const patronId = selected.id;
+    const messageText = draft.trim();
+    const messageTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+    // 1. Optimistic Update: Add message immediately with sending status
+    const clientMessageId = Date.now();
+    const newMsg: LocalMessage = {
+      id: clientMessageId,
+      from: "admin",
+      text: messageText,
+      time: messageTime,
+      sending: true,
+    };
+
+    setChats((prev) => ({
+      ...prev,
+      [patronId]: [...(prev[patronId] || []), newMsg],
+    }));
     setDraft("");
+
+    // 2. Simulate API request success
+    setTimeout(() => {
+      setChats((prev) => {
+        const roomMessages = prev[patronId] || [];
+        return {
+          ...prev,
+          [patronId]: roomMessages.map((m: any) => 
+            m.id === clientMessageId ? { ...m, sending: false } : m
+          ),
+        };
+      });
+
+      // 3. Simulate patron typing and sending a reply
+      setTimeout(() => {
+        setTypingPatronId(patronId);
+
+        setTimeout(() => {
+          setTypingPatronId(null);
+          
+          const replies = [
+            "Got it! Thanks for the quick response.",
+            "Awesome, looking forward to it.",
+            "Perfect. Let me know when they arrive.",
+            "Thank you so much!",
+            "Understood, thanks."
+          ];
+          const randomReply = replies[Math.floor(Math.random() * replies.length)];
+          const replyMsg: LocalMessage = {
+            id: Date.now(),
+            from: "patron",
+            text: randomReply,
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          };
+
+          setChats((prev) => ({
+            ...prev,
+            [patronId]: [...(prev[patronId] || []), replyMsg],
+          }));
+        }, 1500); // typing lasts 1.5s
+      }, 1000); // typing starts after 1s
+    }, 800); // network latency of 800ms
   }
 
   return (
@@ -40,7 +114,10 @@ export default function PatronsPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Patron list */}
-        <div className="w-[300px] flex-shrink-0 border-r border-[#e8e8e8] bg-white overflow-y-auto">
+        <div className={cn(
+          "w-full md:w-[300px] flex-shrink-0 border-r border-[#e8e8e8] bg-white overflow-y-auto",
+          isMobileDetailActive ? "hidden md:block" : "block"
+        )}>
           <div className="p-3">
             <Input className="h-9" placeholder="🔍  Search patrons..." />
           </div>
@@ -51,7 +128,7 @@ export default function PatronsPage() {
                 "flex items-center gap-2.5 p-[12px_14px] border-b border-[#f5f5f5] cursor-pointer border-l-[3px] border-transparent transition-all hover:bg-[#fafafa]",
                 selected?.id === p.id && "bg-[#e8f5f0] border-l-[#115746]"
               )} 
-              onClick={() => setSelected(p)}
+              onClick={() => { setSelected(p); setIsMobileDetailActive(true); }}
             >
               <div 
                 className="w-[38px] h-[38px] rounded-full flex items-center justify-center text-[12px] font-bold shrink-0"
@@ -71,10 +148,19 @@ export default function PatronsPage() {
 
         {/* Detail split */}
         {selected && (
-          <div className="flex-1 flex flex-col overflow-hidden bg-[#f9f9f9]">
+          <div className={cn(
+            "flex-1 flex flex-col overflow-hidden bg-[#f9f9f9]",
+            !isMobileDetailActive ? "hidden md:flex" : "flex"
+          )}>
             {/* Patron header */}
             <div className="bg-white border-b border-[#e8e8e8] p-[14px_20px] flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setIsMobileDetailActive(false)}
+                  className="md:hidden flex items-center gap-1 text-[13px] font-semibold text-[#115746] bg-transparent border-none cursor-pointer mr-1.5"
+                >
+                  ← Back
+                </button>
                 <div 
                   className="w-[42px] h-[42px] rounded-full flex items-center justify-center text-[14px] font-bold"
                   style={{ background: selected.avBg, color: selected.avColor }}
@@ -90,7 +176,7 @@ export default function PatronsPage() {
               </div>
             </div>
 
-            <div className="flex-1 grid grid-cols-[1fr_320px] overflow-hidden">
+            <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_320px] overflow-hidden">
               {/* Chat */}
               <div className="flex flex-col border-r border-[#e8e8e8] overflow-hidden">
                 <div className="p-[10px_16px] border-b border-[#f0f0f0] text-[11px] font-bold text-[#115746] uppercase tracking-wider bg-[#f9f9f9] shrink-0">
@@ -105,18 +191,41 @@ export default function PatronsPage() {
                         m.from === "admin" ? "items-end" : "items-start"
                       )}
                     >
-                      {i === 0 && <div className="text-[10px] text-[#aaa] mb-1 font-semibold">{m.from === "patron" ? selected.name : `Zart (you)`}</div>}
+                      {(i === 0 || messages[i - 1].from !== m.from) && (
+                        <div className="text-[10px] text-[#aaa] mb-1 mt-2 first:mt-0 font-semibold">
+                          {m.from === "patron" ? selected.name : "Zart (you)"}
+                        </div>
+                      )}
                       <div 
                         className={cn(
                           "max-w-[70%] p-[10px_14px] rounded-[12px] text-[13px] leading-normal",
-                          m.from === "patron" ? "bg-white text-[#1a1a1a] border border-[#e8e8e8] rounded-tl-[4px]" : "bg-[#115746] text-[#FDF4D7] rounded-tr-[4px]"
+                          m.from === "patron" ? "bg-white text-[#1a1a1a] border border-[#e8e8e8] rounded-tl-[4px]" : "bg-[#115746] text-[#FDF4D7] rounded-tr-[4px]",
+                          m.sending && "opacity-75"
                         )}
                       >
                         {m.text}
                       </div>
-                      <div className="text-[10px] text-[#bbb] mt-1">{m.time}</div>
+                      <div className="flex items-center gap-1 mt-1 text-[10px] text-[#bbb]">
+                        <span>{m.time}</span>
+                        {m.from === "admin" && (
+                          <span className="text-[9px] font-bold text-[#115746] ml-1">
+                            {m.sending ? "⚡ Sending..." : "✓✓"}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   ))}
+                  {typingPatronId === selected.id && (
+                    <div className="flex items-center gap-2 text-[11px] text-[#888] italic px-1 self-start mt-1">
+                      <div className="flex gap-0.5 items-center">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#bbb] animate-bounce [animation-delay:-0.3s]" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#bbb] animate-bounce [animation-delay:-0.15s]" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#bbb] animate-bounce" />
+                      </div>
+                      {selected.name} is typing...
+                    </div>
+                  )}
+                  <div ref={chatEndRef} />
                 </div>
                 <div className="p-[12px_16px] border-t border-[#e8e8e8] bg-white shrink-0">
                   <div className="flex gap-2 items-end">
@@ -134,7 +243,7 @@ export default function PatronsPage() {
               </div>
 
               {/* Info panel */}
-              <div className="p-4 overflow-y-auto bg-[#f9f9f9] flex flex-col gap-3">
+              <div className="hidden lg:flex p-4 overflow-y-auto bg-[#f9f9f9] flex-col gap-3">
                 <Card>
                   <CardHeader><CardTitle>Patron info</CardTitle></CardHeader>
                   <CardContent className="flex flex-col gap-2">

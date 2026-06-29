@@ -13,6 +13,7 @@ export function useAdminSignin() {
       // Assuming data is LoginData containing user and accessToken
       if (typeof window !== "undefined") {
         sessionStorage.setItem("zart_access_token", data.accessToken);
+        sessionStorage.setItem("zart_refresh_token", data.refreshToken);
       }
       queryClient.setQueryData(AUTH_QUERY_KEY, data.user);
       router.push("/dashboard/requests");

@@ -1,9 +1,4 @@
-export interface Category {
-  label: string;
-  pct: number;
-  jobs: number;
-  color: string;
-}
+import { Category, TopArtisan } from "@/types/reports";
 
 export const CATEGORIES: Category[] = [
   { label: "Plumbing",   pct: 72, jobs: 42, color: "#115746" },
@@ -14,16 +9,7 @@ export const CATEGORIES: Category[] = [
   { label: "Cleaning",   pct: 17, jobs: 10, color: "#EDB4CA" },
 ];
 
-export interface TopArtisan {
-  rank: number;
-  initials: string;
-  bg: string;
-  color: string;
-  name: string;
-  type: string;
-  jobs: number;
-  rating: number;
-}
+
 
 export const TOP_ARTISANS: TopArtisan[] = [
   { rank: 1, initials: "JM", bg: "#e8f5f0", color: "#115746", name: "John Mensah", type: "Plumber · Lekki", jobs: 12, rating: 4.9 },

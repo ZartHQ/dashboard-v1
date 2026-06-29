@@ -1,25 +1,4 @@
-export interface JobInfo {
-  title: string;
-  id: string;
-  status?: string;
-}
-
-export interface Patron {
-  id: number;
-  name: string;
-  initials: string;
-  avBg: string;
-  avColor: string;
-  preview: string;
-  time: string;
-  unread: boolean;
-  loc: string;
-  bookings: number;
-  joined: string;
-  spent: string;
-  activeJob: JobInfo | null;
-  pastJobs: JobInfo[];
-}
+import { JobInfo, Patron, Message } from "@/types/patrons";
 
 export const PATRONS: Patron[] = [
   { id: 1, name: "John Doe", initials: "JD", avBg: "#e8f5f0", avColor: "#115746", preview: "Thanks for the update!", time: "9:41 AM", unread: true, loc: "Lekki Phase 1", bookings: 8, joined: "March 2025", spent: "₦94,000", activeJob: { title: "Fix leaking sink", id: "ZRT-0042", status: "Pending" }, pastJobs: [{ title: "Toilet flush repair", id: "ZRT-0031" }, { title: "Bathroom tile grouting", id: "ZRT-0024" }] },
@@ -29,14 +8,32 @@ export const PATRONS: Patron[] = [
   { id: 5, name: "Grace Okonkwo", initials: "GO", avBg: "#e8f5e8", avColor: "#166534", preview: "Excellent service, thank you!", time: "2 days ago", unread: false, loc: "Lekki Phase 2", bookings: 6, joined: "January 2025", spent: "₦72,000", activeJob: null, pastJobs: [] },
 ];
 
-export interface Message {
-  from: 'patron' | 'admin';
-  text: string;
-  time: string;
-}
 
-export const INIT_MESSAGES: Message[] = [
-  { from: "patron", text: "Hi, I submitted a plumbing request this morning. Just checking if anyone has been assigned yet?", time: "9:30 AM" },
-  { from: "admin", text: "Hi John! Yes, we've reviewed your request. We're assigning John Mensah, one of our top-rated plumbers in Lekki. He'll reach out shortly to confirm timing.", time: "9:38 AM" },
-  { from: "patron", text: "Thanks for the update! What time should I expect him?", time: "9:41 AM" },
-];
+
+export const MOCK_PATRON_CHATS: Record<number, Message[]> = {
+  1: [
+    { from: "patron", text: "Hi, I submitted a plumbing request this morning. Just checking if anyone has been assigned yet?", time: "9:30 AM" },
+    { from: "admin", text: "Hi John! Yes, we've reviewed your request. We're assigning John Mensah, one of our top-rated plumbers in Lekki. He'll reach out shortly to confirm timing.", time: "9:38 AM" },
+    { from: "patron", text: "Thanks for the update!", time: "9:41 AM" },
+  ],
+  2: [
+    { from: "patron", text: "Hello, my ceiling fan is making a strange noise and needs to be replaced. I requested an electrician.", time: "8:30 AM" },
+    { from: "admin", text: "Hello Amaka. We have assigned Nkechi Kalu to your request. She is highly rated for electrical work.", time: "8:45 AM" },
+    { from: "patron", text: "What time will he arrive?", time: "8:50 AM" },
+  ],
+  3: [
+    { from: "patron", text: "Hi, the wardrobe door in my room won't close properly. Do you have a carpenter?", time: "Yesterday 2:00 PM" },
+    { from: "admin", text: "Hello Tunde, yes we do! Chidi Bosah will be with you shortly.", time: "Yesterday 2:15 PM" },
+    { from: "patron", text: "Job is done, very happy!", time: "Yesterday 3:30 PM" },
+  ],
+  4: [
+    { from: "patron", text: "Hi, I need painting services for my new office space in Surulere.", time: "Yesterday 4:00 PM" },
+    { from: "admin", text: "Hi Funke, we're currently sourcing the best painters in your area. We'll update you soon.", time: "Yesterday 4:30 PM" },
+    { from: "patron", text: "Okay, I'll wait to hear from you", time: "Yesterday 4:35 PM" },
+  ],
+  5: [
+    { from: "patron", text: "Hello, I need deep cleaning for my 3-bedroom apartment.", time: "2 days ago" },
+    { from: "admin", text: "Hi Grace, a cleaner has been assigned and is on their way.", time: "2 days ago" },
+    { from: "patron", text: "Excellent service, thank you!", time: "2 days ago" },
+  ],
+};

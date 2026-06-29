@@ -1,5 +1,7 @@
 // --- SHARED TYPES ---
 
+import { Admin } from "@/features/auth/admins";
+
 export interface ApiResponse<T> {
   success: boolean;
   message: string;
@@ -49,7 +51,7 @@ export interface Media {
 
 // --- AUTH TYPES ---
 
-export interface AuthUser extends BaseUser {}
+export interface AuthUser extends BaseUser { }
 
 export interface LoginData {
   accessToken: string;
@@ -87,7 +89,7 @@ export interface ArtisanType {
   description?: string | null;
 }
 
-export interface Patron extends BaseUser {}
+export interface Patron extends BaseUser { }
 
 export interface Artisan extends BaseUser {
   artisanType?: ArtisanType | null;
@@ -109,8 +111,9 @@ export interface ServiceRequest {
 
 export interface ServiceRequestNote {
   id: number;
-  content: string;
-  authorId: number;
+  admin: AdminProfile
+  note: string;
+  adminId: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -120,4 +123,5 @@ export interface ServiceRequestDetail extends ServiceRequest {
 }
 
 export type ServiceRequestListResponse = PaginatedApiResponse<ServiceRequest>;
+
 export type ServiceRequestDetailResponse = ApiResponse<ServiceRequestDetail>;

@@ -14,7 +14,10 @@ export const authApi = {
   },
 
   logout: async () => {
-    // Backend should handle session clearing (e.g. clearing cookies)
-    await api.post("/admin/logout").catch(() => {});
+    let refreshToken = "";
+    if (typeof window !== "undefined") {
+      refreshToken = sessionStorage.getItem("zart_refresh_token") || "";
+    }
+    await api.post("/auth/signout", { refreshToken }).catch(() => {});
   },
 };

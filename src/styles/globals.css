@@ -367,9 +367,11 @@ tr:hover td { background: #f9fffe; }
 
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
-  .sidebar { width: 100%; min-height: auto; position: relative; flex-direction: row; flex-wrap: wrap; }
-  .main { margin-left: 0; }
   .metrics { grid-template-columns: 1fr 1fr; }
-  .req-list { width: 100%; }
-  .workspace { flex-direction: column; }
 }
+
+@media (max-width: 480px) {
+  .metrics { grid-template-columns: 1fr; }
+  .content { padding: 16px; }
+}
+

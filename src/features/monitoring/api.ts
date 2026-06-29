@@ -1,4 +1,6 @@
-import { FLAGS, Flag } from "./constants";
+import { api } from "@/lib/api";
+import { FLAGS } from "./constants";
+import { Flag } from "@/types/monitoring";
 
 export interface QueueStats {
   waiting: number;
@@ -9,41 +11,53 @@ export interface QueueStats {
 }
 
 export interface QueueHealth {
-  status: 'ok' | 'error';
+  status: "ok" | "error";
   details?: string;
 }
 
 export const monitoringApi = {
   getStats: async (): Promise<QueueStats> => {
-    return new Promise((resolve) => setTimeout(() => resolve({
-      waiting: 42,
-      active: 12,
-      completed: 1250,
-      failed: 3,
-      delayed: 0
-    }), 500));
+    const response = await api.get<{
+      success: boolean;
+      data: {
+        emailQueue: QueueStats;
+      };
+    }>("/queues/stats");
+    return response.data.data.emailQueue;
   },
 
   getQueueHealth: async (): Promise<QueueHealth> => {
-    return new Promise((resolve) => setTimeout(() => resolve({
-      status: 'ok',
-      details: 'All queues operational'
-    }), 500));
+    const response = await api.get<{
+      success: boolean;
+      status: string;
+      data?: any;
+    }>("/queues/health");
+    return {
+      status: response.data.status === "healthy" ? "ok" : "error",
+      details: `Queue health: ${response.data.status}`,
+    };
   },
-  
+
   getSystemHealth: async (): Promise<{ status: string }> => {
-    return new Promise((resolve) => setTimeout(() => resolve({ status: 'healthy' }), 500));
+    const response = await api.get<{ status: string }>("/health");
+    return response.data;
   },
 
   getLiveHealth: async (): Promise<{ status: string }> => {
-    return new Promise((resolve) => setTimeout(() => resolve({ status: 'live' }), 500));
+    const response = await api.get<{ status: string }>("/health/live");
+    return response.data;
   },
-  
-  retryFailed: async () => {
-    return new Promise((resolve) => setTimeout(() => resolve({ success: true }), 800));
+
+  retryFailed: async (): Promise<{ success: boolean; message?: string }> => {
+    const response = await api.post<{
+      success: boolean;
+      message: string;
+      data: { retriedCount: number };
+    }>("/queues/retry-failed");
+    return response.data;
   },
-  
+
   getFlags: async (): Promise<Flag[]> => {
     return new Promise((resolve) => setTimeout(() => resolve(FLAGS), 500));
-  }
+  },
 };

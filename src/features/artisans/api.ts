@@ -1,11 +1,42 @@
 import { api } from "@/lib/api";
-import { ARTISANS, Artisan } from "./constants";
+import { Artisan } from "@/types/artisans";
+
+export interface GetArtisansParams {
+  page?: number;
+  limit?: number;
+  artisanTypeId?: number;
+  location?: string;
+  vettingStatus?: string;
+}
+
+export interface CreateArtisanInput {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  artisanTypeId: number;
+  operatingArea: string[];
+  skills: string[];
+}
 
 export const artisansApi = {
-  getArtisans: async (): Promise<Artisan[]> => {
-    // In real app: const response = await api.get("/artisans"); return response.data;
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(ARTISANS), 800);
-    });
+  getArtisans: async (params?: GetArtisansParams): Promise<Artisan[]> => {
+    const response = await api.get<any>("/admin/artisans", { params });
+    const rawData = Array.isArray(response.data.data)
+      ? response.data.data
+      : Array.isArray(response.data)
+        ? response.data
+        : [];
+    return rawData;
+  },
+
+  getArtisanById: async (id: number): Promise<any> => {
+    const response = await api.get(`/admin/artisans/${id}`);
+    return response.data.data;
+  },
+
+  createArtisan: async (data: CreateArtisanInput): Promise<any> => {
+    const response = await api.post("/admin/artisans", data);
+    return response.data.data;
   },
 };

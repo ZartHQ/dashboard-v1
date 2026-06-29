@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAdminProfile } from "./queries";
 import { authApi } from "./api";
+import { AdminProfile } from "@/types/api";
 
-export interface SessionAdmin {
-  id: number;
+export interface SessionAdmin extends AdminProfile {
   name: string;
   initials: string;
   role: string;
@@ -49,6 +49,7 @@ export async function clearSession() {
     if (typeof window !== "undefined") {
       sessionStorage.removeItem("zart_admin");
       sessionStorage.removeItem("zart_access_token");
+      sessionStorage.removeItem("zart_refresh_token");
       window.location.href = "/";
     }
   }

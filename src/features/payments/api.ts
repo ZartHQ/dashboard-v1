@@ -1,5 +1,6 @@
 import { api } from "@/lib/api";
-import { PAYMENTS, Payment } from "./constants";
+import { PAYMENTS } from "./constants";
+import { Payment } from "@/types/payments";
 
 export const paymentsApi = {
   getPayments: async (): Promise<Payment[]> => {

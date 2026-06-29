@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { artisansApi } from "./api";
+import { artisansApi, GetArtisansParams } from "./api";
 
-export function useArtisans() {
+export function useArtisans(params?: GetArtisansParams) {
   return useQuery({
-    queryKey: ["artisans"],
-    queryFn: artisansApi.getArtisans,
+    queryKey: ["admin", "artisans", params],
+    queryFn: () => artisansApi.getArtisans(params),
   });
 }
