@@ -1,6 +1,22 @@
-import { Artisan } from "@/types/artisans";
+export interface MockArtisan {
+  id: number;
+  name: string;
+  initials: string;
+  type: string;
+  loc: string;
+  phone: string;
+  status: string;
+  vetted: boolean;
+  jobs: number;
+  rating: number | null;
+  completion: number | null;
+  skills: string[];
+  warning?: string;
+  avBg: string;
+  avColor: string;
+}
 
-export const ARTISANS: Artisan[] = [
+export const ARTISANS: MockArtisan[] = [
   { id: 1, name: "John Mensah", initials: "JM", type: "Plumber", loc: "Lekki", phone: "0801 XXX XXXX", status: "online", vetted: true, jobs: 57, rating: 4.9, completion: 98, skills: ["Pipe fitting", "Sink repair", "Drainage", "Water heater"], avBg: "#e8f5f0", avColor: "#115746" },
   { id: 2, name: "Akin Kolade", initials: "AK", type: "Electrician", loc: "Victoria Island", phone: "0802 XXX XXXX", status: "online", vetted: true, jobs: 44, rating: 4.8, completion: 95, skills: ["Wiring", "Fan install", "Fuse board", "Inverter"], avBg: "#fff3e0", avColor: "#c2410c" },
   { id: 3, name: "Chidi Bosah", initials: "CB", type: "Carpenter", loc: "Ikeja", phone: "0809 XXX XXXX", status: "busy", vetted: true, jobs: 39, rating: 4.7, completion: 92, skills: ["Furniture", "Door fitting", "Wardrobes"], avBg: "#FDF4D7", avColor: "#8a6f00" },

@@ -1,7 +1,5 @@
 // --- SHARED TYPES ---
 
-import { Admin } from "@/features/auth/admins";
-
 export interface ApiResponse<T> {
   success: boolean;
   message: string;
@@ -107,6 +105,11 @@ export interface ServiceRequest {
   media: Media[];
   createdAt: string;
   updatedAt: string;
+  refrenceId: string;
+  patronId: number;
+  artisanTypeId: number;
+  artisanId: number;
+  address: string;
 }
 
 export interface ServiceRequestNote {

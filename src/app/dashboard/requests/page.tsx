@@ -213,7 +213,7 @@ export default function RequestsPage() {
                   <span className="text-[11px] text-[#888]">{r.patron?.firstName} {r.patron?.lastName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[11px] text-[#aaa]">📍 {r.patron?.homeAddress || "No location"}</span>
+                  <span className="text-[11px] text-[#aaa]">📍 {r.address}</span>
                   <span className="text-[11px] text-[#bbb]">{new Date(r.createdAt || Date.now()).toLocaleDateString()}</span>
                 </div>
               </div>
@@ -363,7 +363,7 @@ export default function RequestsPage() {
                     </div>
                     <div className="flex flex-col gap-1">
                       <div className="text-[11px] text-[#aaa] font-medium">Location</div>
-                      <div className="text-[13px] text-[#1a1a1a] font-semibold">{selected.patron?.homeAddress || "No location"}</div>
+                      <div className="text-[13px] text-[#1a1a1a] font-semibold">{selected.address}</div>
                     </div>
                     <div className="flex flex-col gap-1">
                       <div className="text-[11px] text-[#aaa] font-medium">Requested</div>

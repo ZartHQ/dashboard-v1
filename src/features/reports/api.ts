@@ -1,4 +1,3 @@
-import { api } from "@/lib/api";
 import { CATEGORIES, TOP_ARTISANS } from "./constants";
 import { Category, TopArtisan } from "@/types/reports";
 
