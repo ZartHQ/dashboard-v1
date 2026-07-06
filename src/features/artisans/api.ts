@@ -1,4 +1,5 @@
 import { api } from "@/lib/api";
+import { UpdateArtisanVettingStatusRequest } from "@/types/api";
 import { Artisan } from "@/types/artisans";
 
 export interface GetArtisansParams {
@@ -39,4 +40,9 @@ export const artisansApi = {
     const response = await api.post("/admin/artisans", data);
     return response.data.data;
   },
+
+  updateArtisanVettingStatus: async (id: number, data: UpdateArtisanVettingStatusRequest): Promise<any> => {
+    const response = await api.patch(`/admin/artisans/${id}/vetting-status`, data);
+    return response.data.data;
+  }
 };

@@ -7,3 +7,11 @@ export function usePatrons() {
     queryFn: patronsApi.getPatrons,
   });
 }
+
+export function usePatronDetail(id: number | null | undefined) {
+  return useQuery({
+    queryKey: ["patrons", id],
+    queryFn: () => (id ? patronsApi.getPatronById(id) : null),
+    enabled: !!id,
+  });
+}

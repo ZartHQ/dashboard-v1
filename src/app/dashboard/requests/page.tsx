@@ -2,7 +2,7 @@
 
 import { useState, ChangeEvent, useEffect } from "react";
 import { STATUS_LABELS } from "../../../features/requests/constants";
-import { useRequests, useRequestDetail } from "../../../features/requests/queries";
+import { useRequests, useRequestDetail, useRequestCounts } from "../../../features/requests/queries";
 import { useUpdateStatusMutation, useAssignArtisanMutation, useAddNoteMutation } from "../../../features/requests/mutations";
 import { useArtisans } from "../../../features/artisans/queries";
 import { ServiceRequestDetail, ServiceRequestNote, ServiceRequestStatus } from "@/types/api";
@@ -45,23 +45,29 @@ export default function RequestsPage() {
 
   const { data: selectedDetail, isLoading: isDetailLoading } = useRequestDetail(selectedId);
   const { data: artisansList } = useArtisans();
+  const { data: counts } = useRequestCounts();
   console.log(artisansList);
+
+  const getFilterCount = (f: string) => {
+    if (!counts) return 0;
+    return Number(counts[f]) || 0;
+  };
 
   const [note, setNote] = useState("");
   const [subtotal, setSubtotal] = useState(12000);
   const [selectedArtisanId, setSelectedArtisanId] = useState<string>("");
 
   const requestsList = requests?.data || [];
-  const selectedListItem = requestsList.find(r => r.id.toString() === selectedId) || requestsList[0] || null;
-  const selected = (selectedDetail || selectedListItem);
+  const selectedListItem = selectedId ? (requestsList.find(r => r.id.toString() === selectedId) || null) : null;
+  const selected = selectedId ? (selectedDetail || selectedListItem) : null;
 
   const [reqStatus, setReqStatus] = useState<ServiceRequestStatus>((selected?.status as ServiceRequestStatus) || "pending");
 
   useEffect(() => {
-    if (selectedDetail?.status) {
-      setReqStatus(selectedDetail.status as ServiceRequestStatus);
+    if (selected?.status) {
+      setReqStatus(selected.status as ServiceRequestStatus);
     }
-  }, [selectedDetail?.status]);
+  }, [selected?.id, selected?.status]);
 
   useEffect(() => {
     if (selected?.artisan?.id) {
@@ -134,21 +140,22 @@ export default function RequestsPage() {
                 filter === f && f === "assigned" && "bg-[#e8f5f0] text-[#115746] border-[#b2d8cc]",
                 filter === f && f === "in_progress" && "bg-[#fff5f2] text-[#FA4812] border-[#ffd4c7]",
                 filter === f && f === "completed" && "bg-[#f0fdf4] text-[#15803d] border-[#bbf7d0]",
-                filter === f && f === "cancelled" && "bg-[#ffe8e8] text-[#c41c1c] border-[#fecaca]"
+                filter === f && f === "cancelled" && "bg-[#f5f5f5] text-[#737373] border-[#e5e5e5]"
               )}
               onClick={() => setFilter(f)}
             >
-              {f === "all"
-                ? "All"
-                : f === "pending"
-                  ? "Pending"
-                  : f === "assigned"
-                    ? "Assigned"
-                    : f === "in_progress"
-                      ? "In progress"
-                      : f === "completed"
-                        ? "Completed"
-                        : "Cancelled"}
+              {`${f === "all"
+                  ? "All"
+                  : f === "pending"
+                    ? "Pending"
+                    : f === "assigned"
+                      ? "Assigned"
+                      : f === "in_progress"
+                        ? "In progress"
+                        : f === "completed"
+                          ? "Completed"
+                          : "Cancelled"
+                } (${getFilterCount(f)})`}
             </button>
           ))}
         </div>
@@ -536,9 +543,13 @@ export default function RequestsPage() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center bg-[#f9f9f9] text-[#bbb]">
-            <div className="text-[36px] mb-2">📋</div>
-            <div className="text-[14px]">Select a request to view details</div>
+          <div className="flex-1 flex flex-col items-center justify-center bg-[#f9f9f9] text-[#bbb] font-outfit p-6">
+            <img 
+              src="/zart-logo-green.svg" 
+              alt="Zart Logo" 
+              className="w-16 h-16 object-contain mb-4" 
+            />
+            <div className="text-[14px] font-semibold text-[#888] tracking-wide">Select a request to view details</div>
           </div>
         )}
       </div>

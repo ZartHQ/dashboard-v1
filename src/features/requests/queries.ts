@@ -15,3 +15,10 @@ export function useRequestDetail(id: string | null) {
     enabled: !!id,
   });
 }
+
+export function useRequestCounts() {
+  return useQuery({
+    queryKey: ["admin", "service-requests", "counts"],
+    queryFn: requestsApi.getRequestCountByStatus,
+  });
+}

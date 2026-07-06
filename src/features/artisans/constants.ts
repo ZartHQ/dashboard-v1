@@ -25,8 +25,10 @@ export const ARTISANS: MockArtisan[] = [
 ];
 
 export const STATUS_PILL: Record<string, { label: string; cls: string }> = {
-  online: { label: "Online", cls: "sp-online" },
-  busy: { label: "On a job", cls: "sp-busy" },
-  offline: { label: "Offline", cls: "sp-offline" },
+  pending: { label: "Pending", cls: "sp-offline" },
+  under_review: { label: "Under Review", cls: "sp-busy" },
+  requires_action: { label: "Action Required", cls: "sp-busy" },
+  approved: { label: "Approved", cls: "sp-online" },
+  rejected: { label: "Rejected", cls: "sp-suspended" },
   suspended: { label: "Suspended", cls: "sp-suspended" },
 };

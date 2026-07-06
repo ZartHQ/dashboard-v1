@@ -1,12 +1,17 @@
 import { api } from "@/lib/api";
-import { PATRONS } from "./constants";
 import { Patron } from "@/types/patrons";
 
 export const patronsApi = {
   getPatrons: async (): Promise<Patron[]> => {
-    // In real app: const response = await api.get("/patrons"); return response.data;
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(PATRONS), 800);
-    });
+    const response = await api.get("/admin/patrons");
+
+    console.log(response.data);
+    return response.data.data;
   },
+
+  getPatronById: async (id: number): Promise<Patron> => {
+    const response = await api.get(`/admin/patrons/${id}`);
+
+    return response.data.data;
+  }
 };

@@ -1,5 +1,12 @@
 import { ArtisanType, BaseUser } from "./api";
 
+export type VettingStatus = "pending" |
+  "under_review" |
+  "requires_action" |
+  "approved" |
+  "rejected" |
+  "suspended";
+
 export interface Artisan {
   id: number;
   artisanType: ArtisanType;
@@ -10,6 +17,6 @@ export interface Artisan {
   rating?: number;
   skills: string[];
   user: BaseUser;
-  vettingStatus: "pending" | "suspended" | "verified";
+  vettingStatus: VettingStatus;
   userId: number;
 }

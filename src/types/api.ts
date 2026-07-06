@@ -1,5 +1,7 @@
 // --- SHARED TYPES ---
 
+import { VettingStatus } from "./artisans";
+
 export interface ApiResponse<T> {
   success: boolean;
   message: string;
@@ -128,3 +130,8 @@ export interface ServiceRequestDetail extends ServiceRequest {
 export type ServiceRequestListResponse = PaginatedApiResponse<ServiceRequest>;
 
 export type ServiceRequestDetailResponse = ApiResponse<ServiceRequestDetail>;
+
+export interface UpdateArtisanVettingStatusRequest {
+  vettingStatus: VettingStatus;
+  note?: string;
+}

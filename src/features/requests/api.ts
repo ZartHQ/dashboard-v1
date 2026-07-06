@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import { ServiceRequest, ServiceRequestDetail, ServiceRequestListResponse, ServiceRequestDetailResponse } from "@/types/api";
+import { ServiceRequestDetail, ServiceRequestListResponse, ServiceRequestDetailResponse } from "@/types/api";
 
 export interface GetRequestsParams {
   status?: string;
@@ -34,4 +34,10 @@ export const requestsApi = {
     console.log(response.data);
     return response.data.data;
   },
+
+  getRequestCountByStatus: async (): Promise<any> => {
+    const response = await api.get(`admin/service-requests/counts`);
+    console.log(response, "<===");
+    return response.data.data;
+  }
 };

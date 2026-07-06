@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { STATUS_PILL } from "../../../features/artisans/constants";
 import { useArtisans } from "../../../features/artisans/queries";
-import { useCreateArtisanMutation } from "../../../features/artisans/mutations";
+import { useCreateArtisanMutation, useUpdateArtisanVettingStatusMutation } from "../../../features/artisans/mutations";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -15,7 +15,13 @@ export default function ArtisansPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [location, setLocation] = useState("all");
-  const [selectedTab, setSelectedTab] = useState<"all" | "online" | "pending" | "suspended">("all");
+  const [selectedTab, setSelectedTab] = useState<
+    "all" | "approved" | "pending" | "under_review" | "requires_action" | "suspended" | "rejected"
+  >("all");
+  const [viewingArtisan, setViewingArtisan] = useState<any>(null);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [newStatus, setNewStatus] = useState<string>("pending");
+  const [statusNote, setStatusNote] = useState("");
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,6 +34,19 @@ export default function ArtisansPage() {
   const [skills, setSkills] = useState("");
 
   const createArtisanMutation = useCreateArtisanMutation();
+  const updateVettingMutation = useUpdateArtisanVettingStatusMutation();
+
+  const handleUpdateVetting = (id: number, vettingStatus: any, note?: string) => {
+    updateVettingMutation.mutate({
+      id,
+      data: { vettingStatus, note: note || undefined }
+    }, {
+      onSuccess: () => {
+        setViewingArtisan((prev: any) => prev ? { ...prev, vettingStatus } : null);
+        setIsStatusModalOpen(false);
+      }
+    });
+  };
 
   const CATEGORY_MAP: Record<string, number> = {
     plumbing: 1,
@@ -37,9 +56,8 @@ export default function ArtisansPage() {
   };
 
   const getVettingStatus = () => {
-    if (selectedTab === "pending") return "pending";
-    if (selectedTab === "suspended") return "suspended";
-    return undefined;
+    if (selectedTab === "all") return undefined;
+    return selectedTab;
   };
 
   const { data: artisans, isLoading } = useArtisans({
@@ -88,18 +106,16 @@ export default function ArtisansPage() {
     return <PageLoader />;
   }
 
-  // Frontend filters for search and "online" tab status
+  // Frontend filters for search
   const filteredArtisans = (artisans || []).filter((a) => {
     const matchesSearch =
       !search ||
       a.user.firstName.toLowerCase().includes(search.toLowerCase()) ||
       a.user.lastName.toLowerCase().includes(search.toLowerCase()) ||
       a.artisanType.name.toLowerCase().includes(search.toLowerCase()) ||
-      a.operatingArea.includes(search.toLowerCase());
+      a.operatingArea.some((area: string) => area.toLowerCase().includes(search.toLowerCase()));
 
-    const matchesOnline = selectedTab !== "online" || a.vettingStatus === "verified";
-
-    return matchesSearch && matchesOnline;
+    return matchesSearch;
   });
 
   return (
@@ -147,16 +163,22 @@ export default function ArtisansPage() {
           </Select>
         </div>
 
-        <div className="chips" style={{ marginBottom: 18 }}>
-          {(["all", "online", "pending", "suspended"] as const).map((tab) => {
+        <div className="chips" style={{ marginBottom: 18, display: "flex", gap: 6, flexWrap: "wrap" }}>
+          {(["all", "approved", "pending", "under_review", "requires_action", "suspended", "rejected"] as const).map((tab) => {
             const label =
               tab === "all"
                 ? "All"
-                : tab === "online"
-                  ? "Online"
+                : tab === "approved"
+                  ? "Approved"
                   : tab === "pending"
-                    ? "Pending vetting"
-                    : "Suspended";
+                    ? "Pending"
+                    : tab === "under_review"
+                      ? "Under Review"
+                      : tab === "requires_action"
+                        ? "Action Required"
+                        : tab === "suspended"
+                          ? "Suspended"
+                          : "Rejected";
             return (
               <button
                 key={tab}
@@ -176,7 +198,7 @@ export default function ArtisansPage() {
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 14 }}>
             {filteredArtisans.map((a) => (
-              <Card key={a.id} className="flex flex-col" style={{ opacity: a.vettingStatus === "suspended" ? 0.65 : 1 }}>
+              <Card key={a.id} className="flex flex-col" style={{ opacity: (a.vettingStatus === "suspended" || a.vettingStatus === "rejected") ? 0.65 : 1 }}>
                 <div
                   style={{
                     padding: 16,
@@ -215,7 +237,7 @@ export default function ArtisansPage() {
                       }}
                     >
                       {a.user.firstName} {a.user.lastName}
-                      {a.vettingStatus === "verified" && (
+                      {a.vettingStatus === "approved" && (
                         <Badge variant="vetted" className="ml-1.5">
                           Vetted
                         </Badge>
@@ -280,23 +302,25 @@ export default function ArtisansPage() {
                   </div>
                 </CardContent>
                 <div style={{ padding: "10px 16px", borderTop: "1px solid #f0f0f0", display: "flex", gap: 8 }}>
-                  <Button variant="outline" className="flex-1 text-xs">
-                    📞 Call
+                  <Button 
+                    variant="outline" 
+                    className="w-10 h-8 p-0 flex items-center justify-center text-xs shrink-0"
+                    onClick={() => a.user.phone && window.open(`tel:${a.user.phone}`)}
+                  >
+                    📞
                   </Button>
-                  {a.vettingStatus === "suspended" ? (
-                    <Button className="flex-1 text-xs border-[1.5px] border-[#22c55e] text-[#166534] bg-[#f0fdf4]">
-                      Reinstate
-                    </Button>
-                  ) : a.vettingStatus === "pending" ? (
-                    <Button variant="outline" className="flex-1 text-xs">
-                      Approve
-                    </Button>
-                  ) : (
-                    <Button variant="wa" className="flex-1 text-xs">
-                      💬 WhatsApp
-                    </Button>
-                  )}
-                  <Button variant="plain" className="flex-1 text-xs">
+                  <Button 
+                    variant="wa" 
+                    className="w-10 h-8 p-0 flex items-center justify-center text-xs shrink-0"
+                    onClick={() => a.user.phone && window.open(`https://wa.me/${a.user.phone.replace(/[^0-9]/g, "")}`)}
+                  >
+                    💬
+                  </Button>
+                  <Button 
+                    variant="primary" 
+                    className="flex-1 h-8 text-xs font-bold uppercase tracking-wider"
+                    onClick={() => setViewingArtisan(a)}
+                  >
                     View profile
                   </Button>
                 </div>
@@ -414,6 +438,257 @@ export default function ArtisansPage() {
                 </Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Artisan Profile Details Drawer */}
+      {viewingArtisan && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
+            display: "flex",
+            justifyContent: "flex-end",
+            zIndex: 1000,
+            backdropFilter: "blur(4px)",
+          }}
+          onClick={() => setViewingArtisan(null)}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              width: "440px",
+              height: "100%",
+              padding: "30px 24px",
+              boxShadow: "-10px 0 25px -5px rgba(0, 0, 0, 0.1)",
+              display: "flex",
+              flexDirection: "column",
+              fontFamily: "Outfit, sans-serif",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+              <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 700, color: "#115746" }}>Artisan Profile</h3>
+              <button
+                onClick={() => setViewingArtisan(null)}
+                style={{
+                  border: "none",
+                  background: "transparent",
+                  fontSize: "20px",
+                  cursor: "pointer",
+                  color: "#aaa",
+                  padding: "4px",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Profile Summary Card */}
+            <div style={{ display: "flex", alignItems: "center", gap: "16px", background: "#f9f9f9", padding: "16px", borderRadius: "12px", border: "1px solid #f0f0f0", marginBottom: "20px" }}>
+              <div
+                style={{
+                  width: "56px",
+                  height: "56px",
+                  borderRadius: "50%",
+                  background: "#115746",
+                  color: "#FDF4D7",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "18px",
+                  fontWeight: 700,
+                }}
+              >
+                {viewingArtisan.user.firstName[0]}{viewingArtisan.user.lastName[0]}
+              </div>
+              <div>
+                <div style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a" }}>
+                  {viewingArtisan.user.firstName} {viewingArtisan.user.lastName}
+                </div>
+                <div style={{ fontSize: "13px", color: "#888", marginTop: "2px" }}>
+                  {viewingArtisan.artisanType.name}
+                </div>
+              </div>
+            </div>
+
+            {/* Stats grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "24px" }}>
+              <div style={{ background: "#e8f5f0", padding: "12px", borderRadius: "10px", textAlign: "center", border: "1px solid #b2d8cc" }}>
+                <div style={{ fontSize: "22px", fontWeight: 700, color: "#115746" }}>{viewingArtisan.jobsDone}</div>
+                <div style={{ fontSize: "11px", color: "#115746", fontWeight: 500, marginTop: "2px" }}>Jobs Completed</div>
+              </div>
+              <div style={{ background: "#fff9e6", padding: "12px", borderRadius: "10px", textAlign: "center", border: "1px solid #ffe082" }}>
+                <div style={{ fontSize: "22px", fontWeight: 700, color: "#b27b00" }}>★ {viewingArtisan.rating ?? "—"}</div>
+                <div style={{ fontSize: "11px", color: "#8a6f00", fontWeight: 500, marginTop: "2px" }}>Rating</div>
+              </div>
+            </div>
+
+            {/* Details Section */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px", flex: 1, overflowY: "auto", paddingRight: "4px" }}>
+              <div>
+                <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#aaa", fontWeight: 600, letterSpacing: "0.5px", marginBottom: "6px" }}>Contact Information</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <div style={{ fontSize: "13px", color: "#333" }}>📞 <strong>Phone:</strong> {viewingArtisan.user.phone}</div>
+                  <div style={{ fontSize: "13px", color: "#333" }}>✉️ <strong>Email:</strong> {viewingArtisan.user.email}</div>
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#aaa", fontWeight: 600, letterSpacing: "0.5px", marginBottom: "6px" }}>Service Locations</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                  {viewingArtisan.operatingArea.map((loc: string) => (
+                    <span key={loc} style={{ fontSize: "12px", background: "#f0f0f0", color: "#555", padding: "4px 10px", borderRadius: "20px", fontWeight: 500 }}>
+                      {loc}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#aaa", fontWeight: 600, letterSpacing: "0.5px", marginBottom: "6px" }}>Skills & Specialties</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                  {viewingArtisan.skills.map((skill: string) => (
+                    <span key={skill} style={{ fontSize: "12px", background: "#FDF4D7", color: "#8a6f00", border: "1px solid #e8d98a", padding: "4px 10px", borderRadius: "6px", fontWeight: 500 }}>
+                      {skill}
+                    </span>
+                  ))}
+                  {viewingArtisan.skills.length === 0 && (
+                    <span style={{ fontSize: "12px", color: "#aaa", fontStyle: "italic" }}>No specific skills specified</span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#aaa", fontWeight: 600, letterSpacing: "0.5px", marginBottom: "6px" }}>Operational Status</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
+                    <span className={`sp ${STATUS_PILL[viewingArtisan.vettingStatus]?.cls || "sp-offline"}`}>
+                      {STATUS_PILL[viewingArtisan.vettingStatus]?.label || viewingArtisan.vettingStatus}
+                    </span>
+                    <span style={{ fontSize: "11px", color: "#aaa" }}>Joined: {new Date(viewingArtisan.createdAt).toLocaleDateString()}</span>
+                  </div>
+
+                  {/* Vetting Management Button */}
+                  <Button 
+                    variant="outline" 
+                    className="w-full text-xs font-bold uppercase tracking-wider mt-2.5"
+                    onClick={() => {
+                      setNewStatus(viewingArtisan.vettingStatus);
+                      setStatusNote("");
+                      setIsStatusModalOpen(true);
+                    }}
+                  >
+                    ✏️ Update vetting status
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer Actions */}
+            <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "16px", marginTop: "16px", display: "flex", gap: "10px" }}>
+              <Button variant="outline" className="flex-1" onClick={() => window.open(`tel:${viewingArtisan.user.phone}`)}>
+                📞 Call Artisan
+              </Button>
+              <Button variant="wa" className="flex-1" onClick={() => window.open(`https://wa.me/${viewingArtisan.user.phone.replace(/[^0-9]/g, "")}`)}>
+                💬 WhatsApp
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Vetting Status Update Modal */}
+      {isStatusModalOpen && viewingArtisan && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1100,
+            backdropFilter: "blur(4px)",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              borderRadius: "16px",
+              width: "400px",
+              padding: "24px",
+              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+              background: "#ffffff",
+              border: "1px solid #e8e8e8",
+              fontFamily: "Outfit, sans-serif",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
+              <h3 style={{ margin: 0, fontSize: "18px", fontWeight: 700, color: "#115746" }}>Update Vetting Status</h3>
+              <button
+                onClick={() => setIsStatusModalOpen(false)}
+                style={{
+                  border: "none",
+                  background: "transparent",
+                  fontSize: "18px",
+                  cursor: "pointer",
+                  color: "#aaa",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              <div style={{ fontSize: "13px", color: "#666" }}>
+                Updating vetting status for <strong>{viewingArtisan.user.firstName} {viewingArtisan.user.lastName}</strong>
+              </div>
+
+              <div>
+                <label style={{ fontSize: "11px", color: "#888", fontWeight: 600, display: "block", marginBottom: "6px" }}>
+                  Select Status
+                </label>
+                <Select value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
+                  <option value="pending">Pending</option>
+                  <option value="under_review">Under Review</option>
+                  <option value="requires_action">Action Required</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="suspended">Suspended</option>
+                </Select>
+              </div>
+
+              <div>
+                <label style={{ fontSize: "11px", color: "#888", fontWeight: 600, display: "block", marginBottom: "6px" }}>
+                  Notes (Optional)
+                </label>
+                <textarea
+                  value={statusNote}
+                  onChange={(e) => setStatusNote(e.target.value)}
+                  placeholder="Reason for change, next steps, or feedback..."
+                  className="w-full bg-[#f9f9f9] border-[1.5px] border-[#e0e0e0] rounded-lg p-[10px_12px] text-[13px] text-[#333] font-outfit resize-none h-[80px] focus:outline-none focus:border-[#115746]"
+                />
+              </div>
+
+              <div style={{ display: "flex", gap: "10px", marginTop: "10px", justifyContent: "end" }}>
+                <Button variant="outline" type="button" onClick={() => setIsStatusModalOpen(false)} disabled={updateVettingMutation.isPending}>
+                  Cancel
+                </Button>
+                <Button 
+                  variant="primary" 
+                  onClick={() => {
+                    handleUpdateVetting(viewingArtisan.id, newStatus, statusNote);
+                  }}
+                  isLoading={updateVettingMutation.isPending}
+                >
+                  Update Status
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )}
