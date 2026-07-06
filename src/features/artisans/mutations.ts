@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { artisansApi } from "./api";
-import { UpdateArtisanVettingStatusRequest } from "@/types/api";
+import { UpdateArtisanVettingStatusRequest } from "@/types";
 
 export function useCreateArtisanMutation() {
   const queryClient = useQueryClient();

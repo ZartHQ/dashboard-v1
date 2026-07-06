@@ -1,4 +1,4 @@
-import { FlagPerson, Flag } from "@/types/monitoring";
+import { FlagPerson, Flag } from "@/types";
 
 export const FLAGS: Flag[] = [
   { id: 1, title: "Off-platform solicitation", sub: "Job #ZRT-0038 · Wiring repair · Surulere", priority: "high", status: "open", time: "2h ago", desc: "Artisan Emeka Eze sent a message asking patron Grace Okonkwo to complete the transaction outside Zart via WhatsApp, offering a discount. Auto-detected by keyword scan. Conversation is preserved as evidence.", artisan: { initials: "EE", bg: "#ffe8e8", color: "#c41c1c", name: "Emeka Eze" }, patron: { initials: "GO", bg: "#e8f5e8", color: "#166534", name: "Grace Okonkwo" }, actions: ["View chat", "Suspend Emeka", "Mark resolved", "Dismiss"] },

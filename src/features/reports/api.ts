@@ -1,5 +1,5 @@
 import { CATEGORIES, TOP_ARTISANS } from "./constants";
-import { Category, TopArtisan } from "@/types/reports";
+import { Category, TopArtisan } from "@/types";
 
 export interface ReportsData {
   categories: Category[];

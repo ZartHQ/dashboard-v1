@@ -1,4 +1,4 @@
-import { Payment } from "@/types/payments";
+import { Payment } from "@/types";
 
 export const PAYMENTS: Payment[] = [
   { id: "ZRT-0042", job: "Fix leaking sink", patron: "John Doe", artisan: "John Mensah", amount: 15000, fee: 1200, status: "invoiced", date: "Today" },

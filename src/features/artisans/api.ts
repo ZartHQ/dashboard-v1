@@ -1,6 +1,5 @@
 import { api } from "@/lib/api";
-import { UpdateArtisanVettingStatusRequest } from "@/types/api";
-import { Artisan } from "@/types/artisans";
+import { UpdateArtisanVettingStatusRequest, Artisan } from "@/types";
 
 export interface GetArtisansParams {
   page?: number;

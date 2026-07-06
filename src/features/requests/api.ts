@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import { ServiceRequestDetail, ServiceRequestListResponse, ServiceRequestDetailResponse } from "@/types/api";
+import { ServiceRequestDetail, ServiceRequestListResponse, ServiceRequestDetailResponse } from "@/types";
 
 export interface GetRequestsParams {
   status?: string;

@@ -1,6 +1,6 @@
 import { api } from "@/lib/api";
 import { LoginInput } from "./schemas";
-import { LoginResponse, AdminProfileResponse, AdminProfile, LoginData } from "@/types/api";
+import { LoginResponse, AdminProfileResponse, AdminProfile, LoginData } from "@/types";
 
 export const authApi = {
   signin: async (data: LoginInput): Promise<LoginData> => {

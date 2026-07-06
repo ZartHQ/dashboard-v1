@@ -1,4 +1,4 @@
-import { Category, TopArtisan } from "@/types/reports";
+import { Category, TopArtisan } from "@/types";
 
 export const CATEGORIES: Category[] = [
   { label: "Plumbing",   pct: 72, jobs: 42, color: "#115746" },

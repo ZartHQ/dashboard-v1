@@ -1,4 +1,4 @@
-import { JobInfo, Patron, Message } from "@/types/patrons";
+import { JobInfo, Patron, Message } from "@/features/patrons/types";
 
 export const PATRONS: Patron[] = [
   { id: 1, name: "John Doe", initials: "JD", avBg: "#e8f5f0", avColor: "#115746", preview: "Thanks for the update!", time: "9:41 AM", unread: true, loc: "Lekki Phase 1", bookings: 8, joined: "March 2025", spent: "₦94,000", activeJob: { title: "Fix leaking sink", id: "ZRT-0042", status: "Pending" }, pastJobs: [{ title: "Toilet flush repair", id: "ZRT-0031" }, { title: "Bathroom tile grouting", id: "ZRT-0024" }] },

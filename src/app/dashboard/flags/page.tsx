@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/PageLoader";
+import { Flag, FlagPerson } from "@/types";
 
 export default function FlagsPage() {
   const { data: flags, isLoading: isFlagsLoading } = useFlags();
@@ -64,7 +65,7 @@ export default function FlagsPage() {
         </div>
         
         <div className="flex flex-col gap-3.5">
-          {(Array.isArray(flags) ? flags : [])?.map((f: any) => (
+          {(Array.isArray(flags) ? (flags as Flag[]) : [])?.map((f: Flag) => (
             <Card key={f.id} className={cn(f.priority === "high" && "border-[#FA4812]")}>
               <div className={cn("p-[14px_18px] border-b border-[#f0f0f0] flex items-center justify-between", f.priority === "high" && "bg-[#fff8f6]")}>
                 <div className="flex items-center gap-3">
@@ -87,7 +88,7 @@ export default function FlagsPage() {
               <div className="p-[16px_18px] flex gap-5 items-start">
                 <p className="text-[13px] text-[#555] leading-relaxed flex-1">{f.desc}</p>
                 <div className="flex gap-5 shrink-0">
-                  {[f.artisan, f.patron].map((p: any, i: number) => (
+                  {[f.artisan, f.patron].map((p: FlagPerson, i: number) => (
                     <div key={i} className="text-center">
                       <div 
                         className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-bold text-white mb-1.5 mx-auto"

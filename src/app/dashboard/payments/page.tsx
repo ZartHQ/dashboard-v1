@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/PageLoader";
 
 export default function PaymentsPage() {
@@ -80,10 +80,10 @@ export default function PaymentsPage() {
                     <td className="p-[12px_16px] border-b border-[#f8f8f8] align-middle text-[13px] text-[#1a1a1a] group-last:border-none">{p.patron}</td>
                     <td className="p-[12px_16px] border-b border-[#f8f8f8] align-middle text-[13px] text-[#1a1a1a] group-last:border-none">{p.artisan}</td>
                     <td className="p-[12px_16px] border-b border-[#f8f8f8] align-middle group-last:border-none">
-                      <div className="font-bold text-[#115746]">₦{p.amount.toLocaleString()}</div>
+                      <div className="font-bold text-[#115746]">{formatCurrency(p.amount)}</div>
                     </td>
                     <td className="p-[12px_16px] border-b border-[#f8f8f8] align-middle group-last:border-none">
-                      <div className="text-[11px] text-[#FA4812] font-medium">{p.fee ? `₦${p.fee.toLocaleString()}` : "—"}</div>
+                      <div className="text-[11px] text-[#FA4812] font-medium">{p.fee ? formatCurrency(p.fee) : "—"}</div>
                     </td>
                     <td className="p-[12px_16px] border-b border-[#f8f8f8] align-middle group-last:border-none">
                       <Badge variant={p.status as any}>{BADGE[p.status].label}</Badge>

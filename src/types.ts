@@ -1,7 +1,5 @@
 // --- SHARED TYPES ---
 
-import { VettingStatus } from "./artisans";
-
 export interface ApiResponse<T> {
   success: boolean;
   message: string;
@@ -91,7 +89,7 @@ export interface ArtisanType {
 
 export interface Patron extends BaseUser { }
 
-export interface Artisan extends BaseUser {
+export interface ArtisanUser extends BaseUser {
   artisanType?: ArtisanType | null;
   rating?: number | null;
 }
@@ -103,7 +101,7 @@ export interface ServiceRequest {
   status: ServiceRequestStatus;
   artisanType: ArtisanType;
   patron: Patron;
-  artisan: Artisan | null;
+  artisan: ArtisanUser | null;
   media: Media[];
   createdAt: string;
   updatedAt: string;
@@ -134,4 +132,106 @@ export type ServiceRequestDetailResponse = ApiResponse<ServiceRequestDetail>;
 export interface UpdateArtisanVettingStatusRequest {
   vettingStatus: VettingStatus;
   note?: string;
+}
+
+// --- ADDITIONAL API & DB TYPES ---
+
+export type VettingStatus = "pending" |
+  "under_review" |
+  "requires_action" |
+  "approved" |
+  "rejected" |
+  "suspended";
+
+export interface Artisan {
+  id: number;
+  artisanType: ArtisanType;
+  jobsDone: number;
+  artisanTypeId: number;
+  createdAt: string;
+  operatingArea: string[];
+  rating?: number;
+  skills: string[];
+  user: BaseUser;
+  vettingStatus: VettingStatus;
+  userId: number;
+}
+
+export interface JobInfo {
+  title: string;
+  id: string;
+  status?: string;
+}
+
+export interface DbPatron {
+  id: number;
+  firstName?: string;
+  lastName?: string;
+  name?: string;
+  email?: string;
+  initials?: string;
+  phone?: string | null;
+  createdAt?: string;
+  totalSpent?: number;
+  bookingsCount?: number;
+  preview?: string;
+  time?: string;
+  unread?: boolean;
+  activeJob?: JobInfo | null;
+  pastJobs?: JobInfo[];
+  avBg?: string;
+  avColor?: string;
+  loc?: string;
+  bookings?: number;
+  joined?: string;
+  spent?: string;
+}
+
+export interface FlagPerson {
+  initials: string;
+  bg: string;
+  color: string;
+  name: string;
+}
+
+export interface Flag {
+  id: number;
+  title: string;
+  sub: string;
+  priority: "high" | "medium" | "low";
+  status: string;
+  time: string;
+  desc: string;
+  artisan: FlagPerson;
+  patron: FlagPerson;
+  actions: string[];
+}
+
+export interface Payment {
+  id: string;
+  job: string;
+  patron: string;
+  artisan: string;
+  amount: number;
+  fee: number | null;
+  status: "paid" | "pending" | "disputed" | "invoiced" | "refunded";
+  date: string;
+}
+
+export interface Category {
+  label: string;
+  pct: number;
+  jobs: number;
+  color: string;
+}
+
+export interface TopArtisan {
+  rank: number;
+  initials: string;
+  bg: string;
+  color: string;
+  name: string;
+  type: string;
+  jobs: number;
+  rating: number;
 }

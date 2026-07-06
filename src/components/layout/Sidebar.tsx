@@ -34,6 +34,12 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
 
   const navItems = [
     { 
+      href: "/dashboard", 
+      label: "Dashboard", 
+      icon: "🏠", 
+      section: "Overview" 
+    },
+    { 
       href: "/dashboard/requests", 
       label: "Requests", 
       icon: "📋", 

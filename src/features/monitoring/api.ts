@@ -1,6 +1,6 @@
 import { api } from "@/lib/api";
 import { FLAGS } from "./constants";
-import { Flag } from "@/types/monitoring";
+import { Flag } from "@/types";
 
 export interface QueueStats {
   waiting: number;

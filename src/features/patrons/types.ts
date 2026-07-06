@@ -1,8 +1,6 @@
-export interface JobInfo {
-  title: string;
-  id: string;
-  status?: string;
-}
+import { JobInfo } from "@/types";
+export type { JobInfo };
+
 
 export interface Patron {
   id: number;

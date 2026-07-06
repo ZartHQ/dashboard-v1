@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAdminProfile } from "./queries";
 import { authApi } from "./api";
-import { AdminProfile } from "@/types/api";
+import { AdminProfile } from "@/types";
 
 export interface SessionAdmin extends AdminProfile {
   name: string;
