@@ -24,23 +24,37 @@ export function ArtisanCard({ artisan: a, setViewingArtisan }: ArtisanCardProps)
           borderBottom: "1px solid #f0f0f0",
         }}
       >
-        <div
-          style={{
-            width: 46,
-            height: 46,
-            borderRadius: "50%",
-            background: "#e8f5f0",
-            color: "#115746",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 14,
-            fontWeight: 700,
-            flexShrink: 0,
-          }}
-        >
-          {a.user.firstName[0]}{a.user.lastName[0]}
-        </div>
+        {a.user.image ? (
+          <img
+            src={a.user.image}
+            alt={`${a.user.firstName} ${a.user.lastName}`}
+            style={{
+              width: 46,
+              height: 46,
+              borderRadius: "50%",
+              objectFit: "cover",
+              flexShrink: 0,
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: 46,
+              height: 46,
+              borderRadius: "50%",
+              background: "#e8f5f0",
+              color: "#115746",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 14,
+              fontWeight: 700,
+              flexShrink: 0,
+            }}
+          >
+            {a.user.firstName[0] || ""}{a.user.lastName[0] || ""}
+          </div>
+        )}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{

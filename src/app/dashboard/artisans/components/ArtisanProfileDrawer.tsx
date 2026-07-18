@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/Button";
 import { STATUS_PILL } from "../../../../features/artisans/constants";
 import { formatDate } from "@/lib/utils";
 import { Artisan, VettingStatus } from "@/types";
+import { useUpdateArtisanMutation } from "../../../../features/artisans/mutations";
+import { ArtisanImageUpload } from "./ArtisanImageUpload";
 
 interface ArtisanProfileDrawerProps {
   viewingArtisan: Artisan | null;
@@ -21,7 +23,29 @@ export function ArtisanProfileDrawer({
   setStatusNote,
   setIsStatusModalOpen,
 }: ArtisanProfileDrawerProps) {
+  const updateArtisanMutation = useUpdateArtisanMutation();
+
   if (!viewingArtisan) return null;
+
+  const handleUpdateImage = (newImage: string | null) => {
+    updateArtisanMutation.mutate(
+      {
+        id: viewingArtisan.id,
+        data: { image: newImage || "" },
+      },
+      {
+        onSuccess: () => {
+          setViewingArtisan({
+            ...viewingArtisan,
+            user: {
+              ...viewingArtisan.user,
+              image: newImage,
+            },
+          });
+        },
+      }
+    );
+  };
 
   return (
     <div
@@ -68,22 +92,14 @@ export function ArtisanProfileDrawer({
         </div>
 
         {/* Profile Summary Card */}
-        <div style={{ display: "flex", alignItems: "center", gap: "16px", background: "#f9f9f9", padding: "16px", borderRadius: "12px", border: "1px solid #f0f0f0", marginBottom: "20px" }}>
-          <div
-            style={{
-              width: "56px",
-              height: "56px",
-              borderRadius: "50%",
-              background: "#115746",
-              color: "#FDF4D7",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "18px",
-              fontWeight: 700,
-            }}
-          >
-            {viewingArtisan.user.firstName[0]}{viewingArtisan.user.lastName[0]}
+        <div style={{ display: "flex", alignItems: "center", gap: "20px", background: "#f9f9f9", padding: "16px", borderRadius: "12px", border: "1px solid #f0f0f0", marginBottom: "20px" }}>
+          <div style={{ flexShrink: 0 }}>
+            <ArtisanImageUpload
+              value={viewingArtisan.user.image || null}
+              onChange={handleUpdateImage}
+              firstName={viewingArtisan.user.firstName}
+              lastName={viewingArtisan.user.lastName}
+            />
           </div>
           <div>
             <div style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a" }}>
@@ -92,6 +108,11 @@ export function ArtisanProfileDrawer({
             <div style={{ fontSize: "13px", color: "#888", marginTop: "2px" }}>
               {viewingArtisan.artisanType.name}
             </div>
+            {updateArtisanMutation.isPending && (
+              <div style={{ fontSize: "11px", color: "#115746", fontWeight: 500, marginTop: "4px" }}>
+                Updating photo...
+              </div>
+            )}
           </div>
         </div>
 

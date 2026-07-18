@@ -108,6 +108,7 @@ export interface ServiceRequest {
   refrenceId: string;
   patronId: number;
   artisanTypeId: number;
+  scheduledAt: string;
   artisanId: number;
   address: string;
 }
@@ -234,4 +235,38 @@ export interface TopArtisan {
   type: string;
   jobs: number;
   rating: number;
+}
+
+export interface InvoiceItem {
+  description: string;
+  qty: number;
+  unitPrice: number;
+}
+
+export interface Invoice {
+  id: number;
+  description: string;
+  discount: string | number;
+  discountAmount?: number;
+  items: InvoiceItem[];
+  subtotal: number;
+  fee?: number;
+  serviceFeeAmount?: number;
+  serviceFeePct?: string;
+  total: number;
+  status: "draft" | "sent" | "paid";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateInvoiceDto {
+  description: string;
+  discount?: number;
+  items: InvoiceItem[];
+}
+
+export interface UpdateInvoiceDto {
+  description?: string;
+  discount?: number;
+  items?: InvoiceItem[];
 }

@@ -22,3 +22,12 @@ export function useRequestCounts() {
     queryFn: requestsApi.getRequestCountByStatus,
   });
 }
+
+export function useRequestInvoice(requestId: string | null) {
+  return useQuery({
+    queryKey: ["admin", "service-requests", requestId, "invoice"],
+    queryFn: () => (requestId ? requestsApi.getInvoice(requestId) : null),
+    enabled: !!requestId,
+    retry: false,
+  });
+}

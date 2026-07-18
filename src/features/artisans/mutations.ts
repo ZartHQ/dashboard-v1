@@ -24,3 +24,14 @@ export function useUpdateArtisanVettingStatusMutation() {
     },
   });
 }
+
+export function useUpdateArtisanMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) => artisansApi.updateArtisan(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "artisans"] });
+    },
+  });
+}

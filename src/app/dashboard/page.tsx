@@ -9,7 +9,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PageLoader } from "@/components/ui/PageLoader";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, formatDate, formatDateTime } from "@/lib/utils";
 import { ServiceRequest } from "@/types";
 
 // Custom SVG Icons
@@ -153,8 +153,18 @@ export default function DashboardPage() {
                         <div className="text-[13px] font-bold text-[#1a1a1a] truncate">
                           {req.artisanType?.name || "Service Request"}
                         </div>
-                        <div className="text-[11px] text-[#aaa]">
-                          Patron: <strong className="text-[#666]">{req.patron?.firstName} {req.patron?.lastName}</strong> · Location: <strong className="text-[#666]">{req.address}</strong>
+                        <div className="text-[11px] text-[#aaa] flex flex-wrap items-center gap-1.5 mt-0.5">
+                          <span>Patron: <strong className="text-[#666]">{req.patron?.firstName} {req.patron?.lastName}</strong></span>
+                          <span>·</span>
+                          <span>Location: <strong className="text-[#666]">{req.address}</strong></span>
+                          {req.scheduledAt && (
+                            <>
+                              <span>·</span>
+                              <span className="text-[#1e5a8e] font-semibold bg-[#e0f0ff] border border-[#b3d7f7] px-1.5 py-0.5 rounded-[4px] font-outfit">
+                                📅 {formatDateTime(req.scheduledAt)}
+                              </span>
+                            </>
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center gap-3 shrink-0">

@@ -26,3 +26,15 @@ export function formatDate(date: string | Date): string {
     year: "numeric",
   });
 }
+
+/** Format date and time */
+export function formatDateTime(date: string | Date): string {
+  return new Date(date).toLocaleString("en-NG", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}

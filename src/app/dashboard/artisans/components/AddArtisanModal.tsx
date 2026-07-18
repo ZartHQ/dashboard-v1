@@ -4,6 +4,7 @@ import React, { FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { ArtisanImageUpload } from "./ArtisanImageUpload";
 
 interface AddArtisanModalProps {
   isModalOpen: boolean;
@@ -22,6 +23,8 @@ interface AddArtisanModalProps {
   setOperatingArea: (val: string) => void;
   skills: string;
   setSkills: (val: string) => void;
+  image: string | null;
+  setImage: (val: string | null) => void;
   handleCreateArtisan: (e: FormEvent) => void;
   isPending: boolean;
 }
@@ -43,6 +46,8 @@ export function AddArtisanModal({
   setOperatingArea,
   skills,
   setSkills,
+  image,
+  setImage,
   handleCreateArtisan,
   isPending,
 }: AddArtisanModalProps) {
@@ -91,6 +96,13 @@ export function AddArtisanModal({
         </div>
 
         <form onSubmit={handleCreateArtisan} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+          <ArtisanImageUpload
+            value={image}
+            onChange={setImage}
+            firstName={firstName}
+            lastName={lastName}
+          />
+
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
             <div>
               <label style={{ fontSize: "11px", color: "#888", fontWeight: 600, display: "block", marginBottom: "4px" }}>

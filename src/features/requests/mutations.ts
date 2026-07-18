@@ -71,3 +71,51 @@ export function useAddNoteMutation() {
     },
   });
 }
+
+export function useCreateInvoiceMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: requestsApi.createInvoice,
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "service-requests", variables.requestId, "invoice"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "service-requests"] });
+    },
+  });
+}
+
+export function useUpdateInvoiceMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: requestsApi.updateInvoice,
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "service-requests", variables.requestId, "invoice"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "service-requests"] });
+    },
+  });
+}
+
+export function useSendInvoiceMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (requestId: string) => requestsApi.sendInvoice(requestId),
+    onSuccess: (data, requestId) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "service-requests", requestId, "invoice"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "service-requests"] });
+    },
+  });
+}
+
+export function useMarkInvoicePaidMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (requestId: string) => requestsApi.markInvoicePaid(requestId),
+    onSuccess: (data, requestId) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "service-requests", requestId, "invoice"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "service-requests"] });
+    },
+  });
+}

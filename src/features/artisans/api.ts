@@ -17,6 +17,7 @@ export interface CreateArtisanInput {
   artisanTypeId: number;
   operatingArea: string[];
   skills: string[];
+  image?: string;
 }
 
 export const artisansApi = {
@@ -42,6 +43,11 @@ export const artisansApi = {
 
   updateArtisanVettingStatus: async (id: number, data: UpdateArtisanVettingStatusRequest): Promise<any> => {
     const response = await api.patch(`/admin/artisans/${id}/vetting-status`, data);
+    return response.data.data;
+  },
+
+  updateArtisan: async (id: number, data: any): Promise<any> => {
+    const response = await api.patch(`/admin/artisans/${id}`, data);
     return response.data.data;
   }
 };

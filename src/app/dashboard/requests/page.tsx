@@ -1,15 +1,19 @@
 "use client";
 
-import { useState, ChangeEvent, useEffect } from "react";
-import { STATUS_LABELS } from "../../../features/requests/constants";
-import { useRequests, useRequestDetail, useRequestCounts } from "../../../features/requests/queries";
-import { useUpdateStatusMutation, useAssignArtisanMutation, useAddNoteMutation } from "../../../features/requests/mutations";
+import { useState, useEffect } from "react";
+import { useRequests, useRequestDetail, useRequestCounts, useRequestInvoice } from "../../../features/requests/queries";
+import {
+  useUpdateStatusMutation,
+  useAssignArtisanMutation,
+  useAddNoteMutation,
+  useCreateInvoiceMutation,
+  useUpdateInvoiceMutation,
+  useSendInvoiceMutation,
+  useMarkInvoicePaidMutation
+} from "../../../features/requests/mutations";
 import { useArtisans } from "../../../features/artisans/queries";
-import { ServiceRequestDetail, ServiceRequestNote, ServiceRequestStatus } from "@/types";
-import { Button } from "@/components/ui/Button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
+import { ServiceRequestDetail, ServiceRequestNote, ServiceRequestStatus, Invoice } from "@/types";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import { cn } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { RequestListItem } from "./components/RequestListItem";
@@ -48,6 +52,7 @@ export default function RequestsPage() {
   const { data: selectedDetail, isLoading: isDetailLoading } = useRequestDetail(selectedId);
   const { data: artisansList } = useArtisans();
   const { data: counts } = useRequestCounts();
+  const { data: invoice, isLoading: isInvoiceLoading } = useRequestInvoice(selectedId);
   console.log(artisansList);
 
   const getFilterCount = (f: string) => {
@@ -56,7 +61,6 @@ export default function RequestsPage() {
   };
 
   const [note, setNote] = useState("");
-  const [subtotal, setSubtotal] = useState(12000);
   const [selectedArtisanId, setSelectedArtisanId] = useState<string>("");
 
   const requestsList = requests?.data || [];
@@ -82,6 +86,10 @@ export default function RequestsPage() {
   const updateStatusMutation = useUpdateStatusMutation();
   const assignArtisanMutation = useAssignArtisanMutation();
   const addNoteMutation = useAddNoteMutation();
+  const createInvoiceMutation = useCreateInvoiceMutation();
+  const updateInvoiceMutation = useUpdateInvoiceMutation();
+  const sendInvoiceMutation = useSendInvoiceMutation();
+  const markInvoicePaidMutation = useMarkInvoicePaidMutation();
 
   const handleUpdateStatus = (newStatus: ServiceRequestStatus) => {
     if (selected?.id) {
@@ -108,10 +116,7 @@ export default function RequestsPage() {
     setNote("");
   };
 
-  const feePercent = subtotal >= 400000 ? 0.08 : 0.1;
-  const fee = Math.round(subtotal * feePercent);
-  const total = subtotal + fee;
-  const feeLabel = `Zart service fee (${subtotal >= 400000 ? "8%" : "10%"})`;
+  // Fee and total are managed in details panel or synced from fetched invoice
 
   if (isListLoading && !hasInitialLoaded) {
     return <PageLoader />;
@@ -147,16 +152,16 @@ export default function RequestsPage() {
               onClick={() => setFilter(f)}
             >
               {`${f === "all"
-                  ? "All"
-                  : f === "pending"
-                    ? "Pending"
-                    : f === "assigned"
-                      ? "Assigned"
-                      : f === "in_progress"
-                        ? "In progress"
-                        : f === "completed"
-                          ? "Completed"
-                          : "Cancelled"
+                ? "All"
+                : f === "pending"
+                  ? "Pending"
+                  : f === "assigned"
+                    ? "Assigned"
+                    : f === "in_progress"
+                      ? "In progress"
+                      : f === "completed"
+                        ? "Completed"
+                        : "Cancelled"
                 } (${getFilterCount(f)})`}
             </button>
           ))}
@@ -215,11 +220,12 @@ export default function RequestsPage() {
             artisansList={artisansList || []}
             handleAssign={handleAssign}
             assignArtisanMutation={assignArtisanMutation}
-            subtotal={subtotal}
-            setSubtotal={setSubtotal}
-            feeLabel={feeLabel}
-            fee={fee}
-            total={total}
+            invoice={invoice}
+            isInvoiceLoading={isInvoiceLoading}
+            createInvoiceMutation={createInvoiceMutation}
+            updateInvoiceMutation={updateInvoiceMutation}
+            sendInvoiceMutation={sendInvoiceMutation}
+            markInvoicePaidMutation={markInvoicePaidMutation}
             note={note}
             setNote={setNote}
             handleAddNote={handleAddNote}
@@ -227,10 +233,10 @@ export default function RequestsPage() {
           />
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center bg-[#f9f9f9] text-[#bbb] font-outfit p-6">
-            <img 
-              src="/zart-logo-green.svg" 
-              alt="Zart Logo" 
-              className="w-16 h-16 object-contain mb-4" 
+            <img
+              src="/zart-logo-green.svg"
+              alt="Zart Logo"
+              className="w-16 h-16 object-contain mb-4"
             />
             <div className="text-[14px] font-semibold text-[#888] tracking-wide">Select a request to view details</div>
           </div>

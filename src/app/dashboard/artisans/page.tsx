@@ -37,6 +37,7 @@ export default function ArtisansPage() {
   const [artisanTypeId, setArtisanTypeId] = useState("1");
   const [operatingArea, setOperatingArea] = useState("");
   const [skills, setSkills] = useState("");
+  const [image, setImage] = useState<string | null>(null);
 
   const createArtisanMutation = useCreateArtisanMutation();
   const updateVettingMutation = useUpdateArtisanVettingStatusMutation();
@@ -92,6 +93,7 @@ export default function ArtisansPage() {
         artisanTypeId: Number(artisanTypeId),
         operatingArea: operatingArea.split(",").map((s) => s.trim()).filter(Boolean),
         skills: skills.split(",").map((s) => s.trim()).filter(Boolean),
+        image: image || undefined,
       },
       {
         onSuccess: () => {
@@ -102,6 +104,7 @@ export default function ArtisansPage() {
           setPhone("");
           setOperatingArea("");
           setSkills("");
+          setImage(null);
         },
       }
     );
@@ -231,6 +234,8 @@ export default function ArtisansPage() {
         setOperatingArea={setOperatingArea}
         skills={skills}
         setSkills={setSkills}
+        image={image}
+        setImage={setImage}
         handleCreateArtisan={handleCreateArtisan}
         isPending={createArtisanMutation.isPending}
       />
