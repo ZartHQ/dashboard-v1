@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { cn, formatCurrency } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/PageLoader";
+import { Search } from "lucide-react";
 
 export default function PaymentsPage() {
   const { admin, loading: adminLoading } = useAdmin();
@@ -53,7 +54,10 @@ export default function PaymentsPage() {
               </button>
             ))}
           </div>
-          <Input className="max-w-[240px] h-9" placeholder="🔍  Search by job or patron..." />
+          <div className="relative max-w-[240px] w-full">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#aaa]" />
+            <Input className="h-9 pl-9 w-full" placeholder="Search by job or patron..." />
+          </div>
         </div>
         <Card className="rounded-[14px] overflow-hidden">
           <div className="overflow-x-auto">

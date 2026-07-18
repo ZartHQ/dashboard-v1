@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { ArtisanImageUpload } from "./ArtisanImageUpload";
+import { X } from "lucide-react";
 
 interface AddArtisanModalProps {
   isModalOpen: boolean;
@@ -85,13 +86,14 @@ export function AddArtisanModal({
             style={{
               border: "none",
               background: "none",
-              fontSize: "20px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               cursor: "pointer",
-              color: "#aaa",
               padding: "4px",
             }}
           >
-            ✕
+            <X className="w-5 h-5 text-[#aaa] hover:text-black transition-colors" />
           </button>
         </div>
 

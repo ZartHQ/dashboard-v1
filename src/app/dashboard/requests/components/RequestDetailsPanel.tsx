@@ -9,6 +9,20 @@ import { Input } from "@/components/ui/Input";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { STATUS_LABELS } from "../../../../features/requests/constants";
 import { cn, formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
+import { 
+  ArrowLeft, 
+  Trash2, 
+  Plus, 
+  FileText, 
+  Send, 
+  Check, 
+  Printer, 
+  Phone, 
+  MessageSquare,
+  Lock,
+  Folder,
+  Info
+} from "lucide-react";
 
 interface RequestDetailsPanelProps {
   selected: ServiceRequestDetail;
@@ -125,7 +139,7 @@ export function RequestDetailsPanel({
             onClick={() => setSelectedId(null)}
             className="md:hidden flex items-center gap-1 text-[13px] font-semibold text-[#115746] bg-transparent border-none cursor-pointer mb-2.5"
           >
-            ← Back to requests
+            <ArrowLeft className="w-3.5 h-3.5" /> Back to requests
           </button>
           <div className="text-[17px] font-bold text-[#115746] mb-1">{selected.title}</div>
           <div className="flex items-center gap-2">
@@ -273,7 +287,7 @@ export function RequestDetailsPanel({
                     {m.mediaType === 'image' ? (
                       <img src={m.mediaUrl} alt="Request media" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="text-[22px]">📁</div>
+                      <div className="text-[#115746] flex items-center justify-center w-full h-full bg-[#f0fcf9]"><Folder className="w-6 h-6" /></div>
                     )}
                   </a>
                 ))
@@ -282,8 +296,12 @@ export function RequestDetailsPanel({
               )}
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
-              <Button variant="outline" className="flex-1" onClick={() => selected.patron?.phone && window.open(`tel:${selected.patron.phone}`)}>📞 Call patron</Button>
-              <Button variant="wa" className="flex-1" onClick={() => selected.patron?.phone && window.open(`https://wa.me/${selected.patron.phone.replace(/[^0-9]/g, "")}`)}>💬 Notify patron in app</Button>
+              <Button variant="outline" className="flex-1 flex items-center justify-center gap-2 text-xs font-semibold" onClick={() => selected.patron?.phone && window.open(`tel:${selected.patron.phone}`)}>
+                <Phone className="w-4 h-4" /> Call patron
+              </Button>
+              <Button variant="wa" className="flex-1 flex items-center justify-center gap-2 text-xs font-semibold" onClick={() => selected.patron?.phone && window.open(`https://wa.me/${selected.patron.phone.replace(/[^0-9]/g, "")}`)}>
+                <MessageSquare className="w-4 h-4" /> Notify patron in app
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -339,7 +357,8 @@ export function RequestDetailsPanel({
         <Card className="shrink-0">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
-              <span>📄 Invoice generator</span>
+              <FileText className="w-5 h-5 text-[#115746]" />
+              <span>Invoice generator</span>
               {invoice && (
                 <span className="text-[10px] font-extrabold bg-[#e8f5f0] text-[#115746] border border-[#b2d8cc] px-2 py-0.5 rounded-full uppercase tracking-wider">
                   Generated Previously
@@ -358,12 +377,12 @@ export function RequestDetailsPanel({
                 {/* Generated previously banner */}
                 {invoice ? (
                   <div className="bg-[#e8f5f0] border border-[#b2d8cc] rounded-lg p-[10px_12px] text-[12.5px] text-[#115746] font-semibold mb-4 flex items-center gap-2">
-                    <span className="text-[14px]">✓</span>
+                    <Check className="w-4 h-4 text-[#115746]" />
                     <span>This invoice was generated previously. Status: <strong className="uppercase">{invoice.status}</strong></span>
                   </div>
                 ) : (
                   <div className="bg-[#fff8e1] border border-[#ffe082] rounded-lg p-[10px_12px] text-[12.5px] text-[#8a6f00] font-semibold mb-4 flex items-center gap-2">
-                    <span className="text-[14px]">ℹ</span>
+                    <Info className="w-4 h-4 text-[#8a6f00]" />
                     <span>No invoice generated previously. Ready to create a draft.</span>
                   </div>
                 )}
@@ -371,8 +390,8 @@ export function RequestDetailsPanel({
                 {/* Status Header */}
                 <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-[#f0f0f0]">
                   <div className="flex items-center gap-2">
-                    <span className="text-[13px] font-bold text-[#115746] uppercase tracking-wider">
-                      📄 Invoice details
+                    <span className="text-[13px] font-bold text-[#115746] uppercase tracking-wider flex items-center gap-1.5">
+                      <FileText className="w-4 h-4" /> Invoice details
                     </span>
                     <span className={cn(
                       "text-[9px] font-bold px-2.5 py-0.5 rounded-[10px] border uppercase tracking-wider",
@@ -386,7 +405,7 @@ export function RequestDetailsPanel({
                   </div>
                   {invoice?.status === 'paid' && (
                     <div className="text-[11px] text-[#115746] font-bold flex items-center gap-1 bg-[#e8f5f0] px-2.5 py-1 rounded-[6px]">
-                      ✓ PAID
+                      <Check className="w-3.5 h-3.5 stroke-[3]" /> PAID
                     </div>
                   )}
                 </div>
@@ -452,7 +471,7 @@ export function RequestDetailsPanel({
                               onClick={() => handleRemoveItem(idx)}
                               className="text-[#c41c1c] hover:bg-red-50 h-8 w-8 flex items-center justify-center rounded-md border-none bg-transparent cursor-pointer text-sm"
                             >
-                              🗑
+                              <Trash2 className="w-4 h-4 text-[#c41c1c]" />
                             </button>
                           </div>
                         ))}
@@ -460,9 +479,9 @@ export function RequestDetailsPanel({
                         <button
                           type="button"
                           onClick={handleAddItem}
-                          className="text-[12px] font-bold text-[#115746] border border-dashed border-[#115746]/30 hover:border-[#115746] rounded-lg py-1.5 text-center bg-transparent cursor-pointer hover:bg-[#115746]/5 transition-all mt-1"
+                          className="text-[12px] font-bold text-[#115746] border border-dashed border-[#115746]/30 hover:border-[#115746] rounded-lg py-1.5 text-center bg-transparent cursor-pointer hover:bg-[#115746]/5 transition-all mt-1 flex items-center justify-center gap-1.5"
                         >
-                          + Add Item Row
+                          <Plus className="w-4 h-4" /> Add Item Row
                         </button>
                       </div>
                     </div>
@@ -509,7 +528,7 @@ export function RequestDetailsPanel({
                     <div className="flex gap-2.5 mt-3 border-t border-[#f0f0f0] pt-4">
                       <Button
                         variant="outline"
-                        className="flex-1 text-[11px] font-bold px-3 uppercase tracking-wider"
+                        className="flex-1 text-[11px] font-bold px-3 uppercase tracking-wider flex items-center justify-center gap-2"
                         onClick={() => {
                           const payload = {
                             description,
@@ -528,19 +547,19 @@ export function RequestDetailsPanel({
                           items.filter(it => it.description.trim() !== "").length === 0
                         }
                       >
-                        {createInvoiceMutation.isPending || updateInvoiceMutation.isPending ? "Saving..." : invoice ? "Update Draft" : "Create Draft"}
+                        <FileText className="w-4 h-4" /> {createInvoiceMutation.isPending || updateInvoiceMutation.isPending ? "Saving..." : invoice ? "Update Draft" : "Create Draft"}
                       </Button>
 
                       {invoice && (
                         <Button
                           variant="primary"
-                          className="flex-1 text-[11px] font-bold px-3 uppercase tracking-wider"
+                          className="flex-1 text-[11px] font-bold px-3 uppercase tracking-wider flex items-center justify-center gap-2"
                           onClick={() => {
                             sendInvoiceMutation.mutate(selected.id.toString());
                           }}
                           disabled={sendInvoiceMutation.isPending}
                         >
-                          {sendInvoiceMutation.isPending ? "Sending..." : "Send to Patron"}
+                          <Send className="w-4 h-4" /> {sendInvoiceMutation.isPending ? "Sending..." : "Send to Patron"}
                         </Button>
                       )}
                     </div>
@@ -607,19 +626,19 @@ export function RequestDetailsPanel({
                         <>
                           <Button
                             variant="outline"
-                            className="flex-1 text-[11px] font-bold px-3 uppercase tracking-wider"
+                            className="flex-1 text-[11px] font-bold px-3 uppercase tracking-wider flex items-center justify-center gap-2"
                             onClick={() => sendInvoiceMutation.mutate(selected.id.toString())}
                             disabled={sendInvoiceMutation.isPending}
                           >
-                            {sendInvoiceMutation.isPending ? "Resending..." : "Resend to Patron"}
+                            <Send className="w-4 h-4" /> {sendInvoiceMutation.isPending ? "Resending..." : "Resend to Patron"}
                           </Button>
                           <Button
                             variant="primary"
-                            className="flex-1 text-[11px] font-bold px-3 uppercase tracking-wider"
+                            className="flex-1 text-[11px] font-bold px-3 uppercase tracking-wider flex items-center justify-center gap-2"
                             onClick={() => markInvoicePaidMutation.mutate(selected.id.toString())}
                             disabled={markInvoicePaidMutation.isPending}
                           >
-                            {markInvoicePaidMutation.isPending ? "Mark Paid" : "Mark as Paid"}
+                            <Check className="w-4 h-4" /> {markInvoicePaidMutation.isPending ? "Mark Paid" : "Mark as Paid"}
                           </Button>
                         </>
                       )}
@@ -627,12 +646,12 @@ export function RequestDetailsPanel({
                       {invoice.status === 'paid' && (
                         <Button
                           variant="outline"
-                          className="w-full text-[11px] font-bold px-3 uppercase tracking-wider border-[#115746] text-[#115746] hover:bg-[#e8f5f0]"
+                          className="w-full text-[11px] font-bold px-3 uppercase tracking-wider border-[#115746] text-[#115746] hover:bg-[#e8f5f0] flex items-center justify-center gap-2"
                           onClick={() => {
                             window.print();
                           }}
                         >
-                          🖨 Print Invoice Receipt
+                          <Printer className="w-4 h-4" /> Print Invoice Receipt
                         </Button>
                       )}
                     </div>
@@ -648,7 +667,7 @@ export function RequestDetailsPanel({
           <CardHeader><CardTitle>Internal notes</CardTitle></CardHeader>
           <CardContent>
             <div className="flex items-center gap-1.5 bg-[#fff8e1] border border-[#ffe082] rounded-[6px] p-[6px_10px] text-[11px] text-[#8a6f00] font-semibold mb-2">
-              🔒 Internal only — patron cannot see these notes
+              <Lock className="w-3.5 h-3.5 text-[#8a6f00]" /> Internal only — patron cannot see these notes
             </div>
             <div className="flex flex-col gap-2">
               {((selected as ServiceRequestDetail).notes || []).map((n: any, i: number) => (

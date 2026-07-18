@@ -5,6 +5,7 @@ import { Patron } from "@/features/patrons/types";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import { ArrowLeft, Phone, MessageSquare, MapPin, Calendar, Wrench, CreditCard } from "lucide-react";
 
 interface PatronDetailsPanelProps {
   selected: Patron;
@@ -29,7 +30,7 @@ export function PatronDetailsPanel({
             onClick={() => setIsMobileDetailActive(false)}
             className="md:hidden flex items-center gap-1 text-[13px] font-semibold text-[#115746] bg-transparent border-none cursor-pointer mr-1.5"
           >
-            ← Back
+            <ArrowLeft className="w-3.5 h-3.5" /> Back
           </button>
           <div 
             className="w-[42px] h-[42px] rounded-full flex items-center justify-center text-[14px] font-bold"
@@ -43,8 +44,12 @@ export function PatronDetailsPanel({
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="text-xs h-9" onClick={() => window.open(`tel:${selected.id}`)}>📞 Call</Button>
-          <Button variant="wa" className="text-xs h-9" onClick={() => window.open(`https://wa.me/${selected.id}`)}>💬 WhatsApp</Button>
+          <Button variant="outline" className="text-xs h-9 flex items-center justify-center gap-1.5" onClick={() => window.open(`tel:${selected.id}`)}>
+            <Phone className="w-3.5 h-3.5" /> Call
+          </Button>
+          <Button variant="wa" className="text-xs h-9 flex items-center justify-center gap-1.5" onClick={() => window.open(`https://wa.me/${selected.id}`)}>
+            <MessageSquare className="w-3.5 h-3.5 text-white" /> WhatsApp
+          </Button>
         </div>
       </div>
 
@@ -58,13 +63,13 @@ export function PatronDetailsPanel({
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
-                { label: "Location", value: selected.loc, icon: "📍" },
-                { label: "Joined Zart", value: selected.joined, icon: "📅" },
-                { label: "Total Bookings", value: selected.bookings, icon: "🔧" },
-                { label: "Total Spent", value: selected.spent, icon: "💳" }
+                { label: "Location", value: selected.loc, icon: <MapPin className="w-5 h-5 text-[#115746]" /> },
+                { label: "Joined Zart", value: selected.joined, icon: <Calendar className="w-5 h-5 text-[#115746]" /> },
+                { label: "Total Bookings", value: selected.bookings, icon: <Wrench className="w-5 h-5 text-[#115746]" /> },
+                { label: "Total Spent", value: selected.spent, icon: <CreditCard className="w-5 h-5 text-[#115746]" /> }
               ].map((item) => (
-                <div key={item.label} className="bg-[#fafafa] border border-[#f0f0f0] p-4 rounded-xl flex flex-col gap-1.5">
-                  <span className="text-[18px]">{item.icon}</span>
+                <div key={item.label} className="bg-[#fafafa] border border-[#f0f0f0] p-4 rounded-xl flex flex-col gap-2">
+                  <span>{item.icon}</span>
                   <span className="text-[11px] text-[#aaa] font-semibold uppercase tracking-wider">{item.label}</span>
                   <span className="text-[14px] font-bold text-[#115746]">{item.value}</span>
                 </div>

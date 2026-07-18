@@ -9,6 +9,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/PageLoader";
+import { Search } from "lucide-react";
 import { PatronListItem } from "./components/PatronListItem";
 import { PatronDetailsPanel } from "./components/PatronDetailsPanel";
 
@@ -68,7 +69,10 @@ export default function PatronsPage() {
           isMobileDetailActive ? "hidden md:block" : "block"
         )}>
           <div className="p-3">
-            <Input className="h-9" placeholder="🔍  Search patrons..." />
+            <div className="relative">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#aaa]" />
+              <Input className="h-9 pl-9 w-full" placeholder="Search patrons..." />
+            </div>
           </div>
           {patronsList.map((p) => (
             <PatronListItem

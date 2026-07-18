@@ -11,6 +11,7 @@ import { PageLoader } from "@/components/ui/PageLoader";
 import Link from "next/link";
 import { cn, formatDate, formatDateTime } from "@/lib/utils";
 import { ServiceRequest } from "@/types";
+import { Calendar } from "lucide-react";
 
 // Custom SVG Icons
 const BookingsIcon = () => (
@@ -160,8 +161,8 @@ export default function DashboardPage() {
                           {req.scheduledAt && (
                             <>
                               <span>·</span>
-                              <span className="text-[#1e5a8e] font-semibold bg-[#e0f0ff] border border-[#b3d7f7] px-1.5 py-0.5 rounded-[4px] font-outfit">
-                                📅 {formatDateTime(req.scheduledAt)}
+                              <span className="text-[#1e5a8e] font-semibold bg-[#e0f0ff] border border-[#b3d7f7] px-1.5 py-0.5 rounded-[4px] font-outfit flex items-center gap-1">
+                                <Calendar className="w-3 h-3 text-[#1e5a8e] shrink-0" /> {formatDateTime(req.scheduledAt)}
                               </span>
                             </>
                           )}

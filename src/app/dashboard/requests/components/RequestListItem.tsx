@@ -4,6 +4,7 @@ import React from "react";
 import { ServiceRequest } from "@/types";
 import { STATUS_LABELS } from "../../../../features/requests/constants";
 import { cn, formatDate, formatDateTime } from "@/lib/utils";
+import { MapPin, Calendar } from "lucide-react";
 
 interface RequestListItemProps {
   request: ServiceRequest;
@@ -47,12 +48,14 @@ export function RequestListItem({ request, isSelected, onClick }: RequestListIte
         <span className="text-[11px] text-[#888]">{r.patron?.firstName} {r.patron?.lastName}</span>
       </div>
       <div className="flex justify-between items-end">
-        <span className="text-[11px] text-[#aaa] truncate max-w-[150px]">📍 {r.address}</span>
+        <span className="text-[11px] text-[#aaa] truncate max-w-[150px] flex items-center gap-1">
+          <MapPin className="w-3.5 h-3.5 text-[#aaa] shrink-0" /> {r.address}
+        </span>
         <div className="flex flex-col items-end gap-1 shrink-0">
           <span className="text-[10px] text-[#bbb] font-outfit">Created: {formatDate(r.createdAt || new Date())}</span>
           {r.scheduledAt && (
-            <span className="text-[10px] font-semibold text-[#1e5a8e] bg-[#e0f0ff] border border-[#b3d7f7] px-2 py-0.5 rounded-[12px]">
-              📅 {formatDateTime(r.scheduledAt)}
+            <span className="text-[10px] font-semibold text-[#1e5a8e] bg-[#e0f0ff] border border-[#b3d7f7] px-2 py-0.5 rounded-[12px] flex items-center gap-1">
+              <Calendar className="w-3 h-3 text-[#1e5a8e] shrink-0" /> {formatDateTime(r.scheduledAt)}
             </span>
           )}
         </div>

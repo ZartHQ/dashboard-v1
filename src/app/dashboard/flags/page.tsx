@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { Flag, FlagPerson } from "@/types";
+import { AlertTriangle, Star, MessageSquare } from "lucide-react";
 
 export default function FlagsPage() {
   const { data: flags, isLoading: isFlagsLoading } = useFlags();
@@ -69,8 +70,14 @@ export default function FlagsPage() {
             <Card key={f.id} className={cn(f.priority === "high" && "border-[#FA4812]")}>
               <div className={cn("p-[14px_18px] border-b border-[#f0f0f0] flex items-center justify-between", f.priority === "high" && "bg-[#fff8f6]")}>
                 <div className="flex items-center gap-3">
-                  <div className={cn("w-9 h-9 rounded-[10px] flex items-center justify-center text-[16px]", f.priority === "high" ? "bg-[#ffe8e8]" : "bg-[#fff3e0]")}>
-                    {f.priority === "high" ? "⚠️" : f.id === 3 ? "⭐" : "💬"}
+                  <div className={cn("w-9 h-9 rounded-[10px] flex items-center justify-center", f.priority === "high" ? "bg-[#ffe8e8]" : "bg-[#fff3e0]")}>
+                    {f.priority === "high" ? (
+                      <AlertTriangle className="w-5 h-5 text-[#FA4812]" />
+                    ) : f.id === 3 ? (
+                      <Star className="w-5 h-5 fill-[#b27b00] text-[#b27b00]" />
+                    ) : (
+                      <MessageSquare className="w-5 h-5 text-[#8a5f00]" />
+                    )}
                   </div>
                   <div>
                     <div className="text-[14px] font-bold text-[#1a1a1a]">{f.title}</div>

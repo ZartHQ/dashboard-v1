@@ -16,6 +16,7 @@ import { ServiceRequestDetail, ServiceRequestNote, ServiceRequestStatus, Invoice
 import { Input } from "@/components/ui/Input";
 import { cn } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/PageLoader";
+import { Search } from "lucide-react";
 import { RequestListItem } from "./components/RequestListItem";
 import { RequestDetailsPanel } from "./components/RequestDetailsPanel";
 
@@ -176,12 +177,15 @@ export default function RequestsPage() {
           selectedId !== null ? "hidden md:flex" : "flex"
         )}>
           <div className="p-3 shrink-0">
-            <Input
-              className="h-9"
-              placeholder="🔍  Search requests..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+            <div className="relative">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#aaa]" />
+              <Input
+                className="h-9 pl-9 w-full"
+                placeholder="Search requests..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
           </div>
           <div className="flex-1 overflow-y-auto min-h-0 relative">
             {isListLoading && (

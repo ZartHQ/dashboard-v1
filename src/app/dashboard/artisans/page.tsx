@@ -15,6 +15,7 @@ import { AddArtisanModal } from "./components/AddArtisanModal";
 import { ArtisanProfileDrawer } from "./components/ArtisanProfileDrawer";
 import { UpdateVettingModal } from "./components/UpdateVettingModal";
 import { Artisan, VettingStatus } from "@/types";
+import { Search, Plus } from "lucide-react";
 
 export default function ArtisansPage() {
   const [search, setSearch] = useState("");
@@ -141,19 +142,22 @@ export default function ArtisansPage() {
             </span>
           )}
         </div>
-        <Button variant="primary" onClick={() => setIsModalOpen(true)}>
-          + Add artisan
+        <Button variant="primary" onClick={() => setIsModalOpen(true)} className="flex items-center gap-1.5">
+          <Plus className="w-4 h-4" /> Add artisan
         </Button>
       </div>
 
       <div className="content">
         <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
-          <Input
-            className="flex-1 min-w-[200px]"
-            placeholder="🔍  Search by name, category or location..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#aaa]" />
+            <Input
+              className="pl-9 w-full"
+              placeholder="Search by name, category or location..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
           <Select className="w-auto" value={category} onChange={(e) => setCategory(e.target.value)}>
             <option value="all">All categories</option>
             <option value="plumbing">Plumbing</option>

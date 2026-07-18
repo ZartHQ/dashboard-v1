@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { STATUS_PILL } from "../../../../features/artisans/constants";
 import { formatDate } from "@/lib/utils";
 import { Artisan, VettingStatus } from "@/types";
+import { X, Star, Phone, Mail, UserCheck, MessageSquare } from "lucide-react";
 import { useUpdateArtisanMutation } from "../../../../features/artisans/mutations";
 import { ArtisanImageUpload } from "./ArtisanImageUpload";
 
@@ -81,13 +82,14 @@ export function ArtisanProfileDrawer({
             style={{
               border: "none",
               background: "transparent",
-              fontSize: "20px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               cursor: "pointer",
-              color: "#aaa",
               padding: "4px",
             }}
           >
-            ✕
+            <X className="w-5 h-5 text-[#aaa] hover:text-black transition-colors" />
           </button>
         </div>
 
@@ -122,8 +124,10 @@ export function ArtisanProfileDrawer({
             <div style={{ fontSize: "22px", fontWeight: 700, color: "#115746" }}>{viewingArtisan.jobsDone}</div>
             <div style={{ fontSize: "11px", color: "#115746", fontWeight: 500, marginTop: "2px" }}>Jobs Completed</div>
           </div>
-          <div style={{ background: "#fff9e6", padding: "12px", borderRadius: "10px", textAlign: "center", border: "1px solid #ffe082" }}>
-            <div style={{ fontSize: "22px", fontWeight: 700, color: "#b27b00" }}>★ {viewingArtisan.rating ?? "—"}</div>
+          <div style={{ background: "#fff9e6", padding: "12px", borderRadius: "10px", textAlign: "center", border: "1px solid #ffe082", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ fontSize: "22px", fontWeight: 700, color: "#b27b00", display: "flex", alignItems: "center", gap: "4px" }}>
+              <Star className="w-5 h-5 fill-[#b27b00] text-[#b27b00]" /> {viewingArtisan.rating ?? "—"}
+            </div>
             <div style={{ fontSize: "11px", color: "#8a6f00", fontWeight: 500, marginTop: "2px" }}>Rating</div>
           </div>
         </div>
@@ -132,9 +136,13 @@ export function ArtisanProfileDrawer({
         <div style={{ display: "flex", flexDirection: "column", gap: "16px", flex: 1, overflowY: "auto", paddingRight: "4px" }}>
           <div>
             <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#aaa", fontWeight: 600, letterSpacing: "0.5px", marginBottom: "6px" }}>Contact Information</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <div style={{ fontSize: "13px", color: "#333" }}>📞 <strong>Phone:</strong> {viewingArtisan.user.phone}</div>
-              <div style={{ fontSize: "13px", color: "#333" }}>✉️ <strong>Email:</strong> {viewingArtisan.user.email}</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <div style={{ fontSize: "13px", color: "#333", display: "flex", alignItems: "center", gap: "6px" }}>
+                <Phone className="w-4 h-4 text-[#115746]" /> <strong>Phone:</strong> {viewingArtisan.user.phone}
+              </div>
+              <div style={{ fontSize: "13px", color: "#333", display: "flex", alignItems: "center", gap: "6px" }}>
+                <Mail className="w-4 h-4 text-[#115746]" /> <strong>Email:</strong> {viewingArtisan.user.email}
+              </div>
             </div>
           </div>
 
@@ -176,14 +184,14 @@ export function ArtisanProfileDrawer({
               {/* Vetting Management Button */}
               <Button 
                 variant="outline" 
-                className="w-full text-xs font-bold uppercase tracking-wider mt-2.5"
+                className="w-full text-xs font-bold uppercase tracking-wider mt-2.5 flex items-center justify-center gap-1.5"
                 onClick={() => {
                   setNewStatus(viewingArtisan.vettingStatus);
                   setStatusNote("");
                   setIsStatusModalOpen(true);
                 }}
               >
-                ✏️ Update vetting status
+                <UserCheck className="w-4 h-4" /> Update vetting status
               </Button>
             </div>
           </div>
@@ -191,11 +199,11 @@ export function ArtisanProfileDrawer({
 
         {/* Footer Actions */}
         <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "16px", marginTop: "16px", display: "flex", gap: "10px" }}>
-          <Button variant="outline" className="flex-1" onClick={() => viewingArtisan.user.phone && window.open(`tel:${viewingArtisan.user.phone}`)}>
-            📞 Call Artisan
+          <Button variant="outline" className="flex-1 flex items-center justify-center gap-2" onClick={() => viewingArtisan.user.phone && window.open(`tel:${viewingArtisan.user.phone}`)}>
+            <Phone className="w-4 h-4" /> Call Artisan
           </Button>
-          <Button variant="wa" className="flex-1" onClick={() => viewingArtisan.user.phone && window.open(`https://wa.me/${viewingArtisan.user.phone.replace(/[^0-9]/g, "")}`)}>
-            💬 WhatsApp
+          <Button variant="wa" className="flex-1 flex items-center justify-center gap-2" onClick={() => viewingArtisan.user.phone && window.open(`https://wa.me/${viewingArtisan.user.phone.replace(/[^0-9]/g, "")}`)}>
+            <MessageSquare className="w-4 h-4 text-white" /> WhatsApp
           </Button>
         </div>
       </div>

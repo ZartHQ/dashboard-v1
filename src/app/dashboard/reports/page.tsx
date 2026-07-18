@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Select } from "@/components/ui/Select";
 import { cn } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/PageLoader";
+import { Star } from "lucide-react";
 
 export default function ReportsPage() {
   const { admin, loading: adminLoading } = useAdmin();
@@ -85,7 +86,9 @@ export default function ReportsPage() {
                   </div>
                   <div className="text-right">
                     <div className="text-[13px] font-bold text-[#115746]">{a.jobs} jobs</div>
-                    <div className="text-[11px] text-[#FA4812] mt-[1px]">★ {a.rating}</div>
+                    <div className="text-[11px] text-[#FA4812] mt-[1px] flex items-center justify-end gap-0.5">
+                      <Star className="w-3.5 h-3.5 fill-[#FA4812] text-[#FA4812]" /> {a.rating}
+                    </div>
                   </div>
                 </div>
               ))}

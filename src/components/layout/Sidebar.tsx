@@ -6,6 +6,17 @@ import { clearSession, SessionAdmin } from "../../features/auth/auth";
 import { useRequests } from "../../features/requests/queries";
 import { useFlags } from "../../features/monitoring/queries";
 import { cn } from "@/lib/utils";
+import { 
+  Home, 
+  ClipboardList, 
+  Wrench, 
+  User, 
+  AlertTriangle, 
+  CreditCard, 
+  BarChart3, 
+  LogOut, 
+  X 
+} from "lucide-react";
 
 interface SidebarProps {
   admin: SessionAdmin | null;
@@ -36,32 +47,32 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
     { 
       href: "/dashboard", 
       label: "Dashboard", 
-      icon: "🏠", 
+      icon: Home, 
       section: "Overview" 
     },
     { 
       href: "/dashboard/requests", 
       label: "Requests", 
-      icon: "📋", 
+      icon: ClipboardList, 
       badge: pendingRequestsCount > 0 ? String(pendingRequestsCount) : undefined, 
       section: "Operations" 
     },
     { 
       href: "/dashboard/artisans", 
       label: "Artisans", 
-      icon: "🔧", 
+      icon: Wrench, 
       section: false 
     },
     { 
       href: "/dashboard/patrons",  
       label: "Patrons",  
-      icon: "👤", 
+      icon: User, 
       section: false 
     },
     { 
       href: "/dashboard/flags",    
       label: "Flags",    
-      icon: "⚠️", 
+      icon: AlertTriangle, 
       badge: openFlagsCount > 0 ? String(openFlagsCount) : undefined, 
       badgeWarn: true, 
       section: "Monitor" 
@@ -69,13 +80,13 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
     { 
       href: "/dashboard/payments", 
       label: "Payments", 
-      icon: "💳", 
+      icon: CreditCard, 
       section: false 
     },
     { 
       href: "/dashboard/reports",  
       label: "Reports",  
-      icon: "📊", 
+      icon: BarChart3, 
       section: false 
     },
   ];
@@ -111,10 +122,10 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
           </div>
           <button 
             onClick={onClose}
-            className="md:hidden bg-transparent border-none text-[#FDF4D7]/60 hover:text-white text-[18px] cursor-pointer p-1"
+            className="md:hidden bg-transparent border-none text-[#FDF4D7]/60 hover:text-white cursor-pointer p-1 flex items-center justify-center"
             aria-label="Close sidebar"
           >
-            ✕
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -124,6 +135,7 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
             const showSection = item.section && item.section !== lastSection;
             if (item.section) lastSection = item.section;
             const isActive = pathname === item.href;
+            const Icon = item.icon;
             return (
               <div key={i}>
                 {showSection && typeof item.section === 'string' && (
@@ -139,7 +151,7 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
                     isActive && "bg-white/12 text-[#FDF4D7] border-l-[#FA4812] font-semibold"
                   )}
                 >
-                  <span>{item.icon}</span>
+                  <Icon className={cn("w-4 h-4 text-[#FDF4D7]/65 shrink-0", isActive && "text-[#FDF4D7]")} />
                   <span>{item.label}</span>
                   {item.badge && (
                     <span className={cn(
@@ -187,10 +199,10 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
             </Link>
             <button
               onClick={logout}
-              className="bg-none border-none text-[#FDF4D7]/50 hover:text-white cursor-pointer text-[18px] flex-shrink-0 pl-1 transition-colors"
+              className="bg-none border-none text-[#FDF4D7]/50 hover:text-white cursor-pointer flex-shrink-0 pl-1 transition-colors flex items-center justify-center p-1"
               title="Log out"
             >
-              ↩
+              <LogOut className="w-4 h-4" />
             </button>
           </div>
         </div>

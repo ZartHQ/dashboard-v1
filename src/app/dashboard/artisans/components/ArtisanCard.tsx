@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { STATUS_PILL } from "../../../../features/artisans/constants";
 import { Artisan } from "@/types";
+import { MapPin, Star, Phone, MessageSquare } from "lucide-react";
 
 interface ArtisanCardProps {
   artisan: Artisan;
@@ -82,9 +83,12 @@ export function ArtisanCard({ artisan: a, setViewingArtisan }: ArtisanCardProps)
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
+              display: "flex",
+              alignItems: "center",
+              gap: "4px"
             }}
           >
-            📍 {a.operatingArea.join(", ")} · {a.user.phone}
+            <MapPin className="w-3.5 h-3.5 text-[#aaa] shrink-0" /> {a.operatingArea.join(", ")} · {a.user.phone}
           </div>
         </div>
         <span className={`sp ${STATUS_PILL[a.vettingStatus]?.cls || "sp-offline"}`}>
@@ -95,7 +99,15 @@ export function ArtisanCard({ artisan: a, setViewingArtisan }: ArtisanCardProps)
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
           {[
             { val: a.jobsDone, label: "Jobs done" },
-            { val: a.rating ?? "—", label: "Rating" },
+            { 
+              val: (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>
+                  <Star className="w-4 h-4 fill-[#b27b00] text-[#b27b00]" />
+                  {a.rating ?? "—"}
+                </span>
+              ), 
+              label: "Rating" 
+            },
           ].map((s) => (
             <div
               key={s.label}
@@ -105,9 +117,13 @@ export function ArtisanCard({ artisan: a, setViewingArtisan }: ArtisanCardProps)
                 padding: 8,
                 textAlign: "center",
                 border: "1px solid #f0f0f0",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center"
               }}
             >
-              <div style={{ fontSize: 16, fontWeight: 700, color: "#115746" }}>{s.val}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#115746", display: "flex", alignItems: "center" }}>{s.val}</div>
               <div style={{ fontSize: 10, color: "#aaa", marginTop: 2 }}>{s.label}</div>
             </div>
           ))}
@@ -134,17 +150,17 @@ export function ArtisanCard({ artisan: a, setViewingArtisan }: ArtisanCardProps)
       <div style={{ padding: "10px 16px", borderTop: "1px solid #f0f0f0", display: "flex", gap: 8 }}>
         <Button 
           variant="outline" 
-          className="w-10 h-8 p-0 flex items-center justify-center text-xs shrink-0"
+          className="w-10 h-8 p-0 flex items-center justify-center shrink-0"
           onClick={() => a.user.phone && window.open(`tel:${a.user.phone}`)}
         >
-          📞
+          <Phone className="w-3.5 h-3.5 text-[#115746]" />
         </Button>
         <Button 
           variant="wa" 
-          className="w-10 h-8 p-0 flex items-center justify-center text-xs shrink-0"
+          className="w-10 h-8 p-0 flex items-center justify-center shrink-0"
           onClick={() => a.user.phone && window.open(`https://wa.me/${a.user.phone.replace(/[^0-9]/g, "")}`)}
         >
-          💬
+          <MessageSquare className="w-3.5 h-3.5 text-white" />
         </Button>
         <Button 
           variant="primary" 
