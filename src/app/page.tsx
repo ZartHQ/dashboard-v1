@@ -1,13 +1,32 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useLoginForm } from "../features/auth/hooks";
+import { useAdminProfile } from "../features/auth/queries";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { cn } from "@/lib/utils";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { data: admin, isLoading: profileLoading } = useAdminProfile();
   const { form, onSubmit, isLoading, error } = useLoginForm();
   const { register, formState: { errors } } = form;
+
+  useEffect(() => {
+    if (admin) {
+      router.replace("/dashboard");
+    }
+  }, [admin, router]);
+
+  if (profileLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#f5f5f5]">
+        <div className="w-8 h-8 border-4 border-[#115746] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen">
