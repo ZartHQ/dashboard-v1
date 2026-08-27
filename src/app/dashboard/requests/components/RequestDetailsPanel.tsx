@@ -355,7 +355,7 @@ export function RequestDetailsPanel({
 
         {/* Invoice */}
         <Card className="shrink-0">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-[#115746]" />
               <span>Invoice generator</span>
@@ -365,7 +365,6 @@ export function RequestDetailsPanel({
                 </span>
               )}
             </CardTitle>
-            <span className="text-[11px] text-[#aaa]">Auto-sends to patron in app on completion</span>
           </CardHeader>
           <CardContent className="overflow-x-auto">
             {isInvoiceLoading ? (
@@ -686,6 +685,14 @@ export function RequestDetailsPanel({
             <textarea
               value={note}
               onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setNote(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  if (note.trim() && !addNoteMutation.isPending) {
+                    handleAddNote();
+                  }
+                }
+              }}
               placeholder="Add an internal note (e.g. 'called patron, no answer')..."
               className="w-full bg-[#f9f9f9] border-[1.5px] border-[#e0e0e0] rounded-lg p-[10px_12px] text-[13px] text-[#333] font-outfit resize-none h-[72px] mt-2.5 focus:outline-none focus:border-[#115746]"
             />
