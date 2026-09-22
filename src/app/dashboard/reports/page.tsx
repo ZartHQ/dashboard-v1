@@ -5,7 +5,7 @@ import { useReports } from "../../../features/reports/queries";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Select } from "@/components/ui/Select";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { Star } from "lucide-react";
 
@@ -18,6 +18,8 @@ export default function ReportsPage() {
   }
 
   const { categories, topArtisans } = reports || { categories: [], topArtisans: [] };
+  const summary = reports?.summary;
+  const health = reports?.platformHealth;
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -31,15 +33,14 @@ export default function ReportsPage() {
       <div className="p-6 overflow-y-auto flex-1">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           {[
-            { label: "Jobs completed", val: "128", sub: "+18 vs last week" }, 
-            { label: "New patrons", val: "24", sub: "+6 vs last week" }, 
-            { label: "Revenue invoiced", val: "₦1.4M", sub: "+₦180k" }, 
-            { label: "Completion rate", val: "90%", sub: "Target: 85% ✓" }
+            { label: "Jobs completed", val: (summary?.jobsCompleted ?? 0).toString() },
+            { label: "New patrons", val: (summary?.newPatrons ?? 0).toString() },
+            { label: "Revenue invoiced", val: formatCurrency(summary?.revenueInvoiced ?? 0) },
+            { label: "Completion rate", val: `${summary?.completionRate ?? 0}%` }
           ].map((m) => (
             <Card key={m.label} className="p-[14px_16px]">
               <div className="text-[11px] text-[#aaa] mb-1.5 uppercase tracking-wider font-semibold">{m.label}</div>
               <div className="text-[26px] font-bold text-[#115746]">{m.val}</div>
-              <div className="text-[11px] mt-1 font-medium text-[#166534]">{m.sub}</div>
             </Card>
           ))}
         </div>
@@ -104,10 +105,10 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-[#f9f9f9]">
             {[
-              { val: "18 min", label: "Avg response time" }, 
-              { val: "2.4 hrs", label: "Avg job duration" }, 
-              { val: "73%", label: "Patron repeat rate" }, 
-              { val: "1.6%", label: "Dispute rate", warn: true }
+              { val: health?.avgResponseTime ?? "N/A", label: "Avg response time" },
+              { val: health?.avgJobDuration ?? "N/A", label: "Avg job duration" },
+              { val: health?.patronRepeatRate ?? "N/A", label: "Patron repeat rate" },
+              { val: health?.disputeRate ?? "N/A", label: "Dispute rate", warn: true }
             ].map((h) => (
               <div key={h.label} className="bg-white border border-[#e8e8e8] rounded-[10px] p-[16px_20px] text-center">
                 <div className={cn("text-[20px] font-bold mb-1.5", h.warn ? "text-[#c2410c]" : "text-[#1a1a1a]")}>{h.val}</div>

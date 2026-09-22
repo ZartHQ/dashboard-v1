@@ -13,9 +13,10 @@ import {
   User, 
   AlertTriangle, 
   CreditCard, 
-  BarChart3, 
-  LogOut, 
-  X 
+  BarChart3,
+  LifeBuoy,
+  LogOut,
+  X
 } from "lucide-react";
 
 interface SidebarProps {
@@ -83,11 +84,17 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
       icon: CreditCard, 
       section: false 
     },
-    { 
-      href: "/dashboard/reports",  
-      label: "Reports",  
-      icon: BarChart3, 
-      section: false 
+    {
+      href: "/dashboard/reports",
+      label: "Reports",
+      icon: BarChart3,
+      section: false
+    },
+    {
+      href: "/dashboard/support",
+      label: "Support",
+      icon: LifeBuoy,
+      section: "Support"
     },
   ];
 

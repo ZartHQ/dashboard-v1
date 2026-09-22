@@ -18,7 +18,7 @@ module.exports = {
         }
       },
       fontFamily: {
-        outfit: ["var(--font-outfit)", "sans-serif"],
+        outfit: ["'Poppins'", "sans-serif"],
       },
       keyframes: {
         "zoom-pulse": {
