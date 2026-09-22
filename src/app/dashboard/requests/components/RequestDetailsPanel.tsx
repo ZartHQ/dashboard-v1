@@ -8,6 +8,7 @@ import { Select } from "@/components/ui/Select";
 import { Input } from "@/components/ui/Input";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { STATUS_LABELS } from "../../../../features/requests/constants";
+import { MessageThread } from "./MessageThread";
 import { cn, formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
 import { 
   ArrowLeft, 
@@ -303,6 +304,17 @@ export function RequestDetailsPanel({
                 <MessageSquare className="w-4 h-4" /> Notify patron in app
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Messages */}
+        <Card className="shrink-0 overflow-hidden">
+          <CardHeader className="border-b border-[#f0f0f0]"><CardTitle>Messages</CardTitle></CardHeader>
+          <CardContent className="p-0">
+            <MessageThread
+              requestId={selected.id}
+              patronName={`${selected.patron?.firstName || "the patron"} ${selected.patron?.lastName || ""}`.trim()}
+            />
           </CardContent>
         </Card>
 

@@ -102,15 +102,6 @@ export default function DashboardPage() {
               color: "text-[#c2410c]"
             },
             {
-              title: "Active Flags",
-              value: openFlagsCount,
-              desc: "Requires immediate attention",
-              icon: <FlagsIcon />,
-              bg: "from-[#ffe8e8] to-[#fff5f5]",
-              border: "border-[#fecaca]",
-              color: "text-[#c41c1c]"
-            },
-            {
               title: "Registered Patrons",
               value: totalPatronsCount,
               desc: "Total client accounts on Zart",
@@ -118,6 +109,15 @@ export default function DashboardPage() {
               bg: "from-[#fffde6] to-[#fffff0]",
               border: "border-[#fef08a]",
               color: "text-[#856404]"
+            },
+            {
+              title: "Active Flags",
+              value: openFlagsCount,
+              desc: "Requires immediate attention",
+              icon: <FlagsIcon />,
+              bg: "from-[#ffe8e8] to-[#fff5f5]",
+              border: "border-[#fecaca]",
+              color: "text-[#c41c1c]"
             }
           ].map((stat) => (
             <Card key={stat.title} className={cn("border border-solid bg-gradient-to-br", stat.border, stat.bg)}>
@@ -133,10 +133,8 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {/* Content Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Activity Ticker */}
-          <Card className="lg:col-span-2 flex flex-col min-h-[360px]">
+        {/* Recent Activity */}
+        <Card className="flex flex-col flex-1 min-h-[360px]">
             <CardHeader className="border-b border-[#f0f0f0] flex flex-row items-center justify-between">
               <CardTitle>Recent Service Requests</CardTitle>
               <Link href="/dashboard/requests">
@@ -196,55 +194,6 @@ export default function DashboardPage() {
               )}
             </CardContent>
           </Card>
-
-          {/* Quick Actions Shortcuts */}
-          <div className="flex flex-col gap-4">
-            <Card>
-              <CardHeader className="border-b border-[#f0f0f0]">
-                <CardTitle>System Shortcuts</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 flex flex-col gap-2.5">
-                {[
-                  { label: "Vetting Queue", href: "/dashboard/artisans", desc: "Review registered artisan accounts", icon: "🔧" },
-                  { label: "Open Flags Log", href: "/dashboard/flags", desc: "Check flag alerts and pricing disputes", icon: "⚠️" },
-                  { label: "Patrons Summary", href: "/dashboard/patrons", desc: "View location and booking indexes", icon: "👤" },
-                  { label: "Revenue & Reports", href: "/dashboard/reports", desc: "Examine exportable operational metrics", icon: "📊" }
-                ].map((act) => (
-                  <Link key={act.label} href={act.href} className="w-full">
-                    <div className="flex items-center gap-3 p-3 bg-[#fafafa] border border-[#f0f0f0] rounded-xl hover:border-[#115746] hover:bg-[#f4fbf8] transition-all cursor-pointer group">
-                      <span className="text-[20px] group-hover:scale-110 transition-transform">{act.icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[13px] font-bold text-[#1a1a1a] group-hover:text-[#115746] transition-colors">{act.label}</div>
-                        <div className="text-[11px] text-[#aaa] truncate">{act.desc}</div>
-                      </div>
-                      <span className="text-[#aaa] group-hover:text-[#115746] transition-colors">➔</span>
-                    </div>
-                  </Link>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Active Warnings Widget */}
-            {openFlagsCount > 0 && (
-              <Card className="bg-[#fff5f5] border border-[#fca5a5]">
-                <CardContent className="p-4 flex gap-3 items-start">
-                  <span className="text-[22px]">🚨</span>
-                  <div className="flex-1">
-                    <div className="text-[13px] font-bold text-[#991b1b]">Attention Required</div>
-                    <div className="text-[11px] text-[#b91c1c] mt-0.5 leading-relaxed">
-                      There are currently <strong>{openFlagsCount}</strong> unresolved monitoring flag alerts. Please check the logs immediately to resolve off-platform transactions or pricing conflicts.
-                    </div>
-                    <Link href="/dashboard/flags" className="inline-block mt-2">
-                      <Button variant="outline" size="sm" className="h-7 text-[10px] border-[#991b1b] text-[#991b1b] bg-white hover:bg-[#991b1b] hover:text-white">
-                        Review Flags Log
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </div>
       </div>
     </div>
   );
