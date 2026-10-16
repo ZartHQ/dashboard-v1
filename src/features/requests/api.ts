@@ -17,8 +17,13 @@ export interface GetRequestsParams {
 
 export const requestsApi = {
   getRequests: async (params: GetRequestsParams = {}): Promise<ServiceRequestListResponse> => {
-    const response = await api.get<ServiceRequestListResponse>("/admin/service-requests", { params });
-    return response.data;
+    const response = await api.get<any>("/admin/service-requests", { params });
+    const body = response.data ?? {};
+    const inner = body.data ?? {};
+    // Backend returns { data: { items, meta } }; tolerate an older { data: [] } shape too.
+    const items = Array.isArray(inner) ? inner : inner.items ?? [];
+    const meta = Array.isArray(inner) ? body.meta : inner.meta;
+    return { ...body, data: items, meta };
   },
 
   getRequestById: async (id: string): Promise<ServiceRequestDetail> => {

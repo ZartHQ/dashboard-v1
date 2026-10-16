@@ -23,10 +23,12 @@ export interface CreateArtisanInput {
 export const artisansApi = {
   getArtisans: async (params?: GetArtisansParams): Promise<Artisan[]> => {
     const response = await api.get<any>("/admin/artisans", { params });
-    const rawData = Array.isArray(response.data.data)
-      ? response.data.data
-      : Array.isArray(response.data)
-        ? response.data
+    const inner = response.data?.data ?? {};
+    // Backend returns { data: { items, meta } }; tolerate { data: [] } too.
+    const rawData = Array.isArray(inner)
+      ? inner
+      : Array.isArray(inner.items)
+        ? inner.items
         : [];
     return rawData;
   },
