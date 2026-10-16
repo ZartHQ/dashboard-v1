@@ -56,10 +56,10 @@ export default function ArtisansPage() {
   };
 
   const CATEGORY_MAP: Record<string, number> = {
-    plumbing: 1,
-    electrical: 2,
-    carpentry: 3,
-    painting: 4,
+    plumber: 1,
+    electrician: 2,
+    carpenter: 3,
+    cleaner: 4,
   };
 
   const getVettingStatus = () => {
@@ -160,10 +160,10 @@ export default function ArtisansPage() {
           </div>
           <Select className="w-auto" value={category} onChange={(e) => setCategory(e.target.value)}>
             <option value="all">All categories</option>
-            <option value="plumbing">Plumbing</option>
-            <option value="electrical">Electrical</option>
-            <option value="carpentry">Carpentry</option>
-            <option value="painting">Painting</option>
+            <option value="plumber">Plumber</option>
+            <option value="electrician">Electrician</option>
+            <option value="carpenter">Carpenter</option>
+            <option value="cleaner">Cleaner</option>
           </Select>
           <Select className="w-auto" value={location} onChange={(e) => setLocation(e.target.value)}>
             <option value="all">All locations</option>
