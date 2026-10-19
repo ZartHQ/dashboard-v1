@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { STATUS_LABELS } from "../../../../features/requests/constants";
 import { cn, formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
+import { getApiErrorMessage } from "@/lib/apiError";
 import { 
   ArrowLeft, 
   Trash2, 
@@ -38,7 +39,7 @@ interface RequestDetailsPanelProps {
   setSelectedArtisanId: (id: string) => void;
   artisansList: Artisan[];
   handleAssign: () => void;
-  assignArtisanMutation: { isPending: boolean };
+  assignArtisanMutation: { isPending: boolean; isError?: boolean; error?: unknown };
   invoice: Invoice | null | undefined;
   isInvoiceLoading: boolean;
   createInvoiceMutation: any;
@@ -123,6 +124,15 @@ export function RequestDetailsPanel({
   const feePercent = subtotal >= 400000 ? 0.08 : 0.1;
   const fee = Math.round(subtotal * feePercent);
   const total = Math.max(0, subtotal + fee - discount);
+
+  // Only approved artisans can be assigned (the backend rejects any other status).
+  const approvedArtisans = (artisansList || []).filter((a) => a.vettingStatus === "approved");
+  const hasArtisansButNoneApproved = (artisansList || []).length > 0 && approvedArtisans.length === 0;
+  const noArtisansAtAll = (artisansList || []).length === 0;
+
+  // Invoices can only be created once the request is assigned.
+  const canCreateInvoice = reqStatus === "assigned";
+
   return (
     <div className={cn(
       "flex-1 flex flex-col overflow-hidden bg-[#f9f9f9] min-h-0 relative",
@@ -195,8 +205,10 @@ export function RequestDetailsPanel({
                     value={selectedArtisanId}
                     onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedArtisanId(e.target.value)}
                   >
-                    <option value="">Select artisan...</option>
-                    {artisansList?.map((a) => (
+                    <option value="">
+                      {approvedArtisans.length > 0 ? "Select artisan..." : "No approved artisans"}
+                    </option>
+                    {approvedArtisans.map((a) => (
                       <option key={a.id} value={a.id}>
                         {a.user.firstName} {a.user.lastName} ({a.artisanType.name})
                       </option>
@@ -316,14 +328,29 @@ export function RequestDetailsPanel({
                   className="w-full"
                   value={selectedArtisanId}
                   onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedArtisanId(e.target.value)}
+                  disabled={approvedArtisans.length === 0}
                 >
-                  <option value="">Select an artisan...</option>
-                  {artisansList?.map((a) => (
+                  <option value="">
+                    {approvedArtisans.length > 0 ? "Select an artisan..." : "No approved artisans available"}
+                  </option>
+                  {approvedArtisans.map((a) => (
                     <option key={a.id} value={a.id}>
                       {a.user?.firstName} {a.user?.lastName} — {a.artisanType.name} · {a.operatingArea.join(', ')} · ★ {a.rating ?? "—"} ({a.jobsDone} jobs)
                     </option>
                   ))}
                 </Select>
+
+                {/* Hint: explain why the list may be empty */}
+                {noArtisansAtAll && (
+                  <div className="flex items-center gap-1.5 bg-[#fff8e1] border border-[#ffe082] rounded-[6px] p-[6px_10px] text-[11px] text-[#8a6f00] font-semibold">
+                    <Info className="w-3.5 h-3.5 text-[#8a6f00]" /> No artisans yet. Add one on the Artisans page first.
+                  </div>
+                )}
+                {hasArtisansButNoneApproved && (
+                  <div className="flex items-center gap-1.5 bg-[#fff8e1] border border-[#ffe082] rounded-[6px] p-[6px_10px] text-[11px] text-[#8a6f00] font-semibold">
+                    <Info className="w-3.5 h-3.5 text-[#8a6f00]" /> Only approved artisans can be assigned. Approve one on the Artisans page.
+                  </div>
+                )}
 
                 <Button
                   variant="primary"
@@ -333,6 +360,14 @@ export function RequestDetailsPanel({
                 >
                   {assignArtisanMutation.isPending ? "Assigning..." : "Assign artisan & notify patron via app"}
                 </Button>
+
+                {/* Surface the backend error instead of failing silently */}
+                {assignArtisanMutation.isError && (
+                  <div className="flex items-center gap-1.5 bg-[#fff1f2] border border-[#fecdd3] rounded-[6px] p-[6px_10px] text-[11px] text-[#c41c1c] font-semibold">
+                    <Info className="w-3.5 h-3.5 text-[#c41c1c] shrink-0" />
+                    {getApiErrorMessage(assignArtisanMutation.error, "Could not assign artisan. Please try again.")}
+                  </div>
+                )}
               </div>
             ) : (
               <div className="flex flex-col gap-1.5">
@@ -523,6 +558,14 @@ export function RequestDetailsPanel({
                       </div>
                     </div>
 
+                    {/* Hint: invoices can only be created after the request is assigned */}
+                    {!invoice && !canCreateInvoice && (
+                      <div className="flex items-center gap-1.5 bg-[#fff8e1] border border-[#ffe082] rounded-[6px] p-[8px_12px] text-[11.5px] text-[#8a6f00] font-semibold">
+                        <Info className="w-4 h-4 text-[#8a6f00] shrink-0" />
+                        Assign an artisan to this request before creating an invoice.
+                      </div>
+                    )}
+
                     {/* Form actions */}
                     <div className="flex gap-2.5 mt-3 border-t border-[#f0f0f0] pt-4">
                       <Button
@@ -543,7 +586,8 @@ export function RequestDetailsPanel({
                         disabled={
                           createInvoiceMutation.isPending ||
                           updateInvoiceMutation.isPending ||
-                          items.filter(it => it.description.trim() !== "").length === 0
+                          items.filter(it => it.description.trim() !== "").length === 0 ||
+                          (!invoice && !canCreateInvoice)
                         }
                       >
                         <FileText className="w-4 h-4" /> {createInvoiceMutation.isPending || updateInvoiceMutation.isPending ? "Saving..." : invoice ? "Update Draft" : "Create Draft"}
@@ -562,6 +606,17 @@ export function RequestDetailsPanel({
                         </Button>
                       )}
                     </div>
+
+                    {/* Surface invoice errors instead of failing silently */}
+                    {(createInvoiceMutation.isError || updateInvoiceMutation.isError || sendInvoiceMutation.isError) && (
+                      <div className="flex items-center gap-1.5 bg-[#fff1f2] border border-[#fecdd3] rounded-[6px] p-[6px_10px] text-[11px] text-[#c41c1c] font-semibold">
+                        <Info className="w-3.5 h-3.5 text-[#c41c1c] shrink-0" />
+                        {getApiErrorMessage(
+                          createInvoiceMutation.error || updateInvoiceMutation.error || sendInvoiceMutation.error,
+                          "Could not save the invoice. Please try again."
+                        )}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   /* Read-Only State: Sent or Paid */
@@ -654,6 +709,17 @@ export function RequestDetailsPanel({
                         </Button>
                       )}
                     </div>
+
+                    {/* Surface send / mark-paid errors */}
+                    {(sendInvoiceMutation.isError || markInvoicePaidMutation.isError) && (
+                      <div className="flex items-center gap-1.5 bg-[#fff1f2] border border-[#fecdd3] rounded-[6px] p-[6px_10px] text-[11px] text-[#c41c1c] font-semibold">
+                        <Info className="w-3.5 h-3.5 text-[#c41c1c] shrink-0" />
+                        {getApiErrorMessage(
+                          sendInvoiceMutation.error || markInvoicePaidMutation.error,
+                          "Could not update the invoice. Please try again."
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
