@@ -6,13 +6,14 @@ import { clearSession, SessionAdmin } from "../../features/auth/auth";
 import { useRequests } from "../../features/requests/queries";
 import { useFlags } from "../../features/monitoring/queries";
 import { cn } from "@/lib/utils";
+import ThemeToggle from "./ThemeToggle";
 import { 
-  Home, 
-  ClipboardList, 
-  Wrench, 
-  User, 
-  AlertTriangle, 
-  CreditCard, 
+  Home,
+  ClipboardList,
+  Wrench,
+  User,
+  AlertTriangle,
+  CreditCard,
   BarChart3,
   LifeBuoy,
   LogOut,
@@ -55,11 +56,11 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
       href: "/dashboard/requests", 
       label: "Requests", 
       icon: ClipboardList, 
-      badge: pendingRequestsCount > 0 ? String(pendingRequestsCount) : undefined, 
-      section: "Operations" 
+      badge: pendingRequestsCount > 0 ? String(pendingRequestsCount) : undefined,
+      section: "Operations"
     },
-    { 
-      href: "/dashboard/artisans", 
+    {
+      href: "/dashboard/artisans",
       label: "Artisans", 
       icon: Wrench, 
       section: false 
@@ -174,8 +175,13 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
           })}
         </div>
 
+        {/* Theme toggle */}
+        <div className="mt-auto border-t border-white/10 pt-1">
+          <ThemeToggle />
+        </div>
+
         {/* Admin footer */}
-        <div className="mt-auto p-[16px] border-t border-white/10">
+        <div className="p-[16px] border-t border-white/10">
           <div className="flex items-center gap-[10px]">
             <Link
               href="/dashboard/profile"

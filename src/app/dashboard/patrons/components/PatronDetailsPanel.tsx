@@ -5,7 +5,8 @@ import { Patron } from "@/features/patrons/types";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, Phone, MessageSquare, MapPin, Calendar, Wrench, CreditCard } from "lucide-react";
+import { ArrowLeft, Phone, MapPin, Calendar, Wrench, CreditCard } from "lucide-react";
+import { PatronChat } from "./PatronChat";
 
 interface PatronDetailsPanelProps {
   selected: Patron;
@@ -47,9 +48,6 @@ export function PatronDetailsPanel({
           <Button variant="outline" className="text-xs h-9 flex items-center justify-center gap-1.5" onClick={() => window.open(`tel:${selected.id}`)}>
             <Phone className="w-3.5 h-3.5" /> Call
           </Button>
-          <Button variant="wa" className="text-xs h-9 flex items-center justify-center gap-1.5" onClick={() => window.open(`https://wa.me/${selected.id}`)}>
-            <MessageSquare className="w-3.5 h-3.5 text-white" /> WhatsApp
-          </Button>
         </div>
       </div>
 
@@ -75,6 +73,16 @@ export function PatronDetailsPanel({
                 </div>
               ))}
             </div>
+          </CardContent>
+        </Card>
+
+        {/* In-app chat with the patron */}
+        <Card className="overflow-hidden">
+          <CardHeader className="border-b border-[#f0f0f0]">
+            <CardTitle>Chat with patron</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <PatronChat patronId={selected.id} patronName={selected.name} />
           </CardContent>
         </Card>
 

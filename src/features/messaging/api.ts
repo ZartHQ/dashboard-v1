@@ -1,46 +1,31 @@
 import { api } from "@/lib/api";
-import { Message, SendMessageInput } from "./types";
-import { messagingStub } from "./stub";
-
-/**
- * While true, messaging runs on the local stub store so the UI works
- * without a backend. When the backend endpoints below are live, set this
- * to false (and delete ./stub.ts). No UI changes are needed.
- *
- * Expected backend routes:
- *   GET  /admin/requests/:id/messages        -> Message[]
- *   POST /admin/requests/:id/messages        -> Message   (body: { body })
- *   POST /admin/requests/:id/messages/read   -> void
- */
-export const USE_STUB = true;
+import { ChatMessage, Conversation, Paginated } from "./types";
 
 export const messagingApi = {
-  getThread: async (requestId: number): Promise<Message[]> => {
-    if (USE_STUB) return messagingStub.getThread(requestId);
-    const res = await api.get(`/admin/requests/${requestId}/messages`);
-    return res.data.data;
+  // List conversations (admin). Paginated; we pull a wide page so we can
+  // match a request's thread client-side (there is no get-by-request route).
+  getConversations: async (page = 1, limit = 100): Promise<Paginated<Conversation>> => {
+    const res = await api.get<any>("/admin/conversations", { params: { page, limit } });
+    const data = res.data?.data ?? {};
+    return {
+      items: Array.isArray(data.items) ? data.items : [],
+      meta: data.meta ?? { total: 0, page, limit, totalPages: 0 },
+    };
   },
 
-  sendMessage: async ({ requestId, body }: SendMessageInput): Promise<Message> => {
-    if (USE_STUB) {
-      return messagingStub.append({
-        id: `local-${Date.now()}`,
-        requestId,
-        body,
-        sender: "admin",
-        createdAt: new Date().toISOString(),
-        read: true,
-      });
-    }
-    const res = await api.post(`/admin/requests/${requestId}/messages`, { body });
-    return res.data.data;
+  // Find the conversation tied to a specific service request, if the patron
+  // has started one. Returns null when none exists yet.
+  findConversationForRequest: async (requestId: number): Promise<Conversation | null> => {
+    const { items } = await messagingApi.getConversations(1, 100);
+    return items.find((c) => c.serviceRequestId === requestId) ?? null;
   },
 
-  markRead: async (requestId: number): Promise<void> => {
-    if (USE_STUB) {
-      messagingStub.markRead(requestId);
-      return;
-    }
-    await api.post(`/admin/requests/${requestId}/messages/read`, {});
+  // Message history for a conversation. Page 1 = newest page, oldest-first within.
+  getMessages: async (conversationId: number, page = 1, limit = 50): Promise<ChatMessage[]> => {
+    const res = await api.get<any>(`/admin/conversations/${conversationId}/messages`, {
+      params: { page, limit },
+    });
+    const data = res.data?.data ?? {};
+    return Array.isArray(data.items) ? data.items : [];
   },
 };

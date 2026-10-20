@@ -68,11 +68,11 @@ html, body {
 
 .nav-section {
   padding: 16px 16px 6px;
-  font-size: 10px;
-  color: rgba(253,244,215,0.4);
+  font-size: 12px;
+  color: rgba(253,244,215,0.65);
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  font-weight: 600;
+  letter-spacing: 0.4px;
+  font-weight: 700;
 }
 .nav-item {
   display: flex;
@@ -156,8 +156,8 @@ html, body {
 .metric-label { font-size: 11px; color: var(--faint); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; }
 .metric-value { font-size: 26px; font-weight: 700; color: var(--green); }
 .metric-sub { font-size: 11px; margin-top: 4px; font-weight: 500; }
-.up { color: #166534; }
-.warn-color { color: #c2410c; }
+.up { color: var(--green); }
+.warn-color { color: var(--orange); }
 
 /* ─── Filter chips ─── */
 .chips { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -215,8 +215,8 @@ tr:hover td { background: #f9fffe; }
 .badge { display: inline-block; font-size: 10px; padding: 3px 10px; border-radius: 8px; font-weight: 700; }
 .badge-paid    { background: var(--green-lt); color: var(--green); border: 1px solid var(--green-bd); }
 .badge-pending { background: var(--cream); color: #8a6f00; border: 1px solid var(--cream-bd); }
-.badge-disputed{ background: var(--orange-lt); color: var(--orange); border: 1px solid #fecaca; }
-.badge-invoiced{ background: #fff3e0; color: #c2410c; border: 1px solid #fed7aa; }
+.badge-disputed{ background: var(--orange-lt); color: var(--orange); border: 1px solid #ffd4c7; }
+.badge-invoiced{ background: var(--cream); color: #8a6500; border: 1px solid var(--cream-bd); }
 .badge-refunded{ background: #f5f5f5; color: #888; border: 1px solid #e0e0e0; }
 .badge-vetted  { background: var(--green-lt); color: var(--green); border: 1px solid var(--green-bd); font-size: 9px; padding: 2px 6px; }
 
@@ -232,24 +232,24 @@ tr:hover td { background: #f9fffe; }
 .dot-pending   { background: var(--yellow); }
 .dot-assigned  { background: var(--green); }
 .dot-progress  { background: var(--orange); }
-.dot-done      { background: #22c55e; }
-.dot-cancelled { background: #ef4444; }
+.dot-done      { background: var(--green); }
+.dot-cancelled { background: #9aa0a6; }
 
 /* ─── Category badges ─── */
 .cat { font-size: 10px; padding: 2px 8px; border-radius: 6px; font-weight: 600; }
-.cat-plumb { background: #e0f0ff; color: #1e5a8e; }
-.cat-elec  { background: #fff3cc; color: #8a5f00; }
-.cat-carp  { background: #e8f5e8; color: #2a6b2a; }
-.cat-paint { background: #f0eaff; color: #5a3d8a; }
-.cat-ac    { background: #e0f8f8; color: #1a6a6a; }
-.cat-clean { background: #ffe8e8; color: #8a2020; }
+.cat-plumb,
+.cat-elec,
+.cat-carp,
+.cat-paint,
+.cat-ac,
+.cat-clean { background: var(--green-lt); color: var(--green); }
 
 /* ─── Status pills ─── */
 .sp { font-size: 10px; padding: 4px 10px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
-.sp-online   { background: #e8f5e8; color: #166534; border: 1px solid #bbf7d0; }
-.sp-busy     { background: #fff3e0; color: #c2410c; border: 1px solid #fed7aa; }
+.sp-online   { background: var(--green-lt); color: var(--green); border: 1px solid var(--green-bd); }
+.sp-busy     { background: var(--orange-lt); color: var(--orange); border: 1px solid #ffd4c7; }
 .sp-offline  { background: #f5f5f5; color: #888; border: 1px solid #e0e0e0; }
-.sp-suspended{ background: #ffe8e8; color: #c41c1c; border: 1px solid #fecaca; }
+.sp-suspended{ background: var(--orange-lt); color: var(--orange); border: 1px solid #ffd4c7; }
 
 /* ─── Internal note box ─── */
 .internal-label {
@@ -374,4 +374,206 @@ tr:hover td { background: #f9fffe; }
   .metrics { grid-template-columns: 1fr; }
   .content { padding: 16px; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   POLISH LAYER  -  depth, warmth and life (visual lift only)
+   Overrides the flat defaults above. Safe to tweak or remove.
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  /* brand-tinted soft shadows for cohesion */
+  --sh-sm: 0 1px 2px rgba(17,87,70,0.05), 0 1px 3px rgba(17,87,70,0.04);
+  --sh:    0 1px 3px rgba(17,87,70,0.05), 0 6px 16px rgba(17,87,70,0.06);
+  --sh-md: 0 4px 10px rgba(17,87,70,0.07), 0 14px 32px rgba(17,87,70,0.08);
+  --border: #ecebe4;      /* warmer, softer border */
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+}
+
+/* Warm, alive page background instead of flat grey */
+html, body {
+  background:
+    radial-gradient(1200px 600px at 100% -10%, rgba(255,201,42,0.06), transparent 60%),
+    radial-gradient(1000px 700px at -10% 110%, rgba(17,87,70,0.05), transparent 55%),
+    #f6f5f1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Sidebar: subtle gradient + depth */
+.sidebar {
+  background: linear-gradient(180deg, #13624e 0%, #0d4035 100%);
+  box-shadow: 2px 0 20px rgba(13,64,53,0.14);
+}
+.nav-item { border-radius: 0 10px 10px 0; margin-right: 10px; }
+.nav-item.active {
+  background: linear-gradient(90deg, rgba(250,72,18,0.18), rgba(255,255,255,0.10));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+}
+.nav-badge { box-shadow: 0 2px 6px rgba(250,72,18,0.35); }
+
+/* Topbar: lift off the page */
+.topbar {
+  background: rgba(255,255,255,0.86);
+  backdrop-filter: saturate(1.1) blur(8px);
+  box-shadow: 0 1px 0 rgba(17,87,70,0.06), 0 6px 18px rgba(17,87,70,0.04);
+}
+
+/* Cards / surfaces: soft shadow + hover lift */
+.card, .table-wrap, .flag-card {
+  border-color: var(--border);
+  box-shadow: var(--sh);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.card:hover, .flag-card:hover { box-shadow: var(--sh-md); transform: translateY(-2px); }
+.card-head { background: linear-gradient(180deg, #ffffff, #fcfbf8); }
+
+/* Metric tiles: depth, accent bar, hover */
+.metric {
+  border-color: var(--border);
+  box-shadow: var(--sh);
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.metric::before {
+  content: "";
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--green) 0%, var(--yellow) 55%, var(--orange) 100%);
+  opacity: 0.95;
+}
+/* brand trio accents: live dot pulses yellow->green, nav badge orange already */
+.live-pill { border-color: var(--yellow); }
+.live-pill .live-dot { background: var(--orange); }
+.metric:hover { box-shadow: var(--sh-md); transform: translateY(-2px); }
+.metric-value { letter-spacing: -0.5px; }
+
+/* Buttons: tactile shadow + press */
+.btn { box-shadow: var(--sh-sm); transition: all 0.16s ease; }
+.btn:hover { box-shadow: var(--sh); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); box-shadow: var(--sh-sm); }
+.btn-primary { background: linear-gradient(180deg, #14624f, #0f4e3f); }
+.btn-orange { background: linear-gradient(180deg, #fb5222, #f23e0a); box-shadow: 0 2px 8px rgba(250,72,18,0.28); }
+
+/* Chips: softer, with motion */
+.chip { transition: all 0.15s ease; box-shadow: var(--sh-sm); }
+.chip.active { box-shadow: 0 2px 8px rgba(17,87,70,0.22); }
+
+/* List rows: smoother active accent */
+.req-item.active, .patron-row.active {
+  background: linear-gradient(90deg, var(--green-lt), rgba(232,245,240,0.3));
+  box-shadow: inset 0 0 0 1px rgba(178,216,204,0.5);
+}
+
+/* Inputs: gentle focus ring */
+.search-input:focus, .sel:focus, .inv-input:focus {
+  box-shadow: 0 0 0 3px rgba(17,87,70,0.12);
+}
+
+/* Shared UI Card component (Tailwind-based) gets depth too */
+.ui-card { box-shadow: var(--sh); transition: box-shadow 0.2s ease, transform 0.2s ease; }
+.ui-card:hover { box-shadow: var(--sh-md); transform: translateY(-2px); }
+
+/* Refined scrollbars */
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: rgba(17,87,70,0.18); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(17,87,70,0.3); border: 2px solid transparent; background-clip: content-box; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* ══════════════════════════════════════════════════════════════
+   DARK MODE  -  deep Zart green. Toggle sets html[data-theme].
+   Re-maps brand tokens (green/orange/yellow stay) + overrides the
+   common inline light colours so every page flips, not just the
+   token-based ones.
+   ══════════════════════════════════════════════════════════════ */
+html[data-theme="dark"] {
+  --green-lt: #16281f;   /* active rows: subtle green tint */
+  --green-bd: #2c4a3f;
+  --orange-lt:#2a1710;
+  --cream:    #24231c;
+  --cream-bd: #46401f;
+  --text:     #f1f3f2;
+  --muted:    #aab2ad;
+  --faint:    #717773;
+  --border:   #2a2d2b;   /* neutral subtle divider */
+  --surface:  #17191a;   /* secondary surface */
+  --bg:       #0d0e0e;   /* near-black */
+  --white:    #1a1c1d;   /* cards: dark grey */
+  --wa-lt:    #14241b;
+  --green-txt:#4fd1a6;   /* brand green that reads on dark */
+  --cream-fg: #e4c56a;   /* skill-tag text on dark */
+  color-scheme: dark;
+}
+
+/* smooth the flip */
+html, body { transition: background-color .18s ease, color .18s ease; }
+
+/* base surface in dark: near-black with only a faint brand hint */
+html[data-theme="dark"], html[data-theme="dark"] body {
+  background:
+    radial-gradient(1100px 600px at 100% -10%, rgba(255,201,42,0.025), transparent 60%),
+    radial-gradient(900px 700px at -10% 110%, rgba(17,87,70,0.05), transparent 55%),
+    #0d0e0e;
+}
+
+/* sidebar: charcoal in dark (brand orange/cream accents stay) */
+html[data-theme="dark"] .sidebar {
+  background: linear-gradient(180deg, #141615 0%, #0f1110 100%);
+  box-shadow: 2px 0 20px rgba(0,0,0,0.4);
+  border-right: 1px solid #23262300;
+}
+
+/* polish-layer surfaces that were hardcoded light */
+html[data-theme="dark"] .topbar { background: rgba(22,24,25,0.85); box-shadow: 0 1px 0 rgba(0,0,0,0.3), 0 6px 18px rgba(0,0,0,0.3); }
+html[data-theme="dark"] .card-head { background: linear-gradient(180deg, #1a1c1d, #171919); }
+html[data-theme="dark"] .card, html[data-theme="dark"] .table-wrap, html[data-theme="dark"] .flag-card, html[data-theme="dark"] .metric, html[data-theme="dark"] .ui-card { box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 8px 22px rgba(0,0,0,0.35); }
+html[data-theme="dark"] .pagination, html[data-theme="dark"] .req-item:hover:not(.active), html[data-theme="dark"] .patron-row:hover:not(.active) { background: #17191a; }
+
+/* ── override common inline light utilities (Tailwind arbitrary values) ── */
+/* backgrounds -> dark card / surface */
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] .bg-\[\#fff\] { background-color: #1a1c1d !important; }
+html[data-theme="dark"] .bg-\[\#fafafa\],
+html[data-theme="dark"] .bg-\[\#f9f9f9\],
+html[data-theme="dark"] .bg-\[\#f5f5f5\],
+html[data-theme="dark"] .bg-\[\#f0f0f0\] { background-color: #17191a !important; }
+
+/* tinted surfaces whose companion text we flip to light -> dark tints,
+   so the light text stays readable (selected row, pending/assigned pills,
+   hint boxes). Category chips keep their light tint + dark text untouched. */
+html[data-theme="dark"] .bg-\[\#e8f5f0\] { background-color: #16281f !important; }  /* green tint: selected row, assigned */
+html[data-theme="dark"] .bg-\[\#FDF4D7\] { background-color: #262012 !important; }  /* cream: pending pill */
+html[data-theme="dark"] .bg-\[\#fff8e1\] { background-color: #241f10 !important; }  /* yellow hint box */
+html[data-theme="dark"] .bg-\[\#fff5f2\] { background-color: #2a1710 !important; }  /* orange tint: in progress */
+html[data-theme="dark"] .bg-\[\#f0fdf4\] { background-color: #122417 !important; }  /* green: completed */
+html[data-theme="dark"] .bg-\[\#f0fff4\] { background-color: #123726 !important; }  /* WhatsApp button */
+
+/* hover backgrounds are a SEPARATE class from the base, so override them too
+   (otherwise rows flash white on hover in dark mode) */
+html[data-theme="dark"] .hover\:bg-\[\#fafafa\]:hover,
+html[data-theme="dark"] .hover\:bg-\[\#f9f9f9\]:hover,
+html[data-theme="dark"] .hover\:bg-\[\#f5f5f5\]:hover,
+html[data-theme="dark"] .hover\:bg-gray-50:hover { background-color: #1f2221 !important; }
+html[data-theme="dark"] .hover\:bg-white:hover { background-color: #232625 !important; }
+
+/* borders -> green divider */
+html[data-theme="dark"] .border-\[\#f0f0f0\],
+html[data-theme="dark"] .border-\[\#f5f5f5\],
+html[data-theme="dark"] .border-\[\#e8e8e8\],
+html[data-theme="dark"] .border-\[\#e0e0e0\],
+html[data-theme="dark"] .border-\[\#e5e7eb\],
+html[data-theme="dark"] .border-\[\#ecebe4\],
+html[data-theme="dark"] .border-\[\#d1d5db\] { border-color: #2a2d2b !important; }
+
+/* text -> light hierarchy */
+html[data-theme="dark"] .text-\[\#1a1a1a\],
+html[data-theme="dark"] .text-\[\#333\] { color: #eef6f2 !important; }
+html[data-theme="dark"] .text-\[\#555\],
+html[data-theme="dark"] .text-\[\#666\],
+html[data-theme="dark"] .text-\[\#888\] { color: #a6c6ba !important; }
+html[data-theme="dark"] .text-\[\#aaa\] { color: #7a9b8e !important; }
+/* brand green text -> lighter mint so it reads on dark */
+html[data-theme="dark"] .text-\[\#115746\] { color: #5bc9a4 !important; }
+/* amber hint text on cream -> lighter */
+html[data-theme="dark"] .text-\[\#8a6f00\] { color: #e4c56a !important; }
 
