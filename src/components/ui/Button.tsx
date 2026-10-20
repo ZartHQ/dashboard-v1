@@ -4,13 +4,13 @@ import { cn } from "@/lib/utils"
 import { Loader2 } from "lucide-react"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-[10px] text-sm font-semibold shadow-sm transition-all duration-150 hover:-translate-y-px active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#115746]/25 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none disabled:translate-y-0",
   {
     variants: {
       variant: {
-        primary: "bg-[#115746] text-white hover:bg-[#0d4035]",
+        primary: "bg-gradient-to-b from-[#14624f] to-[#0f4e3f] text-white hover:shadow-md hover:brightness-105",
         outline: "border-[1.5px] border-[#115746] bg-white text-[#115746] hover:bg-[#115746] hover:text-white",
-        orange: "bg-[#FA4812] text-white hover:opacity-90",
+        orange: "bg-gradient-to-b from-[#fb5222] to-[#f23e0a] text-white shadow-[0_2px_8px_rgba(250,72,18,0.28)] hover:brightness-105",
         wa: "bg-[#f0fff4] text-[#25d366] border-[1.5px] border-[#25d366] hover:bg-[#25d366] hover:text-white",
         danger: "bg-[#fff8f6] text-[#FA4812] border-[1.5px] border-[#FA4812] hover:bg-[#FA4812] hover:text-white",
         plain: "bg-white text-[#888] border-[1.5px] border-[#e0e0e0] hover:bg-gray-50",

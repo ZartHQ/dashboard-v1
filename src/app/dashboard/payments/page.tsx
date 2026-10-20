@@ -19,6 +19,13 @@ export default function PaymentsPage() {
     return <PageLoader />;
   }
 
+  const list = payments || [];
+  const totalInvoiced = list.reduce((sum, p) => sum + (p.amount || 0), 0);
+  const totalCommission = list.reduce((sum, p) => sum + (p.fee || 0), 0);
+  const awaiting = list.filter((p) => p.status === "pending" || p.status === "invoiced");
+  const awaitingAmount = awaiting.reduce((sum, p) => sum + (p.amount || 0), 0);
+  const disputedCount = list.filter((p) => p.status === "disputed").length;
+
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <div className="bg-white border-b border-[#e8e8e8] p-[14px_24px] flex items-center justify-between sticky top-0 z-50 shrink-0">
@@ -28,10 +35,10 @@ export default function PaymentsPage() {
       <div className="p-6 overflow-y-auto flex-1">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
           {[
-            { label: "Total invoiced", val: "₦1.4M", sub: "+₦180k this week", up: true }, 
-            { label: "Zart commission (8%)", val: "₦112k", sub: "Earned this month", up: true }, 
-            { label: "Awaiting payment", val: "₦84k", sub: "12 invoices pending", up: false }, 
-            { label: "Disputed", val: "2", sub: "Needs resolution", up: false }
+            { label: "Total invoiced", val: formatCurrency(totalInvoiced), sub: `${list.length} transactions`, up: true },
+            { label: "Zart commission", val: formatCurrency(totalCommission), sub: "Earned to date", up: true },
+            { label: "Awaiting payment", val: formatCurrency(awaitingAmount), sub: `${awaiting.length} invoices pending`, up: false },
+            { label: "Disputed", val: disputedCount.toString(), sub: "Needs resolution", up: false }
           ].map((m) => (
             <Card key={m.label} className="p-[14px_16px]">
               <div className="text-[11px] text-[#aaa] mb-1.5 uppercase tracking-wider font-semibold">{m.label}</div>
@@ -107,20 +114,7 @@ export default function PaymentsPage() {
             </table>
           </div>
           <div className="flex items-center justify-between p-[12px_16px] border-t border-[#f0f0f0] bg-[#fafafa]">
-            <span className="text-[12px] text-[#aaa]">Showing {payments?.length || 0} of 128 transactions</span>
-            <div className="flex gap-1.5">
-              {["1", "2", "3", "→"].map((p, i) => (
-                <button 
-                  key={p} 
-                  className={cn(
-                    "text-[12px] p-[5px_12px] rounded-[6px] border-[1.5px] border-[#e0e0e0] text-[#888] font-semibold bg-white cursor-pointer transition-all",
-                    i === 0 && "bg-[#115746] text-white border-[#115746]"
-                  )}
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
+            <span className="text-[12px] text-[#aaa]">Showing {list.length} transactions</span>
           </div>
         </Card>
       </div>

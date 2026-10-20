@@ -22,7 +22,7 @@ export function ArtisanCard({ artisan: a, setViewingArtisan }: ArtisanCardProps)
           display: "flex",
           alignItems: "flex-start",
           gap: 12,
-          borderBottom: "1px solid #f0f0f0",
+          borderBottom: "1px solid var(--border)",
         }}
       >
         {a.user.image ? (
@@ -43,8 +43,8 @@ export function ArtisanCard({ artisan: a, setViewingArtisan }: ArtisanCardProps)
               width: 46,
               height: 46,
               borderRadius: "50%",
-              background: "#e8f5f0",
-              color: "#115746",
+              background: "var(--green-lt)",
+              color: "var(--green-txt, #115746)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -61,7 +61,7 @@ export function ArtisanCard({ artisan: a, setViewingArtisan }: ArtisanCardProps)
             style={{
               fontSize: 14,
               fontWeight: 700,
-              color: "#1a1a1a",
+              color: "var(--text)",
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -74,11 +74,11 @@ export function ArtisanCard({ artisan: a, setViewingArtisan }: ArtisanCardProps)
               </Badge>
             )}
           </div>
-          <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{a.artisanType.name}</div>
+          <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>{a.artisanType.name}</div>
           <div
             style={{
               fontSize: 11,
-              color: "#aaa",
+              color: "var(--faint)",
               marginTop: 2,
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -88,7 +88,7 @@ export function ArtisanCard({ artisan: a, setViewingArtisan }: ArtisanCardProps)
               gap: "4px"
             }}
           >
-            <MapPin className="w-3.5 h-3.5 text-[#aaa] shrink-0" /> {a.operatingArea.join(", ")} · {a.user.phone}
+            <MapPin className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--faint)" }} /> {a.operatingArea.join(", ")} · {a.user.phone}
           </div>
         </div>
         <span className={`sp ${STATUS_PILL[a.vettingStatus]?.cls || "sp-offline"}`}>
@@ -99,32 +99,32 @@ export function ArtisanCard({ artisan: a, setViewingArtisan }: ArtisanCardProps)
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
           {[
             { val: a.jobsDone, label: "Jobs done" },
-            { 
+            {
               val: (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>
-                  <Star className="w-4 h-4 fill-[#b27b00] text-[#b27b00]" />
+                  <Star className="w-4 h-4" style={{ fill: "#FFC92A", color: "#FFC92A" }} />
                   {a.rating ?? "—"}
                 </span>
-              ), 
-              label: "Rating" 
+              ),
+              label: "Rating"
             },
           ].map((s) => (
             <div
               key={s.label}
               style={{
-                background: "#f9f9f9",
+                background: "var(--surface)",
                 borderRadius: 8,
                 padding: 8,
                 textAlign: "center",
-                border: "1px solid #f0f0f0",
+                border: "1px solid var(--border)",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center"
               }}
             >
-              <div style={{ fontSize: 16, fontWeight: 700, color: "#115746", display: "flex", alignItems: "center" }}>{s.val}</div>
-              <div style={{ fontSize: 10, color: "#aaa", marginTop: 2 }}>{s.label}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "var(--green-txt, #115746)", display: "flex", alignItems: "center" }}>{s.val}</div>
+              <div style={{ fontSize: 10, color: "var(--faint)", marginTop: 2 }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -136,9 +136,9 @@ export function ArtisanCard({ artisan: a, setViewingArtisan }: ArtisanCardProps)
                 fontSize: 10,
                 padding: "3px 9px",
                 borderRadius: 6,
-                background: "#FDF4D7",
-                color: "#8a6f00",
-                border: "1px solid #e8d98a",
+                background: "var(--cream)",
+                color: "var(--cream-fg, #8a6500)",
+                border: "1px solid var(--cream-bd)",
                 fontWeight: 500,
               }}
             >
@@ -147,23 +147,23 @@ export function ArtisanCard({ artisan: a, setViewingArtisan }: ArtisanCardProps)
           ))}
         </div>
       </CardContent>
-      <div style={{ padding: "10px 16px", borderTop: "1px solid #f0f0f0", display: "flex", gap: 8 }}>
-        <Button 
-          variant="outline" 
+      <div style={{ padding: "10px 16px", borderTop: "1px solid var(--border)", display: "flex", gap: 8 }}>
+        <Button
+          variant="outline"
           className="w-10 h-8 p-0 flex items-center justify-center shrink-0"
           onClick={() => a.user.phone && window.open(`tel:${a.user.phone}`)}
         >
           <Phone className="w-3.5 h-3.5 text-[#115746]" />
         </Button>
-        <Button 
-          variant="wa" 
+        <Button
+          variant="wa"
           className="w-10 h-8 p-0 flex items-center justify-center shrink-0"
           onClick={() => a.user.phone && window.open(`https://wa.me/${a.user.phone.replace(/[^0-9]/g, "")}`)}
         >
-          <MessageSquare className="w-3.5 h-3.5 text-white" />
+          <MessageSquare className="w-3.5 h-3.5" />
         </Button>
-        <Button 
-          variant="primary" 
+        <Button
+          variant="primary"
           className="flex-1 h-8 text-xs font-bold uppercase tracking-wider"
           onClick={() => setViewingArtisan(a)}
         >

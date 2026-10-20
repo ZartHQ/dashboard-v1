@@ -1,19 +1,31 @@
-import { CATEGORIES, TOP_ARTISANS } from "./constants";
+import { api } from "@/lib/api";
 import { Category, TopArtisan } from "@/types";
 
+export interface ReportSummary {
+  jobsCompleted: number;
+  newPatrons: number;
+  revenueInvoiced: number;
+  completionRate: number; // percentage, e.g. 90
+}
+
+export interface PlatformHealth {
+  avgResponseTime: string;
+  avgJobDuration: string;
+  patronRepeatRate: string;
+  disputeRate: string;
+}
+
 export interface ReportsData {
+  summary: ReportSummary;
   categories: Category[];
   topArtisans: TopArtisan[];
+  platformHealth: PlatformHealth;
 }
 
 export const reportsApi = {
   getReports: async (): Promise<ReportsData> => {
-    // In real app: const response = await api.get("/reports"); return response.data;
-    return new Promise((resolve) => {
-      setTimeout(() => resolve({
-        categories: CATEGORIES,
-        topArtisans: TOP_ARTISANS,
-      }), 800);
-    });
+    // Confirm the route with the backend if it differs.
+    const response = await api.get("/admin/reports");
+    return response.data.data;
   },
 };

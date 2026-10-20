@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { STATUS_LABELS } from "../../../../features/requests/constants";
 import { cn, formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
+import { getApiErrorMessage } from "@/lib/apiError";
 import { 
   ArrowLeft, 
   Trash2, 
@@ -38,7 +39,7 @@ interface RequestDetailsPanelProps {
   setSelectedArtisanId: (id: string) => void;
   artisansList: Artisan[];
   handleAssign: () => void;
-  assignArtisanMutation: { isPending: boolean };
+  assignArtisanMutation: { isPending: boolean; isError?: boolean; error?: unknown };
   invoice: Invoice | null | undefined;
   isInvoiceLoading: boolean;
   createInvoiceMutation: any;
@@ -123,6 +124,15 @@ export function RequestDetailsPanel({
   const feePercent = subtotal >= 400000 ? 0.08 : 0.1;
   const fee = Math.round(subtotal * feePercent);
   const total = Math.max(0, subtotal + fee - discount);
+
+  // Only approved artisans can be assigned (the backend rejects any other status).
+  const approvedArtisans = (artisansList || []).filter((a) => a.vettingStatus === "approved");
+  const hasArtisansButNoneApproved = (artisansList || []).length > 0 && approvedArtisans.length === 0;
+  const noArtisansAtAll = (artisansList || []).length === 0;
+
+  // Invoices can only be created once the request is assigned.
+  const canCreateInvoice = reqStatus === "assigned";
+
   return (
     <div className={cn(
       "flex-1 flex flex-col overflow-hidden bg-[#f9f9f9] min-h-0 relative",
@@ -144,14 +154,7 @@ export function RequestDetailsPanel({
           <div className="text-[17px] font-bold text-[#115746] mb-1">{selected.title}</div>
           <div className="flex items-center gap-2">
             <span className="text-[12px] text-[#aaa]">#{selected.id}</span>
-            <span className={cn("text-[10px] px-2 py-0.5 rounded-[6px] font-semibold", `cat-${selected.artisanType?.name?.toLowerCase().substring(0, 5)}`,
-              selected.artisanType?.name?.toLowerCase().includes('plumb') && "bg-[#e0f0ff] text-[#1e5a8e]",
-              selected.artisanType?.name?.toLowerCase().includes('elec') && "bg-[#fff3cc] text-[#8a5f00]",
-              selected.artisanType?.name?.toLowerCase().includes('carp') && "bg-[#e8f5e8] text-[#2a6b2a]",
-              selected.artisanType?.name?.toLowerCase().includes('paint') && "bg-[#f0eaff] text-[#5a3d8a]",
-              selected.artisanType?.name?.toLowerCase().includes('ac') && "bg-[#e0f8f8] text-[#1a6a6a]",
-              selected.artisanType?.name?.toLowerCase().includes('clean') && "bg-[#ffe8e8] text-[#8a2020]"
-            )}>{selected.artisanType?.name}</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-[6px] font-semibold bg-[#e8f5f0] text-[#115746]">{selected.artisanType?.name}</span>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -161,9 +164,9 @@ export function RequestDetailsPanel({
             reqStatus === 'pending' && "bg-[#FDF4D7] text-[#8a6f00] border-[#e8d98a]",
             reqStatus === 'assigned' && "bg-[#e8f5f0] text-[#115746] border-[#b2d8cc]",
             reqStatus === 'in_progress' && "bg-[#fff5f2] text-[#FA4812] border-[#ffd4c7]",
-            reqStatus === 'completed' && "bg-[#f0fdf4] text-[#15803d] border-[#bbf7d0]",
+            reqStatus === 'completed' && "bg-[#e8f5f0] text-[#115746] border-[#b2d8cc]",
             reqStatus === 'cancelled' && "bg-[#f5f5f5] text-[#737373] border-[#e5e5e5]",
-            reqStatus === 'disputed' && "bg-[#fff1f2] text-[#e11d48] border-[#fecdd3]"
+            reqStatus === 'disputed' && "bg-[#fff5f2] text-[#FA4812] border-[#ffd4c7]"
           )}>
             {STATUS_LABELS[reqStatus] || reqStatus}
           </span>
@@ -173,7 +176,7 @@ export function RequestDetailsPanel({
             <div className="flex items-center gap-1.5 flex-wrap">
               <Button
                 variant="outline"
-                className="h-8 text-[11px] font-bold px-3 uppercase tracking-wider border-[#c41c1c] text-[#c41c1c] hover:bg-[#c41c1c] hover:text-white transition-all duration-200"
+                className="h-8 text-[11px] font-bold px-3 uppercase tracking-wider border-[#FA4812] text-[#FA4812] hover:bg-[#FA4812] hover:text-white transition-all duration-200"
                 onClick={() => handleUpdateStatus('cancelled')}
                 disabled={updateStatusMutation.isPending}
               >
@@ -195,8 +198,10 @@ export function RequestDetailsPanel({
                     value={selectedArtisanId}
                     onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedArtisanId(e.target.value)}
                   >
-                    <option value="">Select artisan...</option>
-                    {artisansList?.map((a) => (
+                    <option value="">
+                      {approvedArtisans.length > 0 ? "Select artisan..." : "No approved artisans"}
+                    </option>
+                    {approvedArtisans.map((a) => (
                       <option key={a.id} value={a.id}>
                         {a.user.firstName} {a.user.lastName} ({a.artisanType.name})
                       </option>
@@ -229,7 +234,7 @@ export function RequestDetailsPanel({
             <div className="flex items-center gap-1.5">
               <Button
                 variant="outline"
-                className="h-8 text-[11px] font-bold px-3 uppercase tracking-wider border-[#c41c1c] text-[#c41c1c] hover:bg-[#c41c1c] hover:text-white transition-all duration-200"
+                className="h-8 text-[11px] font-bold px-3 uppercase tracking-wider border-[#FA4812] text-[#FA4812] hover:bg-[#FA4812] hover:text-white transition-all duration-200"
                 onClick={() => handleUpdateStatus('cancelled')}
                 disabled={updateStatusMutation.isPending}
               >
@@ -272,7 +277,7 @@ export function RequestDetailsPanel({
               </div>
               <div className="flex flex-col gap-1">
                 <div className="text-[11px] text-[#aaa] font-medium font-outfit">Scheduled For</div>
-                <div className="text-[13px] text-[#1e5a8e] font-semibold">
+                <div className="text-[13px] text-[#115746] font-semibold">
                   {selected.scheduledAt ? formatDateTime(selected.scheduledAt) : "Not scheduled"}
                 </div>
               </div>
@@ -306,6 +311,7 @@ export function RequestDetailsPanel({
           </CardContent>
         </Card>
 
+
         {/* Assign */}
         <Card className="shrink-0">
           <CardHeader><CardTitle>Assign artisan</CardTitle></CardHeader>
@@ -316,14 +322,29 @@ export function RequestDetailsPanel({
                   className="w-full"
                   value={selectedArtisanId}
                   onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedArtisanId(e.target.value)}
+                  disabled={approvedArtisans.length === 0}
                 >
-                  <option value="">Select an artisan...</option>
-                  {artisansList?.map((a) => (
+                  <option value="">
+                    {approvedArtisans.length > 0 ? "Select an artisan..." : "No approved artisans available"}
+                  </option>
+                  {approvedArtisans.map((a) => (
                     <option key={a.id} value={a.id}>
                       {a.user?.firstName} {a.user?.lastName} — {a.artisanType.name} · {a.operatingArea.join(', ')} · ★ {a.rating ?? "—"} ({a.jobsDone} jobs)
                     </option>
                   ))}
                 </Select>
+
+                {/* Hint: explain why the list may be empty */}
+                {noArtisansAtAll && (
+                  <div className="flex items-center gap-1.5 bg-[#fff8e1] border border-[#ffe082] rounded-[6px] p-[6px_10px] text-[11px] text-[#8a6f00] font-semibold">
+                    <Info className="w-3.5 h-3.5 text-[#8a6f00]" /> No artisans yet. Add one on the Artisans page first.
+                  </div>
+                )}
+                {hasArtisansButNoneApproved && (
+                  <div className="flex items-center gap-1.5 bg-[#fff8e1] border border-[#ffe082] rounded-[6px] p-[6px_10px] text-[11px] text-[#8a6f00] font-semibold">
+                    <Info className="w-3.5 h-3.5 text-[#8a6f00]" /> Only approved artisans can be assigned. Approve one on the Artisans page.
+                  </div>
+                )}
 
                 <Button
                   variant="primary"
@@ -333,6 +354,14 @@ export function RequestDetailsPanel({
                 >
                   {assignArtisanMutation.isPending ? "Assigning..." : "Assign artisan & notify patron via app"}
                 </Button>
+
+                {/* Surface the backend error instead of failing silently */}
+                {assignArtisanMutation.isError && (
+                  <div className="flex items-center gap-1.5 bg-[#fff5f2] border border-[#ffd4c7] rounded-[6px] p-[6px_10px] text-[11px] text-[#FA4812] font-semibold">
+                    <Info className="w-3.5 h-3.5 text-[#FA4812] shrink-0" />
+                    {getApiErrorMessage(assignArtisanMutation.error, "Could not assign artisan. Please try again.")}
+                  </div>
+                )}
               </div>
             ) : (
               <div className="flex flex-col gap-1.5">
@@ -468,9 +497,9 @@ export function RequestDetailsPanel({
                             <button
                               type="button"
                               onClick={() => handleRemoveItem(idx)}
-                              className="text-[#c41c1c] hover:bg-red-50 h-8 w-8 flex items-center justify-center rounded-md border-none bg-transparent cursor-pointer text-sm"
+                              className="text-[#FA4812] hover:bg-[#fff5f2] h-8 w-8 flex items-center justify-center rounded-md border-none bg-transparent cursor-pointer text-sm"
                             >
-                              <Trash2 className="w-4 h-4 text-[#c41c1c]" />
+                              <Trash2 className="w-4 h-4 text-[#FA4812]" />
                             </button>
                           </div>
                         ))}
@@ -512,7 +541,7 @@ export function RequestDetailsPanel({
                         <span className="font-semibold text-[#FA4812]">{formatCurrency(fee)}</span>
                       </div>
                       {discount > 0 && (
-                        <div className="flex justify-between text-[13px] text-green-600">
+                        <div className="flex justify-between text-[13px] text-[#115746]">
                           <span>Discount</span>
                           <span className="font-semibold">-{formatCurrency(discount)}</span>
                         </div>
@@ -522,6 +551,14 @@ export function RequestDetailsPanel({
                         <span className="text-[18px] font-bold text-[#115746]">{formatCurrency(total)}</span>
                       </div>
                     </div>
+
+                    {/* Hint: invoices can only be created after the request is assigned */}
+                    {!invoice && !canCreateInvoice && (
+                      <div className="flex items-center gap-1.5 bg-[#fff8e1] border border-[#ffe082] rounded-[6px] p-[8px_12px] text-[11.5px] text-[#8a6f00] font-semibold">
+                        <Info className="w-4 h-4 text-[#8a6f00] shrink-0" />
+                        Assign an artisan to this request before creating an invoice.
+                      </div>
+                    )}
 
                     {/* Form actions */}
                     <div className="flex gap-2.5 mt-3 border-t border-[#f0f0f0] pt-4">
@@ -543,7 +580,8 @@ export function RequestDetailsPanel({
                         disabled={
                           createInvoiceMutation.isPending ||
                           updateInvoiceMutation.isPending ||
-                          items.filter(it => it.description.trim() !== "").length === 0
+                          items.filter(it => it.description.trim() !== "").length === 0 ||
+                          (!invoice && !canCreateInvoice)
                         }
                       >
                         <FileText className="w-4 h-4" /> {createInvoiceMutation.isPending || updateInvoiceMutation.isPending ? "Saving..." : invoice ? "Update Draft" : "Create Draft"}
@@ -562,6 +600,17 @@ export function RequestDetailsPanel({
                         </Button>
                       )}
                     </div>
+
+                    {/* Surface invoice errors instead of failing silently */}
+                    {(createInvoiceMutation.isError || updateInvoiceMutation.isError || sendInvoiceMutation.isError) && (
+                      <div className="flex items-center gap-1.5 bg-[#fff5f2] border border-[#ffd4c7] rounded-[6px] p-[6px_10px] text-[11px] text-[#FA4812] font-semibold">
+                        <Info className="w-3.5 h-3.5 text-[#FA4812] shrink-0" />
+                        {getApiErrorMessage(
+                          createInvoiceMutation.error || updateInvoiceMutation.error || sendInvoiceMutation.error,
+                          "Could not save the invoice. Please try again."
+                        )}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   /* Read-Only State: Sent or Paid */
@@ -606,7 +655,7 @@ export function RequestDetailsPanel({
                         </span>
                       </div>
                       {((invoice.discountAmount ?? 0) > 0 || parseFloat(invoice.discount as any) > 0) && (
-                        <div className="flex justify-between text-[12px] text-green-600">
+                        <div className="flex justify-between text-[12px] text-[#115746]">
                           <span>Discount</span>
                           <span className="font-medium">
                             -{formatCurrency(invoice.discountAmount ?? parseFloat(invoice.discount as any))}
@@ -654,6 +703,17 @@ export function RequestDetailsPanel({
                         </Button>
                       )}
                     </div>
+
+                    {/* Surface send / mark-paid errors */}
+                    {(sendInvoiceMutation.isError || markInvoicePaidMutation.isError) && (
+                      <div className="flex items-center gap-1.5 bg-[#fff5f2] border border-[#ffd4c7] rounded-[6px] p-[6px_10px] text-[11px] text-[#FA4812] font-semibold">
+                        <Info className="w-3.5 h-3.5 text-[#FA4812] shrink-0" />
+                        {getApiErrorMessage(
+                          sendInvoiceMutation.error || markInvoicePaidMutation.error,
+                          "Could not update the invoice. Please try again."
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

@@ -1,5 +1,4 @@
 import { api } from "@/lib/api";
-import { FLAGS } from "./constants";
 import { Flag } from "@/types";
 
 export interface QueueStats {
@@ -58,6 +57,8 @@ export const monitoringApi = {
   },
 
   getFlags: async (): Promise<Flag[]> => {
-    return new Promise((resolve) => setTimeout(() => resolve(FLAGS), 500));
+    // Confirm the route with the backend if it differs.
+    const response = await api.get("/admin/flags");
+    return response.data.data;
   },
 };
