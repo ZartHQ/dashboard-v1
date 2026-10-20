@@ -139,10 +139,10 @@ export function AddArtisanModal({
               Artisan Category
             </label>
             <Select value={artisanTypeId} onChange={(e) => setArtisanTypeId(e.target.value)}>
-              <option value="1">Plumbing</option>
-              <option value="2">Electrical</option>
-              <option value="3">Carpentry</option>
-              <option value="4">Painting</option>
+              <option value="1">Plumber</option>
+              <option value="2">Electrician</option>
+              <option value="3">Carpenter</option>
+              <option value="4">Cleaner</option>
             </Select>
           </div>
 
