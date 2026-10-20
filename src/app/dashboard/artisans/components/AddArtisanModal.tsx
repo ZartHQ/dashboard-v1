@@ -69,18 +69,18 @@ export function AddArtisanModal({
     >
       <div
         style={{
-          backgroundColor: "white",
+          backgroundColor: "var(--white)",
           borderRadius: "16px",
           width: "480px",
           padding: "24px",
           boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-          background: "#ffffff",
-          border: "1px solid #e8e8e8",
+          background: "var(--white)",
+          border: "1px solid var(--border)",
           fontFamily: "Outfit, sans-serif",
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
-          <h3 style={{ margin: 0, fontSize: "18px", fontWeight: 700, color: "#115746" }}>Add New Artisan</h3>
+          <h3 style={{ margin: 0, fontSize: "18px", fontWeight: 700, color: "var(--green-txt, #115746)" }}>Add New Artisan</h3>
           <button
             onClick={() => setIsModalOpen(false)}
             style={{
@@ -93,7 +93,7 @@ export function AddArtisanModal({
               padding: "4px",
             }}
           >
-            <X className="w-5 h-5 text-[#aaa] hover:text-black transition-colors" />
+            <X className="w-5 h-5 text-[var(--faint)] hover:text-[var(--text)] transition-colors" />
           </button>
         </div>
 
@@ -107,13 +107,13 @@ export function AddArtisanModal({
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
             <div>
-              <label style={{ fontSize: "11px", color: "#888", fontWeight: 600, display: "block", marginBottom: "4px" }}>
+              <label style={{ fontSize: "11px", color: "var(--muted)", fontWeight: 600, display: "block", marginBottom: "4px" }}>
                 First Name
               </label>
               <Input required placeholder="e.g. John" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
             </div>
             <div>
-              <label style={{ fontSize: "11px", color: "#888", fontWeight: 600, display: "block", marginBottom: "4px" }}>
+              <label style={{ fontSize: "11px", color: "var(--muted)", fontWeight: 600, display: "block", marginBottom: "4px" }}>
                 Last Name
               </label>
               <Input required placeholder="e.g. Doe" value={lastName} onChange={(e) => setLastName(e.target.value)} />
@@ -121,21 +121,21 @@ export function AddArtisanModal({
           </div>
 
           <div>
-            <label style={{ fontSize: "11px", color: "#888", fontWeight: 600, display: "block", marginBottom: "4px" }}>
+            <label style={{ fontSize: "11px", color: "var(--muted)", fontWeight: 600, display: "block", marginBottom: "4px" }}>
               Email Address
             </label>
             <Input required type="email" placeholder="e.g. john@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
 
           <div>
-            <label style={{ fontSize: "11px", color: "#888", fontWeight: 600, display: "block", marginBottom: "4px" }}>
+            <label style={{ fontSize: "11px", color: "var(--muted)", fontWeight: 600, display: "block", marginBottom: "4px" }}>
               Phone Number
             </label>
             <Input required placeholder="e.g. 09012345678" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
 
           <div>
-            <label style={{ fontSize: "11px", color: "#888", fontWeight: 600, display: "block", marginBottom: "4px" }}>
+            <label style={{ fontSize: "11px", color: "var(--muted)", fontWeight: 600, display: "block", marginBottom: "4px" }}>
               Artisan Category
             </label>
             <Select value={artisanTypeId} onChange={(e) => setArtisanTypeId(e.target.value)}>
@@ -147,14 +147,14 @@ export function AddArtisanModal({
           </div>
 
           <div>
-            <label style={{ fontSize: "11px", color: "#888", fontWeight: 600, display: "block", marginBottom: "4px" }}>
+            <label style={{ fontSize: "11px", color: "var(--muted)", fontWeight: 600, display: "block", marginBottom: "4px" }}>
               Operating Areas (comma separated)
             </label>
             <Input required placeholder="e.g. Lekki, Victoria Island" value={operatingArea} onChange={(e) => setOperatingArea(e.target.value)} />
           </div>
 
           <div>
-            <label style={{ fontSize: "11px", color: "#888", fontWeight: 600, display: "block", marginBottom: "4px" }}>
+            <label style={{ fontSize: "11px", color: "var(--muted)", fontWeight: 600, display: "block", marginBottom: "4px" }}>
               Skills (comma separated)
             </label>
             <Input required placeholder="e.g. Pipe fitting, Drain unclogging" value={skills} onChange={(e) => setSkills(e.target.value)} />
