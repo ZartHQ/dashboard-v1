@@ -10,6 +10,7 @@ import { PageLoader } from "@/components/ui/PageLoader";
 import { STATUS_LABELS } from "../../../../features/requests/constants";
 import { cn, formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
 import { getApiErrorMessage } from "@/lib/apiError";
+import { useRouter } from "next/navigation";
 import { 
   ArrowLeft, 
   Trash2, 
@@ -78,6 +79,7 @@ export function RequestDetailsPanel({
   handleAddNote,
   addNoteMutation,
 }: RequestDetailsPanelProps) {
+  const router = useRouter();
   const [description, setDescription] = useState("");
   const [discount, setDiscount] = useState<number>(0);
   const [items, setItems] = useState<InvoiceItem[]>([
@@ -304,8 +306,8 @@ export function RequestDetailsPanel({
               <Button variant="outline" className="flex-1 flex items-center justify-center gap-2 text-xs font-semibold" onClick={() => selected.patron?.phone && window.open(`tel:${selected.patron.phone}`)}>
                 <Phone className="w-4 h-4" /> Call patron
               </Button>
-              <Button variant="wa" className="flex-1 flex items-center justify-center gap-2 text-xs font-semibold" onClick={() => selected.patron?.phone && window.open(`https://wa.me/${selected.patron.phone.replace(/[^0-9]/g, "")}`)}>
-                <MessageSquare className="w-4 h-4" /> Notify patron in app
+              <Button variant="primary" className="flex-1 flex items-center justify-center gap-2 text-xs font-semibold" onClick={() => selected.patronId && router.push(`/dashboard/patrons?patronId=${selected.patronId}`)}>
+                <MessageSquare className="w-4 h-4" /> Message patron
               </Button>
             </div>
           </CardContent>
