@@ -111,7 +111,7 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
 
       <aside 
         className={cn(
-          "w-[220px] bg-[#115746] flex flex-col flex-shrink-0 min-h-screen fixed top-0 z-[100] transition-all duration-300 md:left-0",
+          "w-[220px] bg-[#0d3d31] flex flex-col flex-shrink-0 min-h-screen fixed top-0 z-[100] transition-all duration-300 md:left-0",
           isOpen ? "left-0" : "-left-[220px]"
         )}
       >

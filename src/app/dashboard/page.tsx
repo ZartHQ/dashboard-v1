@@ -21,19 +21,19 @@ const BookingsIcon = () => (
 );
 
 const UserIcon = () => (
-  <svg className="w-5 h-5 text-[#c2410c]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+  <svg className="w-5 h-5 text-[#115746]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
   </svg>
 );
 
 const FlagsIcon = () => (
-  <svg className="w-5 h-5 text-[#c41c1c]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+  <svg className="w-5 h-5 text-[#FA4812]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
   </svg>
 );
 
 const RevenueIcon = () => (
-  <svg className="w-5 h-5 text-[#8a6f00]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+  <svg className="w-5 h-5 text-[#115746]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M12 16v1M10 11h4" />
   </svg>
 );
@@ -88,36 +88,36 @@ export default function DashboardPage() {
               value: activeRequestsCount,
               desc: "In progress, assigned, & pending",
               icon: <BookingsIcon />,
-              bg: "from-[#e8f5f0] to-[#f4fbf8]",
-              border: "border-[#b2d8cc]",
-              color: "text-[#115746]"
+              bg: "from-white to-[#fdfbf6]",
+              border: "border-[#efeae0]",
+              color: "text-[#0d3d31]"
             },
             {
               title: "Vetted Artisans",
               value: vettedArtisansCount,
               desc: "Approved active operators",
               icon: <UserIcon />,
-              bg: "from-[#fff3e0] to-[#fffbf5]",
-              border: "border-[#ffe082]",
-              color: "text-[#c2410c]"
+              bg: "from-white to-[#fdfbf6]",
+              border: "border-[#efeae0]",
+              color: "text-[#0d3d31]"
             },
             {
               title: "Registered Patrons",
               value: totalPatronsCount,
               desc: "Total client accounts on Zart",
               icon: <RevenueIcon />,
-              bg: "from-[#fffde6] to-[#fffff0]",
-              border: "border-[#fef08a]",
-              color: "text-[#856404]"
+              bg: "from-white to-[#fdfbf6]",
+              border: "border-[#efeae0]",
+              color: "text-[#0d3d31]"
             },
             {
               title: "Active Flags",
               value: openFlagsCount,
               desc: "Requires immediate attention",
               icon: <FlagsIcon />,
-              bg: "from-[#ffe8e8] to-[#fff5f5]",
-              border: "border-[#fecaca]",
-              color: "text-[#c41c1c]"
+              bg: "from-white to-[#fdfbf6]",
+              border: "border-[#efeae0]",
+              color: "text-[#FA4812]"
             }
           ].map((stat) => (
             <Card key={stat.title} className={cn("border border-solid bg-gradient-to-br", stat.border, stat.bg)}>
