@@ -25,12 +25,13 @@ export default function PatronsPage() {
     const name = p.name || `${firstName} ${lastName}`.trim();
     const initials = p.initials || `${firstName[0]}${lastName[0] || ""}`.toUpperCase();
     
+    // Brand palette only (green / orange / yellow + a neutral) — no off-brand
+    // blues/purples/reds.
     const avColors = [
-      { bg: "#e8f5f0", text: "#115746" },
-      { bg: "#fff3e0", text: "#c2410c" },
-      { bg: "#FDF4D7", text: "#8a6f00" },
-      { bg: "#f0eaff", text: "#5a3d8a" },
-      { bg: "#e8f5e8", text: "#166534" }
+      { bg: "#e8f5f0", text: "#115746" }, // green
+      { bg: "#FEE9E3", text: "#FA4812" }, // orange
+      { bg: "#FDF4D7", text: "#8a6f00" }, // yellow / cream
+      { bg: "#f0f0f0", text: "#555555" }, // neutral
     ];
     const colorPair = avColors[p.id % avColors.length] || avColors[0];
 
