@@ -8,7 +8,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "ui-card rounded-[16px] border-[1.5px] border-[#ecebe4] bg-white text-card-foreground overflow-hidden",
+      "ui-card rounded-[18px] border border-[var(--border)] bg-[var(--white)] text-card-foreground overflow-hidden shadow-[0_1px_2px_rgba(33,29,24,0.04),0_6px_20px_rgba(33,29,24,0.05)]",
       className
     )}
     {...props}
@@ -22,7 +22,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center justify-between p-[12px_16px] border-b border-[#e8e8e8]", className)}
+    className={cn("flex items-center justify-between p-[14px_18px] border-b border-[var(--border)]", className)}
     {...props}
   />
 ))
@@ -35,7 +35,7 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-[13px] font-bold text-[#115746] uppercase tracking-[0.5px]",
+      "text-[15px] font-semibold text-[var(--green-txt,#115746)] tracking-[-0.01em]",
       className
     )}
     {...props}
