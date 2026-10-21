@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Patron } from "@/features/patrons/types";
 import { DbPatron } from "@/types";
 import { usePatrons } from "../../../features/patrons/queries";
@@ -17,12 +17,9 @@ export default function PatronsPage() {
   const { data: patrons, isLoading: patronsLoading } = usePatrons();
   const [selected, setSelected] = useState<Patron | null>(null);
   const [isMobileDetailActive, setIsMobileDetailActive] = useState(false);
+  const didDeepLink = useRef(false);
 
-  if (patronsLoading) {
-    return <PageLoader />;
-  }
-
-  const patronsList = (patrons || []).map((p: DbPatron) => {
+  const toPatron = (p: DbPatron) => {
     const firstName = p.firstName || p.name?.split(" ")[0] || "Patron";
     const lastName = p.lastName || p.name?.split(" ")[1] || "";
     const name = p.name || `${firstName} ${lastName}`.trim();
@@ -53,7 +50,27 @@ export default function PatronsPage() {
       unread: !!p.unread,
       time: p.time || ""
     };
-  });
+  };
+
+  // Deep-link: /dashboard/patrons?patronId=<id> opens that patron (e.g. from a request).
+  useEffect(() => {
+    if (didDeepLink.current || !patrons) return;
+    const pid = new URLSearchParams(window.location.search).get("patronId");
+    if (!pid) return;
+    const raw = (patrons as DbPatron[]).find((p) => String(p.id) === pid);
+    if (raw) {
+      setSelected(toPatron(raw));
+      setIsMobileDetailActive(true);
+      didDeepLink.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patrons]);
+
+  if (patronsLoading) {
+    return <PageLoader />;
+  }
+
+  const patronsList = (patrons || []).map(toPatron);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
