@@ -205,7 +205,7 @@ export function RequestDetailsPanel({
                     </option>
                     {approvedArtisans.map((a) => (
                       <option key={a.id} value={a.id}>
-                        {a.user.firstName} {a.user.lastName} ({a.artisanType.name})
+                        {a.user?.firstName} {a.user?.lastName} ({a.artisanType?.name})
                       </option>
                     ))}
                   </Select>
@@ -331,7 +331,7 @@ export function RequestDetailsPanel({
                   </option>
                   {approvedArtisans.map((a) => (
                     <option key={a.id} value={a.id}>
-                      {a.user?.firstName} {a.user?.lastName} — {a.artisanType.name} · {a.operatingArea.join(', ')} · ★ {a.rating ?? "—"} ({a.jobsDone} jobs)
+                      {a.user?.firstName} {a.user?.lastName} — {a.artisanType?.name} · {(a.operatingArea || []).join(', ')} · ★ {a.rating ?? "—"} ({a.jobsDone} jobs)
                     </option>
                   ))}
                 </Select>
