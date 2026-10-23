@@ -94,8 +94,10 @@ export default function RequestsPage() {
 
   const handleUpdateStatus = (newStatus: ServiceRequestStatus) => {
     if (selected?.id) {
+      // Don't flip the badge optimistically — the backend enforces the
+      // transition order (assigned -> in_progress -> completed) and can reject.
+      // The badge updates from the refetched request once the server confirms.
       updateStatusMutation.mutate({ id: selected.id.toString(), status: newStatus });
-      setReqStatus(newStatus);
     }
   };
 

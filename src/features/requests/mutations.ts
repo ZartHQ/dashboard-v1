@@ -112,8 +112,9 @@ export function useMarkInvoicePaidMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (requestId: string) => requestsApi.markInvoicePaid(requestId),
-    onSuccess: (data, requestId) => {
+    mutationFn: ({ requestId, overrideReason }: { requestId: string; overrideReason: string }) =>
+      requestsApi.markInvoicePaid(requestId, overrideReason),
+    onSuccess: (data, { requestId }) => {
       queryClient.invalidateQueries({ queryKey: ["admin", "service-requests", requestId, "invoice"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "service-requests"] });
     },

@@ -153,7 +153,7 @@ export function RequestDetailsPanel({
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back to requests
           </button>
-          <div className="text-[17px] font-bold text-[#115746] mb-1">{selected.title}</div>
+          <div className="text-[17px] font-bold text-[#1a1a1a] mb-1">{selected.title}</div>
           <div className="flex items-center gap-2">
             <span className="text-[12px] text-[#aaa]">#{selected.id}</span>
             <span className="text-[10px] px-2 py-0.5 rounded-[6px] font-semibold bg-[#e8f5f0] text-[#115746]">{selected.artisanType?.name}</span>
@@ -232,7 +232,29 @@ export function RequestDetailsPanel({
             </div>
           )}
 
-          {(reqStatus === 'assigned' || reqStatus === 'in_progress') && (
+          {reqStatus === 'assigned' && (
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant="outline"
+                className="h-8 text-[11px] font-bold px-3 uppercase tracking-wider border-[#FA4812] text-[#FA4812] hover:bg-[#FA4812] hover:text-white transition-all duration-200"
+                onClick={() => handleUpdateStatus('cancelled')}
+                disabled={updateStatusMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                className="h-8 text-[11px] font-bold px-3 uppercase tracking-wider"
+                onClick={() => handleUpdateStatus('in_progress')}
+                disabled={updateStatusMutation.isPending || invoice?.status !== 'paid'}
+                title={invoice?.status !== 'paid' ? 'Invoice must be paid before starting the job' : undefined}
+              >
+                Start job
+              </Button>
+            </div>
+          )}
+
+          {reqStatus === 'in_progress' && (
             <div className="flex items-center gap-1.5">
               <Button
                 variant="outline"
@@ -685,7 +707,17 @@ export function RequestDetailsPanel({
                           <Button
                             variant="primary"
                             className="flex-1 text-[11px] font-bold px-3 uppercase tracking-wider flex items-center justify-center gap-2"
-                            onClick={() => markInvoicePaidMutation.mutate(selected.id.toString())}
+                            onClick={() => {
+                              const reason = window.prompt(
+                                "Reason for marking this invoice paid (e.g. bank transfer confirmed):"
+                              );
+                              if (reason && reason.trim()) {
+                                markInvoicePaidMutation.mutate({
+                                  requestId: selected.id.toString(),
+                                  overrideReason: reason.trim(),
+                                });
+                              }
+                            }}
                             disabled={markInvoicePaidMutation.isPending}
                           >
                             <Check className="w-4 h-4" /> {markInvoicePaidMutation.isPending ? "Mark Paid" : "Mark as Paid"}
