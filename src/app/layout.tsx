@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import "../styles/globals.css";
 
@@ -22,6 +22,18 @@ export const metadata: Metadata = {
     shortcut: "/favicon/favicon.ico",
   },
   manifest: "/favicon/site.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Zart",
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0d3d31",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 import Providers from "@/components/Providers";
