@@ -12,8 +12,8 @@ export function useAdminSignin() {
     onSuccess: (data) => {
       // Assuming data is LoginData containing user and accessToken
       if (typeof window !== "undefined") {
-        sessionStorage.setItem("zart_access_token", data.accessToken);
-        sessionStorage.setItem("zart_refresh_token", data.refreshToken);
+        localStorage.setItem("zart_access_token", data.accessToken);
+        localStorage.setItem("zart_refresh_token", data.refreshToken);
       }
       queryClient.setQueryData(AUTH_QUERY_KEY, data.user);
       router.push("/dashboard");

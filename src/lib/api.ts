@@ -4,6 +4,7 @@ import { API_BASE_URL } from "./config";
 export const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: false,
+  timeout: 20000, // fail a stalled request instead of spinning forever (PWA/mobile)
   headers: {
     "Content-Type": "application/json",
   },
@@ -12,7 +13,7 @@ export const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {
-      const token = sessionStorage.getItem("zart_access_token");
+      const token = localStorage.getItem("zart_access_token");
       // Skip attaching the token for the signin route
       if (token && !config.url?.includes("/admin/signin")) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -49,8 +50,8 @@ api.interceptors.response.use(
         originalRequest.url?.includes("/admin/signin")
       ) {
         if (typeof window !== "undefined") {
-          sessionStorage.removeItem("zart_access_token");
-          sessionStorage.removeItem("zart_refresh_token");
+          localStorage.removeItem("zart_access_token");
+          localStorage.removeItem("zart_refresh_token");
         }
         return Promise.reject(error);
       }
@@ -72,7 +73,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       if (typeof window !== "undefined") {
-        const refreshToken = sessionStorage.getItem("zart_refresh_token");
+        const refreshToken = localStorage.getItem("zart_refresh_token");
         if (refreshToken) {
           try {
             const res = await axios.post(`${API_BASE_URL}/auth/refresh`, {
@@ -80,9 +81,9 @@ api.interceptors.response.use(
             });
             const { accessToken, refreshToken: newRefreshToken } = res.data.data;
 
-            sessionStorage.setItem("zart_access_token", accessToken);
+            localStorage.setItem("zart_access_token", accessToken);
             if (newRefreshToken) {
-              sessionStorage.setItem("zart_refresh_token", newRefreshToken);
+              localStorage.setItem("zart_refresh_token", newRefreshToken);
             }
 
             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
@@ -92,11 +93,16 @@ api.interceptors.response.use(
           } catch (refreshError) {
             processQueue(refreshError, null);
             isRefreshing = false;
-            sessionStorage.removeItem("zart_access_token");
-            sessionStorage.removeItem("zart_refresh_token");
+            localStorage.removeItem("zart_access_token");
+            localStorage.removeItem("zart_refresh_token");
             window.location.href = "/";
             return Promise.reject(refreshError);
           }
+        } else {
+          // No refresh token (e.g. a fresh PWA launch): reset the lock so later
+          // 401s don't queue forever; the rejection falls through to the login.
+          isRefreshing = false;
+          processQueue(error, null);
         }
       }
     }

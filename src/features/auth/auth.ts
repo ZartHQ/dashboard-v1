@@ -47,9 +47,9 @@ export async function clearSession() {
     console.error("Logout failed", err);
   } finally {
     if (typeof window !== "undefined") {
-      sessionStorage.removeItem("zart_admin");
-      sessionStorage.removeItem("zart_access_token");
-      sessionStorage.removeItem("zart_refresh_token");
+      localStorage.removeItem("zart_admin");
+      localStorage.removeItem("zart_access_token");
+      localStorage.removeItem("zart_refresh_token");
       window.location.href = "/";
     }
   }

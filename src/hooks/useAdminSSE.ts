@@ -14,7 +14,7 @@ export function useAdminSSE() {
       if (!active) return;
       setStatus("connecting");
 
-      const token = typeof window !== "undefined" ? sessionStorage.getItem("zart_access_token") : null;
+      const token = typeof window !== "undefined" ? localStorage.getItem("zart_access_token") : null;
       if (!token) {
         setStatus("disconnected");
         return;
