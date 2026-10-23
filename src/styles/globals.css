@@ -578,3 +578,13 @@ html[data-theme="dark"] .text-\[\#115746\] { color: #cdd6d1 !important; }
 /* amber hint text on cream -> lighter */
 html[data-theme="dark"] .text-\[\#8a6f00\] { color: #e4c56a !important; }
 
+/* Dashboard stat cards were whitish gradients in dark mode -> dark surfaces */
+html[data-theme="dark"] .bg-gradient-to-br.from-white {
+  background-image: none !important;
+  background-color: #1a1c1d !important;
+}
+html[data-theme="dark"] .border-\[\#efeae0\] { border-color: #2a2d2b !important; }
+html[data-theme="dark"] .text-\[\#0d3d31\] { color: #5bc9a4 !important; }
+html[data-theme="dark"] .bg-white\/70 { background-color: rgba(255,255,255,0.06) !important; }
+html[data-theme="dark"] .border-white\/50 { border-color: rgba(255,255,255,0.08) !important; }
+
