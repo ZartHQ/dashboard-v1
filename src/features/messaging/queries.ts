@@ -4,6 +4,23 @@ import { messagingApi } from "./api";
 import { ChatMessage, Conversation } from "./types";
 import { getChatSocket } from "@/lib/socket";
 
+/** All patron conversations, newest activity first, for the Messages section. */
+export function useConversations() {
+  return useQuery<Conversation[]>({
+    queryKey: ["admin", "conversations", "all"],
+    queryFn: async () => {
+      const res = await messagingApi.getConversations(1, 100);
+      const items = res.items ?? [];
+      return [...items].sort((a, b) => {
+        const at = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+        const bt = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+        return bt - at;
+      });
+    },
+    refetchInterval: 15000,
+  });
+}
+
 /** Resolve the conversation tied to a service request (null if none yet). */
 export function useRequestConversation(requestId: number | null | undefined) {
   return useQuery<Conversation | null>({
@@ -72,6 +89,17 @@ export function useChatThread(conversationId: number | null | undefined): ChatTh
       );
     };
 
+    // The gateway confirms the sender's own message with a "message_sent"
+    // event (not a socket ack), carrying the saved message. Use it to clear
+    // the "sending" state and show the message in our own thread.
+    const onMessageSent = (payload: { conversationId: number; message: ChatMessage }) => {
+      if (payload.conversationId !== conversationId) return;
+      setSending(false);
+      setMessages((prev) =>
+        prev.some((m) => m.id === payload.message.id) ? prev : [...prev, payload.message]
+      );
+    };
+
     const onError = (payload: { code: string; message: string }) => {
       setError(payload?.message || "Chat error");
       setSending(false);
@@ -80,6 +108,7 @@ export function useChatThread(conversationId: number | null | undefined): ChatTh
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("new_message", onNewMessage);
+    socket.on("message_sent", onMessageSent);
     socket.on("message_read", onRead);
     socket.on("chat_error", onError);
 
@@ -90,6 +119,7 @@ export function useChatThread(conversationId: number | null | undefined): ChatTh
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
       socket.off("new_message", onNewMessage);
+      socket.off("message_sent", onMessageSent);
       socket.off("message_read", onRead);
       socket.off("chat_error", onError);
     };
@@ -123,18 +153,9 @@ export function useChatThread(conversationId: number | null | undefined): ChatTh
       }
       setSending(true);
       setError(null);
-      socket.emit(
-        "send_message",
-        { conversationId, content: body },
-        (ack: { event: string; data: { conversationId: number; message: ChatMessage } }) => {
-          setSending(false);
-          if (ack?.data?.message) {
-            setMessages((prev) =>
-              prev.some((m) => m.id === ack.data.message.id) ? prev : [...prev, ack.data.message]
-            );
-          }
-        }
-      );
+      // The server confirms via the "message_sent" event (handled above),
+      // which clears `sending` and appends the saved message.
+      socket.emit("send_message", { conversationId, content: body });
     },
     [conversationId]
   );
