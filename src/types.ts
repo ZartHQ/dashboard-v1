@@ -270,3 +270,40 @@ export interface UpdateInvoiceDto {
   discount?: number;
   items?: InvoiceItem[];
 }
+
+export type RefundStatus = "pending" | "sent";
+
+export type RefundReason = "patron_cancelled" | "zart_cancelled";
+
+export interface Refund {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  serviceRequestId: number;
+  invoiceId: number;
+  // Decimal columns can arrive as strings
+  amountPaid: number | string;
+  feeAmount: number | string;
+  refundAmount: number | string;
+  reason: RefundReason;
+  status: RefundStatus;
+  // Null for zart_cancelled until an admin gets the patron's details
+  bankName: string | null;
+  accountNumber: string | null;
+  accountName: string | null;
+  sentAt: string | null;
+  note: string | null;
+  serviceRequest: {
+    id: number;
+    title: string;
+    referenceId: string;
+    status: ServiceRequestStatus;
+    patron: {
+      id: number;
+      firstName: string;
+      lastName: string;
+      email: string;
+      phone?: string | null;
+    };
+  };
+}
