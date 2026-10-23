@@ -16,7 +16,7 @@ let socket: Socket | null = null;
 export function getChatSocket(): Socket | null {
   if (typeof window === "undefined") return null;
 
-  const token = sessionStorage.getItem("zart_access_token");
+  const token = localStorage.getItem("zart_access_token");
   if (!token) return null;
 
   if (socket) return socket;
@@ -33,7 +33,7 @@ export function getChatSocket(): Socket | null {
 
   // Keep the token fresh across reconnects (it may have been refreshed).
   socket.on("reconnect_attempt", () => {
-    const fresh = sessionStorage.getItem("zart_access_token");
+    const fresh = localStorage.getItem("zart_access_token");
     if (fresh && socket) socket.auth = { token: fresh };
   });
 
