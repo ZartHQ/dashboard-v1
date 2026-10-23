@@ -8,11 +8,12 @@ import { useFlags } from "../../features/monitoring/queries";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "./ThemeToggle";
 import { 
-  Home,
+  LayoutDashboard,
   ClipboardList,
   Wrench,
-  User,
-  AlertTriangle,
+  Users,
+  MessageSquare,
+  Flag,
   CreditCard,
   BarChart3,
   LifeBuoy,
@@ -49,7 +50,7 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
     { 
       href: "/dashboard", 
       label: "Dashboard", 
-      icon: Home, 
+      icon: LayoutDashboard, 
       section: "Overview" 
     },
     { 
@@ -65,16 +66,22 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
       icon: Wrench, 
       section: false 
     },
-    { 
-      href: "/dashboard/patrons",  
-      label: "Patrons",  
-      icon: User, 
-      section: false 
+    {
+      href: "/dashboard/patrons",
+      label: "Patrons",
+      icon: Users,
+      section: false
+    },
+    {
+      href: "/dashboard/messages",
+      label: "Messages",
+      icon: MessageSquare,
+      section: false
     },
     { 
       href: "/dashboard/flags",    
       label: "Flags",    
-      icon: AlertTriangle, 
+      icon: Flag, 
       badge: openFlagsCount > 0 ? String(openFlagsCount) : undefined, 
       badgeWarn: true, 
       section: "Monitor" 

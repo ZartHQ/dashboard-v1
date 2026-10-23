@@ -75,8 +75,11 @@ export const requestsApi = {
     return response.data;
   },
 
-  markInvoicePaid: async (requestId: string): Promise<any> => {
-    const response = await api.post<any>(`/admin/service-requests/${requestId}/invoice/mark-paid`);
+  markInvoicePaid: async (requestId: string, overrideReason: string): Promise<any> => {
+    const response = await api.post<any>(
+      `/admin/service-requests/${requestId}/invoice/mark-paid`,
+      { overrideReason }
+    );
     return response.data;
   }
 };
