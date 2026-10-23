@@ -572,8 +572,9 @@ html[data-theme="dark"] .text-\[\#555\],
 html[data-theme="dark"] .text-\[\#666\],
 html[data-theme="dark"] .text-\[\#888\] { color: #a6c6ba !important; }
 html[data-theme="dark"] .text-\[\#aaa\] { color: #7a9b8e !important; }
-/* brand green text -> lighter mint so it reads on dark */
-html[data-theme="dark"] .text-\[\#115746\] { color: #5bc9a4 !important; }
+/* brand green text -> soft neutral so dark mode isn't a wall of green
+   (green stays on buttons + sidebar as the brand accent) */
+html[data-theme="dark"] .text-\[\#115746\] { color: #cdd6d1 !important; }
 /* amber hint text on cream -> lighter */
 html[data-theme="dark"] .text-\[\#8a6f00\] { color: #e4c56a !important; }
 
