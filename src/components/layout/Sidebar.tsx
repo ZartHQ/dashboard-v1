@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { clearSession, SessionAdmin } from "../../features/auth/auth";
 import { useRequests } from "../../features/requests/queries";
 import { useFlags } from "../../features/monitoring/queries";
+import { useRefunds } from "../../features/refunds/queries";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "./ThemeToggle";
 import { 
@@ -15,6 +16,7 @@ import {
   MessageSquare,
   Flag,
   CreditCard,
+  Undo2,
   BarChart3,
   LifeBuoy,
   LogOut,
@@ -38,6 +40,10 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
   // Fetch flags count dynamically for the sidebar badge
   const { data: flags } = useFlags();
   const openFlagsCount = flags?.length || 0;
+
+  // Fetch refunds still to be sent for the sidebar badge
+  const { data: pendingRefunds } = useRefunds("pending");
+  const pendingRefundsCount = pendingRefunds?.length || 0;
 
   function logout() {
     clearSession();
@@ -91,6 +97,13 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
       label: "Payments", 
       icon: CreditCard, 
       section: false 
+    },
+    {
+      href: "/dashboard/refunds",
+      label: "Refunds",
+      icon: Undo2,
+      badge: pendingRefundsCount > 0 ? String(pendingRefundsCount) : undefined,
+      section: false
     },
     {
       href: "/dashboard/reports",
