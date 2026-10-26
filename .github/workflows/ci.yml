@@ -1,0 +1,23 @@
+name: CI
+
+# Typecheck + build on every PR, so broken code never reaches Dokploy.
+on:
+  pull_request:
+    branches: [main, master, staging]
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: https://api.zarthq.com/v1
