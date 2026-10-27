@@ -1,6 +1,6 @@
 {
-  "name": "Zart Operations",
-  "short_name": "Zart",
+  "name": "Zart Ops",
+  "short_name": "Zart Ops",
   "description": "Manage requests, artisans, patrons, and every job from one place.",
   "start_url": "/",
   "scope": "/",

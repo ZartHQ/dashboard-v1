@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   manifest: "/favicon/site.webmanifest",
   appleWebApp: {
     capable: true,
-    title: "Zart",
+    title: "Zart Ops",
     statusBarStyle: "black-translucent",
   },
 };
