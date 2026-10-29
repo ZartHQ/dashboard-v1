@@ -33,6 +33,17 @@ const STATUS_ACCENT: Record<string, string> = {
   disputed: "border-l-[#FA4812]",
 };
 
+// Soft full-card tint per status — the whole card carries its status colour,
+// not just the pill/stripe. Kept pale so text stays readable.
+const STATUS_CARD_BG: Record<string, string> = {
+  pending: "bg-[#FFFBEB]",
+  assigned: "bg-[#ECFDF3]",
+  in_progress: "bg-[#FFF4F0]",
+  completed: "bg-[#ECFDF3]",
+  cancelled: "bg-[#F7F7F7]",
+  disputed: "bg-[#FFF4F0]",
+};
+
 export function RequestListItem({ request, isSelected, onClick }: RequestListItemProps) {
   const r = request;
   const patron = `${r.patron?.firstName || ""} ${r.patron?.lastName || ""}`.trim() || "Unknown patron";
@@ -44,9 +55,10 @@ export function RequestListItem({ request, isSelected, onClick }: RequestListIte
   return (
     <div
       className={cn(
-        "rounded-[12px] border border-[#e8e8e8] border-l-[5px] bg-white p-4 mb-2.5 cursor-pointer transition-all hover:shadow-sm",
+        "rounded-[12px] border border-[#e8e8e8] border-l-[5px] p-4 mb-2.5 cursor-pointer transition-all hover:shadow-sm",
         STATUS_ACCENT[r.status] || STATUS_ACCENT.cancelled,
-        isSelected && "bg-[#e8f5f0] shadow-sm ring-1 ring-[#115746]/30"
+        STATUS_CARD_BG[r.status] || STATUS_CARD_BG.cancelled,
+        isSelected && "!bg-[#e8f5f0] shadow-sm ring-1 ring-[#115746]/30"
       )}
       onClick={onClick}
     >

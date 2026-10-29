@@ -73,15 +73,15 @@ export default function DashboardPage() {
         </div>
         
         {/* System Health Indicator */}
-        <div className="flex items-center gap-2 bg-[#e8f5f0] border border-[#b2d8cc] rounded-[20px] p-[5px_12px] text-[11px] text-[#115746] font-semibold">
+        <div className="flex items-center gap-2 bg-[#e8f5f0] border border-[#b2d8cc] rounded-[20px] p-[5px_12px] text-[11px] text-[#115746] font-semibold whitespace-nowrap shrink-0">
           <div className="w-2 h-2 rounded-full bg-[#115746] animate-pulse" />
           API Online
         </div>
       </div>
 
-      <div className="p-6 overflow-y-auto flex-1 flex flex-col gap-6">
+      <div className="p-4 md:p-6 overflow-y-auto flex-1 flex flex-col gap-4 md:gap-6">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {[
             {
               title: "Active Jobs",
@@ -121,13 +121,13 @@ export default function DashboardPage() {
             }
           ].map((stat) => (
             <Card key={stat.title} className={cn("border border-solid bg-gradient-to-br", stat.border, stat.bg)}>
-              <CardContent className="p-5 flex justify-between items-start">
-                <div className="flex flex-col gap-1">
-                  <span className="text-[11px] text-[#aaa] font-bold uppercase tracking-wider">{stat.title}</span>
-                  <span className={cn("text-[32px] font-extrabold tracking-tight", stat.color)}>{stat.value}</span>
-                  <span className="text-[11px] text-[#888] font-medium mt-0.5">{stat.desc}</span>
+              <CardContent className="p-3.5 md:p-5 flex justify-between items-start gap-2">
+                <div className="flex flex-col gap-1 min-w-0">
+                  <span className="text-[10px] md:text-[11px] text-[#aaa] font-bold uppercase tracking-wider leading-tight">{stat.title}</span>
+                  <span className={cn("text-[26px] md:text-[32px] font-extrabold tracking-tight", stat.color)}>{stat.value}</span>
+                  <span className="hidden md:block text-[11px] text-[#888] font-medium mt-0.5">{stat.desc}</span>
                 </div>
-                <div className="p-2.5 bg-white/70 rounded-xl shadow-xs border border-white/50">{stat.icon}</div>
+                <div className="p-2 md:p-2.5 bg-white/70 rounded-xl shadow-xs border border-white/50 shrink-0">{stat.icon}</div>
               </CardContent>
             </Card>
           ))}

@@ -547,6 +547,11 @@ html[data-theme="dark"] .bg-\[\#fff8e1\] { background-color: #241f10 !important;
 html[data-theme="dark"] .bg-\[\#fff5f2\] { background-color: #2a1710 !important; }  /* orange tint: in progress */
 html[data-theme="dark"] .bg-\[\#f0fdf4\] { background-color: #122417 !important; }  /* green: completed */
 html[data-theme="dark"] .bg-\[\#f0fff4\] { background-color: #123726 !important; }  /* WhatsApp button */
+/* Request card full-body tints (RequestListItem STATUS_CARD_BG) — dark variants. */
+html[data-theme="dark"] .bg-\[\#FFFBEB\] { background-color: #262012 !important; }  /* pending cream */
+html[data-theme="dark"] .bg-\[\#ECFDF3\] { background-color: #16281f !important; }  /* assigned / completed mint */
+html[data-theme="dark"] .bg-\[\#FFF4F0\] { background-color: #2a1710 !important; }  /* in progress peach */
+html[data-theme="dark"] .bg-\[\#F7F7F7\] { background-color: #191b1b !important; }  /* cancelled grey */
 
 /* hover backgrounds are a SEPARATE class from the base, so override them too
    (otherwise rows flash white on hover in dark mode) */

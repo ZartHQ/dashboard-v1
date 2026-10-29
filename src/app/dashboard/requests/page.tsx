@@ -14,15 +14,38 @@ import {
 import { useArtisans } from "../../../features/artisans/queries";
 import { ServiceRequestDetail, ServiceRequestNote, ServiceRequestStatus, Invoice } from "@/types";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { cn } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { Search } from "lucide-react";
 import { RequestListItem } from "./components/RequestListItem";
 import { RequestDetailsPanel } from "./components/RequestDetailsPanel";
 
+// Two top-level buckets. The specific statuses live in a dropdown next to
+// the search bar so the tabs stay simple: just Pending vs Done.
+const BUCKETS: Record<"pending" | "done", string[]> = {
+  pending: ["pending", "assigned", "in_progress"],
+  done: ["completed", "cancelled"],
+};
+
+const SUB_OPTIONS: Record<"pending" | "done", { value: string; label: string }[]> = {
+  pending: [
+    { value: "all", label: "All pending" },
+    { value: "pending", label: "Pending" },
+    { value: "assigned", label: "Assigned" },
+    { value: "in_progress", label: "In progress" },
+  ],
+  done: [
+    { value: "all", label: "All done" },
+    { value: "completed", label: "Completed" },
+    { value: "cancelled", label: "Cancelled" },
+  ],
+};
+
 export default function RequestsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [filter, setFilter] = useState("all");
+  const [bucket, setBucket] = useState<"pending" | "done">("pending");
+  const [subStatus, setSubStatus] = useState("all");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [hasInitialLoaded, setHasInitialLoaded] = useState(false);
@@ -37,8 +60,10 @@ export default function RequestsPage() {
     setShowAssignDropdown(false);
   }, [selectedId]);
 
+  // Fetch a wide page and filter by bucket/sub-status on the client so the
+  // Pending/Done tabs and the dropdown can regroup without refetching.
   const { data: requests, isLoading: isListLoading } = useRequests({
-    status: filter !== "all" ? filter : undefined,
+    limit: 100,
     search: debouncedSearch || undefined,
   });
 
@@ -60,6 +85,10 @@ export default function RequestsPage() {
     if (!counts) return 0;
     return Number(counts[f]) || 0;
   };
+
+  // Total for a bucket = sum of its member statuses.
+  const getBucketCount = (b: "pending" | "done") =>
+    BUCKETS[b].reduce((sum, s) => sum + getFilterCount(s), 0);
 
   const [note, setNote] = useState("");
   const [selectedArtisanId, setSelectedArtisanId] = useState<string>("");
@@ -125,7 +154,11 @@ export default function RequestsPage() {
     return <PageLoader />;
   }
 
-  const filtered = requestsList;
+  const filtered = requestsList.filter(
+    (r) =>
+      BUCKETS[bucket].includes(r.status) &&
+      (subStatus === "all" || r.status === subStatus)
+  );
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -138,34 +171,22 @@ export default function RequestsPage() {
             Live
           </div>
         </div>
-        <div className="flex gap-1.5 flex-wrap">
-          {["all", "pending", "assigned", "in_progress", "completed", "cancelled"].map((f) => (
+        <div className="flex gap-1.5">
+          {(["pending", "done"] as const).map((b) => (
             <button
-              key={f}
+              key={b}
               className={cn(
-                "text-[12px] p-[5px_14px] rounded-[20px] border-[1.5px] font-medium transition-all",
-                filter !== f && "border-[#e0e0e0] text-[#888] bg-transparent hover:border-[#115746] hover:text-[#115746]",
-                filter === f && f === "all" && "bg-[#115746] text-white border-[#115746]",
-                filter === f && f === "pending" && "bg-[#FDF4D7] text-[#8a6f00] border-[#e8d98a]",
-                filter === f && f === "assigned" && "bg-[#e8f5f0] text-[#115746] border-[#b2d8cc]",
-                filter === f && f === "in_progress" && "bg-[#fff5f2] text-[#FA4812] border-[#ffd4c7]",
-                filter === f && f === "completed" && "bg-[#f0fdf4] text-[#15803d] border-[#bbf7d0]",
-                filter === f && f === "cancelled" && "bg-[#f5f5f5] text-[#737373] border-[#e5e5e5]"
+                "text-[12px] p-[6px_16px] rounded-[20px] border-[1.5px] font-semibold transition-all",
+                bucket !== b && "border-[#e0e0e0] text-[#888] bg-transparent hover:border-[#115746] hover:text-[#115746]",
+                bucket === b && b === "pending" && "bg-[#115746] text-white border-[#115746]",
+                bucket === b && b === "done" && "bg-[#16a34a] text-white border-[#16a34a]"
               )}
-              onClick={() => setFilter(f)}
+              onClick={() => {
+                setBucket(b);
+                setSubStatus("all");
+              }}
             >
-              {`${f === "all"
-                ? "All"
-                : f === "pending"
-                  ? "Pending"
-                  : f === "assigned"
-                    ? "Assigned"
-                    : f === "in_progress"
-                      ? "In progress"
-                      : f === "completed"
-                        ? "Completed"
-                        : "Cancelled"
-                } (${getFilterCount(f)})`}
+              {`${b === "pending" ? "Pending" : "Done"} (${getBucketCount(b)})`}
             </button>
           ))}
         </div>
@@ -178,8 +199,8 @@ export default function RequestsPage() {
           "w-full md:w-[340px] flex-shrink-0 border-r border-[#e8e8e8] bg-white flex flex-col overflow-hidden min-h-0",
           selectedId !== null ? "hidden md:flex" : "flex"
         )}>
-          <div className="p-3 shrink-0">
-            <div className="relative">
+          <div className="p-3 shrink-0 flex gap-2">
+            <div className="relative flex-1 min-w-0">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#aaa]" />
               <Input
                 className="h-9 pl-9 w-full"
@@ -188,6 +209,17 @@ export default function RequestsPage() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
+            <Select
+              className="h-9 w-auto shrink-0 text-[12px] font-medium text-[#115746]"
+              value={subStatus}
+              onChange={(e) => setSubStatus(e.target.value)}
+            >
+              {SUB_OPTIONS[bucket].map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </Select>
           </div>
           <div className="flex-1 overflow-y-auto min-h-0 relative p-3">
             {isListLoading && (
