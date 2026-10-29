@@ -15,25 +15,25 @@ import { Calendar } from "lucide-react";
 
 // Custom SVG Icons
 const BookingsIcon = () => (
-  <svg className="w-5 h-5 text-[#115746]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
   </svg>
 );
 
 const UserIcon = () => (
-  <svg className="w-5 h-5 text-[#115746]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
   </svg>
 );
 
 const FlagsIcon = () => (
-  <svg className="w-5 h-5 text-[#FA4812]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
   </svg>
 );
 
 const RevenueIcon = () => (
-  <svg className="w-5 h-5 text-[#115746]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M12 16v1M10 11h4" />
   </svg>
 );
@@ -88,46 +88,59 @@ export default function DashboardPage() {
               value: activeRequestsCount,
               desc: "In progress, assigned, & pending",
               icon: <BookingsIcon />,
-              bg: "from-white to-[#fdfbf6]",
-              border: "border-[#efeae0]",
-              color: "text-[#0d3d31]"
+              // Each card owns a colour: emerald / blue / violet / orange.
+              // `accent` tints the spine + icon chip (decorative). `textCls`
+              // colours the number + icon and gets a lighter dark-mode value
+              // in globals.css so it stays readable on the dark surface.
+              accent: "#059669",
+              textCls: "text-[#059669]",
+              bg: "from-white to-[#f0fdf9]",
             },
             {
               title: "Vetted Artisans",
               value: vettedArtisansCount,
               desc: "Approved active operators",
               icon: <UserIcon />,
-              bg: "from-white to-[#fdfbf6]",
-              border: "border-[#efeae0]",
-              color: "text-[#0d3d31]"
+              accent: "#2563eb",
+              textCls: "text-[#2563eb]",
+              bg: "from-white to-[#eff6ff]",
             },
             {
               title: "Registered Patrons",
               value: totalPatronsCount,
               desc: "Total client accounts on Zart",
               icon: <RevenueIcon />,
-              bg: "from-white to-[#fdfbf6]",
-              border: "border-[#efeae0]",
-              color: "text-[#0d3d31]"
+              accent: "#7c3aed",
+              textCls: "text-[#7c3aed]",
+              bg: "from-white to-[#f5f3ff]",
             },
             {
               title: "Active Flags",
               value: openFlagsCount,
               desc: "Requires immediate attention",
               icon: <FlagsIcon />,
-              bg: "from-white to-[#fdfbf6]",
-              border: "border-[#efeae0]",
-              color: "text-[#FA4812]"
+              accent: "#ea580c",
+              textCls: "text-[#ea580c]",
+              bg: "from-white to-[#fff7ed]",
             }
           ].map((stat) => (
-            <Card key={stat.title} className={cn("border border-solid bg-gradient-to-br", stat.border, stat.bg)}>
+            <Card
+              key={stat.title}
+              className={cn("border border-solid border-[#efeae0] border-l-4 bg-gradient-to-br", stat.bg)}
+              style={{ borderLeftColor: stat.accent }}
+            >
               <CardContent className="p-3.5 md:p-5 flex justify-between items-start gap-2">
                 <div className="flex flex-col gap-1 min-w-0">
                   <span className="text-[10px] md:text-[11px] text-[#aaa] font-bold uppercase tracking-wider leading-tight">{stat.title}</span>
-                  <span className={cn("text-[26px] md:text-[32px] font-extrabold tracking-tight", stat.color)}>{stat.value}</span>
+                  <span className={cn("text-[26px] md:text-[32px] font-extrabold tracking-tight", stat.textCls)}>{stat.value}</span>
                   <span className="hidden md:block text-[11px] text-[#888] font-medium mt-0.5">{stat.desc}</span>
                 </div>
-                <div className="p-2 md:p-2.5 bg-white/70 rounded-xl shadow-xs border border-white/50 shrink-0">{stat.icon}</div>
+                <div
+                  className={cn("p-2 md:p-2.5 rounded-xl shrink-0", stat.textCls)}
+                  style={{ backgroundColor: `${stat.accent}1f` }}
+                >
+                  {stat.icon}
+                </div>
               </CardContent>
             </Card>
           ))}

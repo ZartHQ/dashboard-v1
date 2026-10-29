@@ -590,6 +590,11 @@ html[data-theme="dark"] .bg-gradient-to-br.from-white {
 }
 html[data-theme="dark"] .border-\[\#efeae0\] { border-color: #2a2d2b !important; }
 html[data-theme="dark"] .text-\[\#0d3d31\] { color: #5bc9a4 !important; }
+/* Per-card stat accents: lighter on the dark surface so numbers/icons read. */
+html[data-theme="dark"] .text-\[\#059669\] { color: #34d399 !important; }  /* active jobs — emerald */
+html[data-theme="dark"] .text-\[\#2563eb\] { color: #60a5fa !important; }  /* vetted artisans — blue */
+html[data-theme="dark"] .text-\[\#7c3aed\] { color: #a78bfa !important; }  /* patrons — violet */
+html[data-theme="dark"] .text-\[\#ea580c\] { color: #fb923c !important; }  /* flags — orange */
 html[data-theme="dark"] .bg-white\/70 { background-color: rgba(255,255,255,0.06) !important; }
 html[data-theme="dark"] .border-white\/50 { border-color: rgba(255,255,255,0.08) !important; }
 
