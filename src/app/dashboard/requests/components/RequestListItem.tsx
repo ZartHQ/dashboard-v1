@@ -22,6 +22,16 @@ const STATUS_STYLES: Record<string, string> = {
   disputed: "bg-[#fff5f2] text-[#FA4812] border-[#ffd4c7]",
 };
 
+// Colored left stripe per status — a quick colour cue you can scan.
+const STATUS_ACCENT: Record<string, string> = {
+  pending: "border-l-[#FFC92A]",
+  assigned: "border-l-[#16a34a]",
+  in_progress: "border-l-[#FA4812]",
+  completed: "border-l-[#16a34a]",
+  cancelled: "border-l-[#9aa0a6]",
+  disputed: "border-l-[#FA4812]",
+};
+
 export function RequestListItem({ request, isSelected, onClick }: RequestListItemProps) {
   const r = request;
   const patron = `${r.patron?.firstName || ""} ${r.patron?.lastName || ""}`.trim() || "Unknown patron";
@@ -33,8 +43,9 @@ export function RequestListItem({ request, isSelected, onClick }: RequestListIte
   return (
     <div
       className={cn(
-        "rounded-[12px] border border-[#e8e8e8] bg-white p-4 mb-2.5 cursor-pointer transition-all hover:border-[#115746]/50 hover:shadow-sm",
-        isSelected && "border-[#115746] bg-[#e8f5f0] shadow-sm"
+        "rounded-[12px] border border-[#e8e8e8] border-l-[5px] bg-white p-4 mb-2.5 cursor-pointer transition-all hover:shadow-sm",
+        STATUS_ACCENT[r.status] || STATUS_ACCENT.cancelled,
+        isSelected && "bg-[#e8f5f0] shadow-sm ring-1 ring-[#115746]/30"
       )}
       onClick={onClick}
     >
