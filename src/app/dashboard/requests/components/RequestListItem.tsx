@@ -13,13 +13,14 @@ interface RequestListItemProps {
 }
 
 // Brand-only status styles: green / yellow / orange + neutral grey.
+// Vivid filled pills so status is obvious at a glance (and adds colour).
 const STATUS_STYLES: Record<string, string> = {
-  pending: "bg-[#FDF4D7] text-[#8a6500] border-[#e8d98a]",
-  assigned: "bg-[#e8f5f0] text-[#115746] border-[#b2d8cc]",
-  in_progress: "bg-[#fff5f2] text-[#FA4812] border-[#ffd4c7]",
-  completed: "bg-[#e8f5f0] text-[#115746] border-[#b2d8cc]",
+  pending: "bg-[#FFC92A] text-[#4a3d00] border-[#FFC92A]",
+  assigned: "bg-[#16a34a] text-white border-[#16a34a]",
+  in_progress: "bg-[#FA4812] text-white border-[#FA4812]",
+  completed: "bg-[#16a34a] text-white border-[#16a34a]",
   cancelled: "bg-[#f5f5f5] text-[#737373] border-[#e5e5e5]",
-  disputed: "bg-[#fff5f2] text-[#FA4812] border-[#ffd4c7]",
+  disputed: "bg-[#FA4812] text-white border-[#FA4812]",
 };
 
 // Colored left stripe per status — a quick colour cue you can scan.
