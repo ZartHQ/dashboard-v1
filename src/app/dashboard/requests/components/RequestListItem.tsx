@@ -33,8 +33,8 @@ export function RequestListItem({ request, isSelected, onClick }: RequestListIte
   return (
     <div
       className={cn(
-        "p-[14px_16px] border-b border-[#f0f0f0] cursor-pointer border-l-[3px] border-transparent transition-all hover:bg-[#fafafa]",
-        isSelected && "bg-[#e8f5f0] border-l-[#115746]"
+        "rounded-[12px] border border-[#e8e8e8] bg-white p-4 mb-2.5 cursor-pointer transition-all hover:border-[#115746]/50 hover:shadow-sm",
+        isSelected && "border-[#115746] bg-[#e8f5f0] shadow-sm"
       )}
       onClick={onClick}
     >

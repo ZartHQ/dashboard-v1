@@ -189,7 +189,7 @@ export default function RequestsPage() {
               />
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto min-h-0 relative">
+          <div className="flex-1 overflow-y-auto min-h-0 relative p-3">
             {isListLoading && (
               <div className="absolute inset-0 bg-white/60 z-10 flex justify-center pt-10">
                 <div className="w-6 h-6 border-[2px] border-[#115746] border-t-transparent rounded-full animate-spin" />
