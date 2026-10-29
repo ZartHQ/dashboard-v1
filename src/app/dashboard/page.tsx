@@ -38,6 +38,17 @@ const RevenueIcon = () => (
   </svg>
 );
 
+// Status colour for the Recent Service Requests rows: a left stripe (`bar`)
+// plus a vivid filled pill. Solid brand colours so they read in both themes.
+const RECENT_STATUS: Record<string, { bar: string; pill: string }> = {
+  pending: { bar: "#FFC92A", pill: "bg-[#FFC92A] text-[#4a3d00]" },
+  assigned: { bar: "#16a34a", pill: "bg-[#16a34a] text-white" },
+  in_progress: { bar: "#FA4812", pill: "bg-[#FA4812] text-white" },
+  completed: { bar: "#16a34a", pill: "bg-[#16a34a] text-white" },
+  cancelled: { bar: "#9aa0a6", pill: "bg-[#f5f5f5] text-[#737373]" },
+  disputed: { bar: "#FA4812", pill: "bg-[#FA4812] text-white" },
+};
+
 export default function DashboardPage() {
   const { admin, loading: adminLoading } = useAdmin();
   const { data: counts } = useRequestCounts();
@@ -160,7 +171,11 @@ export default function DashboardPage() {
               {recentList.length > 0 ? (
                 <div className="flex flex-col">
                   {recentList.map((req: ServiceRequest) => (
-                    <div key={req.id} className="p-4 border-b border-[#f5f5f5] last:border-b-0 hover:bg-[#fafafa] transition-colors flex justify-between items-center">
+                    <div
+                      key={req.id}
+                      className="p-4 pl-3.5 border-b border-[#f5f5f5] border-l-[4px] last:border-b-0 hover:bg-[#fafafa] transition-colors flex justify-between items-center"
+                      style={{ borderLeftColor: RECENT_STATUS[req.status]?.bar || "#9aa0a6" }}
+                    >
                       <div className="flex flex-col gap-1 min-w-0">
                         <div className="text-[13px] font-bold text-[#1a1a1a] truncate">
                           {req.artisanType?.name || "Service Request"}
@@ -181,12 +196,8 @@ export default function DashboardPage() {
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
                         <span className={cn(
-                          "text-[10px] px-2.5 py-0.5 rounded-[12px] font-bold uppercase tracking-wider",
-                          req.status === "pending" && "bg-[#FDF4D7] text-[#8a6f00]",
-                          req.status === "assigned" && "bg-[#e8f5f0] text-[#115746]",
-                          req.status === "in_progress" && "bg-[#fff5f2] text-[#FA4812]",
-                          req.status === "completed" && "bg-[#f0fdf4] text-[#15803d]",
-                          req.status === "cancelled" && "bg-[#f5f5f5] text-[#737373]"
+                          "text-[10px] px-2.5 py-0.5 rounded-[12px] font-bold uppercase tracking-wider shrink-0",
+                          RECENT_STATUS[req.status]?.pill || "bg-[#f5f5f5] text-[#737373]"
                         )}>
                           {req.status}
                         </span>
