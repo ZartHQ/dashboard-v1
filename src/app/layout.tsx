@@ -4,8 +4,9 @@ import "../styles/globals.css";
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
+  variable: "--font-poppins",
 });
 
 export const metadata: Metadata = {
@@ -44,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={poppins.className} suppressHydrationWarning>
+    <html lang="en" className={`${poppins.variable} font-sans`} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{

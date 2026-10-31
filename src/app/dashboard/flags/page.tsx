@@ -123,7 +123,7 @@ export default function FlagsPage() {
             </Card>
           ))}
         </div>
-        {flags?.length === 0 && <p className="text-center text-[#aaa] py-5 font-outfit text-sm">No flags detected.</p>}
+        {flags?.length === 0 && <p className="text-center text-[#aaa] py-5 text-sm">No flags detected.</p>}
       </div>
     </>
   );
