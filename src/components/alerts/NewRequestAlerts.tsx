@@ -13,6 +13,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { BellRing, Volume2, VolumeX, X } from "lucide-react";
 import { useAdminSSE, AdminSSEEvent } from "@/hooks/useAdminSSE";
+import { PushAlerts, usePushAlerts } from "@/hooks/usePushAlerts";
+import { showSystemNotification } from "@/lib/push";
 import { useRequests } from "@/features/requests/queries";
 import { requestsApi } from "@/features/requests/api";
 import { Button } from "@/components/ui/Button";
@@ -22,6 +24,8 @@ import { cn } from "@/lib/utils";
  * New service request alerts, mounted once in the dashboard layout:
  * - listens for `service_request.created` on the admin SSE stream
  * - shows a stacked toast (top-right) with a View button + plays a chime
+ * - shows a system notification when the dashboard isn't in front
+ *   (Web Push covers the app being closed; see usePushAlerts + public/sw.js)
  * - prefixes the tab title with the number of alerts not yet looked at
  * - tracks which pending requests this admin has opened, so the sidebar
  *   Requests badge means "new requests you haven't opened"
@@ -33,6 +37,8 @@ const MUTE_KEY = "zart-alerts-muted";
 const MAX_SEEN = 500;
 const MAX_TOASTS = 4;
 const TOAST_MS = 10_000;
+/** How long a system notification waits for the request's address. */
+const ADDRESS_WAIT_MS = 2_000;
 
 interface RequestAlert {
   id: string;
@@ -49,6 +55,8 @@ interface NewRequestAlertsValue {
   markRequestSeen: (id: string | number) => void;
   muted: boolean;
   toggleMuted: () => void;
+  /** Phone & desktop alerts (notification permission + Web Push). */
+  push: PushAlerts;
 }
 
 const NewRequestAlertsContext = createContext<NewRequestAlertsValue | null>(null);
@@ -121,6 +129,9 @@ export default function NewRequestAlerts({ children }: { children: React.ReactNo
   const [muted, setMuted] = useState(false);
   const mutedRef = useRef(muted);
   mutedRef.current = muted;
+  const push = usePushAlerts();
+  const systemOnRef = useRef(push.systemNotificationsOn);
+  systemOnRef.current = push.systemNotificationsOn;
 
   // Restore seen ids + mute preference, and keep other tabs in sync.
   useEffect(() => {
@@ -197,17 +208,38 @@ export default function NewRequestAlerts({ children }: { children: React.ReactNo
 
     // The event has no address; fetch it (into the detail cache, so View
     // opens instantly) so the toast can say where.
-    queryClient
+    const address = queryClient
       .fetchQuery({
         queryKey: ["admin", "service-requests", alert.id],
         queryFn: () => requestsApi.getRequestById(alert.id),
       })
       .then((detail) => {
-        if (!detail?.address) return;
-        setToasts((prev) => prev.map((t) => (t.id === alert.id ? { ...t, address: detail.address } : t)));
+        if (detail?.address) {
+          setToasts((prev) => prev.map((t) => (t.id === alert.id ? { ...t, address: detail.address } : t)));
+        }
+        return detail?.address;
       })
-      .catch(() => {});
-  }, [queryClient]);
+      .catch(() => undefined);
+
+    // System notification when the admin isn't looking at the dashboard
+    // (the toast covers the case where they are).
+    if (systemOnRef.current && (document.visibilityState !== "visible" || !document.hasFocus())) {
+      const timeout = new Promise<undefined>((resolve) => setTimeout(resolve, ADDRESS_WAIT_MS));
+      Promise.race([address, timeout]).then((addr) => {
+        const area = addr?.split(",")[0]?.trim();
+        const url = `${REQUESTS_PATH}?id=${alert.id}`;
+        showSystemNotification(
+          {
+            title: "New request",
+            body: [alert.service, area, alert.patronFirstName].filter(Boolean).join(" · "),
+            tag: `request-${alert.id}`,
+            url,
+          },
+          (target) => router.push(target)
+        );
+      });
+    }
+  }, [queryClient, router]);
 
   useAdminSSE(handleEvent);
 
@@ -241,8 +273,8 @@ export default function NewRequestAlerts({ children }: { children: React.ReactNo
   }, [pending, seenIds]);
 
   const value = useMemo(
-    () => ({ unseenCount, markRequestSeen, muted, toggleMuted }),
-    [unseenCount, markRequestSeen, muted, toggleMuted]
+    () => ({ unseenCount, markRequestSeen, muted, toggleMuted, push }),
+    [unseenCount, markRequestSeen, muted, toggleMuted, push]
   );
 
   return (

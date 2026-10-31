@@ -9,6 +9,7 @@ import { useRefunds } from "../../features/refunds/queries";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "./ThemeToggle";
 import { AlertSoundToggle, useNewRequestAlerts } from "../alerts/NewRequestAlerts";
+import { PushAlertsToggle } from "../alerts/PushAlertsToggle";
 import { 
   LayoutDashboard,
   ClipboardList,
@@ -212,6 +213,7 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
         <div className="mt-auto border-t border-white/10 pt-1">
           <ThemeToggle />
           <AlertSoundToggle />
+          <PushAlertsToggle />
         </div>
 
         {/* Admin footer */}
