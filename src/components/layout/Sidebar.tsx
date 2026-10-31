@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { unsubscribeThisDevice } from "@/features/push/api";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { clearSession, SessionAdmin } from "../../features/auth/auth";
@@ -54,7 +55,9 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
   const { data: pendingRefunds } = useRefunds("pending");
   const pendingRefundsCount = pendingRefunds?.length || 0;
 
-  function logout() {
+  async function logout() {
+    // Stop phone/desktop alerts for this device before the session goes.
+    await unsubscribeThisDevice();
     clearSession();
     router.push("/");
   }
