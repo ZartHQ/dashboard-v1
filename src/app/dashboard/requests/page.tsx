@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useRequests, useRequestDetail, useRequestCounts, useRequestInvoice } from "../../../features/requests/queries";
 import {
   useUpdateStatusMutation,
@@ -20,6 +21,7 @@ import { PageLoader } from "@/components/ui/PageLoader";
 import { Search } from "lucide-react";
 import { RequestListItem } from "./components/RequestListItem";
 import { RequestDetailsPanel } from "./components/RequestDetailsPanel";
+import { useNewRequestAlerts } from "@/components/alerts/NewRequestAlerts";
 
 // Two top-level buckets. The specific statuses live in a dropdown next to
 // the search bar so the tabs stay simple: just Pending vs Done.
@@ -42,7 +44,19 @@ const SUB_OPTIONS: Record<"pending" | "done", { value: string; label: string }[]
   ],
 };
 
+// useSearchParams needs a Suspense boundary for the static build.
 export default function RequestsPage() {
+  return (
+    <Suspense fallback={null}>
+      <RequestsPageContent />
+    </Suspense>
+  );
+}
+
+function RequestsPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { markRequestSeen } = useNewRequestAlerts();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [bucket, setBucket] = useState<"pending" | "done">("pending");
   const [subStatus, setSubStatus] = useState("all");
@@ -59,6 +73,19 @@ export default function RequestsPage() {
   useEffect(() => {
     setShowAssignDropdown(false);
   }, [selectedId]);
+
+  // Opened from a new-request alert: /dashboard/requests?id=123
+  const linkedId = searchParams.get("id");
+  useEffect(() => {
+    if (!linkedId) return;
+    setSelectedId(linkedId);
+    router.replace("/dashboard/requests");
+  }, [linkedId, router]);
+
+  // Opening a request clears it from the sidebar "new" badge.
+  useEffect(() => {
+    if (selectedId) markRequestSeen(selectedId);
+  }, [selectedId, markRequestSeen]);
 
   // Fetch a wide page and filter by bucket/sub-status on the client so the
   // Pending/Done tabs and the dropdown can regroup without refetching.
@@ -270,7 +297,7 @@ export default function RequestsPage() {
             addNoteMutation={addNoteMutation}
           />
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center bg-[#f9f9f9] text-[#bbb] font-outfit p-6">
+          <div className="flex-1 flex flex-col items-center justify-center bg-[#f9f9f9] text-[#bbb] p-6">
             <img
               src="/zart-logo-green.svg"
               alt="Zart Logo"

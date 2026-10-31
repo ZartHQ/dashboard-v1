@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { clearSession, SessionAdmin } from "../../features/auth/auth";
-import { useRequests } from "../../features/requests/queries";
 import { useFlags } from "../../features/monitoring/queries";
 import { useRefunds } from "../../features/refunds/queries";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "./ThemeToggle";
+import { AlertSoundToggle, useNewRequestAlerts } from "../alerts/NewRequestAlerts";
 import { 
   LayoutDashboard,
   ClipboardList,
@@ -33,9 +34,16 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Fetch pending requests count dynamically for the sidebar badge
-  const { data: requestsResponse } = useRequests({ status: "pending" });
-  const pendingRequestsCount = requestsResponse?.meta?.total || requestsResponse?.data?.length || 0;
+  // Pending requests this admin hasn't opened yet (tracked in NewRequestAlerts)
+  const { unseenCount: newRequestsCount } = useNewRequestAlerts();
+
+  // Pulse the Requests badge briefly whenever the count goes up
+  const prevNewRequestsCount = useRef(newRequestsCount);
+  const [pulseKey, setPulseKey] = useState(0);
+  useEffect(() => {
+    if (newRequestsCount > prevNewRequestsCount.current) setPulseKey((k) => k + 1);
+    prevNewRequestsCount.current = newRequestsCount;
+  }, [newRequestsCount]);
 
   // Fetch flags count dynamically for the sidebar badge
   const { data: flags } = useFlags();
@@ -63,7 +71,8 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
       href: "/dashboard/requests", 
       label: "Requests", 
       icon: ClipboardList, 
-      badge: pendingRequestsCount > 0 ? String(pendingRequestsCount) : undefined,
+      badge: newRequestsCount > 0 ? String(newRequestsCount) : undefined,
+      badgePulse: true,
       section: "Operations"
     },
     {
@@ -182,10 +191,14 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
                   <Icon className={cn("w-4 h-4 text-[#FDF4D7]/65 shrink-0", isActive && "text-[#FDF4D7]")} />
                   <span>{item.label}</span>
                   {item.badge && (
-                    <span className={cn(
-                      "ml-auto text-[10px] p-[2px_7px] rounded-[10px] font-semibold bg-[#FA4812] text-white",
-                      item.badgeWarn && "bg-[#FFC92A] text-[#1a1a1a]"
-                    )}>
+                    <span
+                      key={item.badgePulse ? pulseKey : undefined}
+                      className={cn(
+                        "ml-auto text-[10px] p-[2px_7px] rounded-[10px] font-semibold bg-[#FA4812] text-white",
+                        item.badgeWarn && "bg-[#FFC92A] text-[#1a1a1a]",
+                        item.badgePulse && pulseKey > 0 && "motion-safe:animate-badge-pulse"
+                      )}
+                    >
                       {item.badge}
                     </span>
                   )}
@@ -198,6 +211,7 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
         {/* Theme toggle */}
         <div className="mt-auto border-t border-white/10 pt-1">
           <ThemeToggle />
+          <AlertSoundToggle />
         </div>
 
         {/* Admin footer */}

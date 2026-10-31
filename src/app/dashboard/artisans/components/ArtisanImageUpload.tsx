@@ -35,7 +35,7 @@ export function ArtisanImageUpload({ value, onChange, firstName = "", lastName =
   const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || "A";
 
   return (
-    <div className="flex flex-col items-center gap-2 mb-4 font-outfit">
+    <div className="flex flex-col items-center gap-2 mb-4">
       <div
         onClick={() => fileInputRef.current?.click()}
         className="relative group cursor-pointer w-20 h-20 rounded-full overflow-hidden border-2 border-dashed border-[#115746]/30 hover:border-[#115746] flex items-center justify-center transition-all bg-[#fafafa] shadow-inner"
