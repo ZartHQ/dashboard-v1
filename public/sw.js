@@ -34,6 +34,10 @@ self.addEventListener("push", (event) => {
       icon: ICON,
       badge: BADGE,
       data: { url: payload.url || DEFAULT_URL },
+      // Keep it on screen until it's clicked or closed (desktop browsers;
+      // phones manage this themselves).
+      requireInteraction: true,
+      renotify: !!payload.tag,
     })
   );
 });

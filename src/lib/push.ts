@@ -99,6 +99,8 @@ export async function showSystemNotification(
     icon: APP_ICON,
     badge: NOTIFICATION_BADGE,
     data: { url: n.url },
+    // Stays until clicked or closed on desktop browsers.
+    requireInteraction: true,
   };
 
   const registration = await registerServiceWorker();
