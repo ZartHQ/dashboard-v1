@@ -48,164 +48,128 @@ export function ArtisanProfileDrawer({
     );
   };
 
+  const phone = viewingArtisan.user.phone;
+  const pill = STATUS_PILL[viewingArtisan.vettingStatus];
+
   return (
     <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.4)",
-        display: "flex",
-        justifyContent: "flex-end",
-        zIndex: 1000,
-        backdropFilter: "blur(4px)",
-      }}
+      className="fixed inset-0 z-[1000] flex justify-end bg-black/40 backdrop-blur-sm"
       onClick={() => setViewingArtisan(null)}
     >
       <div
-        style={{
-          backgroundColor: "white",
-          width: "440px",
-          height: "100%",
-          padding: "30px 24px",
-          boxShadow: "-10px 0 25px -5px rgba(0, 0, 0, 0.1)",
-          display: "flex",
-          flexDirection: "column",
-        }}
+        className="bg-white w-full sm:w-[420px] h-full flex flex-col shadow-[-10px_0_25px_-5px_rgba(0,0,0,0.1)]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
-          <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 700, color: "#115746" }}>Artisan Profile</h3>
-          <button
-            onClick={() => setViewingArtisan(null)}
-            style={{
-              border: "none",
-              background: "transparent",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              padding: "4px",
-            }}
-          >
-            <X className="w-5 h-5 text-[#aaa] hover:text-black transition-colors" />
-          </button>
-        </div>
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex justify-end">
+            <button
+              onClick={() => setViewingArtisan(null)}
+              aria-label="Close"
+              className="bg-transparent border-none cursor-pointer p-1 text-[#aaa] hover:text-[#555]"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-        {/* Profile Summary Card */}
-        <div style={{ display: "flex", alignItems: "center", gap: "20px", background: "#f9f9f9", padding: "16px", borderRadius: "12px", border: "1px solid #f0f0f0", marginBottom: "20px" }}>
-          <div style={{ flexShrink: 0 }}>
+          {/* Who */}
+          <div className="flex flex-col items-center text-center">
             <ArtisanImageUpload
               value={viewingArtisan.user.image || null}
               onChange={handleUpdateImage}
               firstName={viewingArtisan.user.firstName}
               lastName={viewingArtisan.user.lastName}
             />
-          </div>
-          <div>
-            <div style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a" }}>
+            <div className="text-[18px] font-bold text-[#1a1a1a] mt-3">
               {viewingArtisan.user.firstName} {viewingArtisan.user.lastName}
             </div>
-            <div style={{ fontSize: "13px", color: "#888", marginTop: "2px" }}>
-              {viewingArtisan.artisanType.name}
+            <div className="text-[13px] text-[#888] mt-0.5">{viewingArtisan.artisanType.name}</div>
+            <div className="flex items-center gap-2 mt-2.5">
+              <span className={`sp ${pill?.cls || "sp-offline"}`}>{pill?.label || viewingArtisan.vettingStatus}</span>
+              <span className="text-[11px] text-[#aaa]">Joined {formatDate(viewingArtisan.createdAt)}</span>
             </div>
             {updateArtisanMutation.isPending && (
-              <div style={{ fontSize: "11px", color: "#115746", fontWeight: 500, marginTop: "4px" }}>
-                Updating photo...
-              </div>
+              <div className="text-[11px] text-[#115746] font-medium mt-2">Updating photo...</div>
             )}
           </div>
-        </div>
 
-        {/* Stats grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "24px" }}>
-          <div style={{ background: "#e8f5f0", padding: "12px", borderRadius: "10px", textAlign: "center", border: "1px solid #b2d8cc" }}>
-            <div style={{ fontSize: "22px", fontWeight: 700, color: "#115746" }}>{viewingArtisan.jobsDone}</div>
-            <div style={{ fontSize: "11px", color: "#115746", fontWeight: 500, marginTop: "2px" }}>Jobs Completed</div>
-          </div>
-          <div style={{ background: "#fff9e6", padding: "12px", borderRadius: "10px", textAlign: "center", border: "1px solid #ffe082", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ fontSize: "22px", fontWeight: 700, color: "#b27b00", display: "flex", alignItems: "center", gap: "4px" }}>
-              <Star className="w-5 h-5 fill-[#b27b00] text-[#b27b00]" /> {viewingArtisan.rating ?? "—"}
+          {/* Numbers */}
+          <div className="grid grid-cols-2 gap-3 mt-6">
+            <div className="bg-[#f9f9f9] border border-[#f0f0f0] rounded-xl p-3 text-center">
+              <div className="text-[20px] font-bold text-[#1a1a1a]">{viewingArtisan.jobsDone}</div>
+              <div className="text-[11px] text-[#888] mt-0.5">Jobs done</div>
             </div>
-            <div style={{ fontSize: "11px", color: "#8a6f00", fontWeight: 500, marginTop: "2px" }}>Rating</div>
-          </div>
-        </div>
-
-        {/* Details Section */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px", flex: 1, overflowY: "auto", paddingRight: "4px" }}>
-          <div>
-            <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#aaa", fontWeight: 600, letterSpacing: "0.5px", marginBottom: "6px" }}>Contact Information</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <div style={{ fontSize: "13px", color: "#333", display: "flex", alignItems: "center", gap: "6px" }}>
-                <Phone className="w-4 h-4 text-[#115746]" /> <strong>Phone:</strong> {viewingArtisan.user.phone}
+            <div className="bg-[#f9f9f9] border border-[#f0f0f0] rounded-xl p-3 text-center">
+              <div className="text-[20px] font-bold text-[#1a1a1a] flex items-center justify-center gap-1">
+                <Star className="w-4 h-4 fill-[#e4a11b] text-[#e4a11b]" /> {viewingArtisan.rating ?? "—"}
               </div>
-              <div style={{ fontSize: "13px", color: "#333", display: "flex", alignItems: "center", gap: "6px" }}>
-                <Mail className="w-4 h-4 text-[#115746]" /> <strong>Email:</strong> {viewingArtisan.user.email}
+              <div className="text-[11px] text-[#888] mt-0.5">Rating</div>
+            </div>
+          </div>
+
+          {/* Contact */}
+          <Section title="Contact">
+            <div className="flex flex-col gap-2.5 text-[13px]">
+              <div className="flex items-center gap-2.5 text-[#333]">
+                <Phone className="w-4 h-4 text-[#aaa] shrink-0" /> {phone || "No phone"}
+              </div>
+              <div className="flex items-center gap-2.5 text-[#333] min-w-0">
+                <Mail className="w-4 h-4 text-[#aaa] shrink-0" /> <span className="truncate">{viewingArtisan.user.email}</span>
               </div>
             </div>
-          </div>
+          </Section>
 
-          <div>
-            <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#aaa", fontWeight: 600, letterSpacing: "0.5px", marginBottom: "6px" }}>Service Locations</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-              {viewingArtisan.operatingArea.map((loc: string) => (
-                <span key={loc} style={{ fontSize: "12px", background: "#f0f0f0", color: "#555", padding: "4px 10px", borderRadius: "20px", fontWeight: 500 }}>
-                  {loc}
-                </span>
-              ))}
-            </div>
-          </div>
+          <Section title="Areas">
+            <Chips items={viewingArtisan.operatingArea} empty="No areas added" />
+          </Section>
 
-          <div>
-            <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#aaa", fontWeight: 600, letterSpacing: "0.5px", marginBottom: "6px" }}>Skills & Specialties</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-              {viewingArtisan.skills.map((skill: string) => (
-                <span key={skill} style={{ fontSize: "12px", background: "#FDF4D7", color: "#8a6f00", border: "1px solid #e8d98a", padding: "4px 10px", borderRadius: "6px", fontWeight: 500 }}>
-                  {skill}
-                </span>
-              ))}
-              {viewingArtisan.skills.length === 0 && (
-                <span style={{ fontSize: "12px", color: "#aaa", fontStyle: "italic" }}>No specific skills specified</span>
-              )}
-            </div>
-          </div>
+          <Section title="Skills">
+            <Chips items={viewingArtisan.skills} empty="No skills added" />
+          </Section>
 
-          <div>
-            <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#aaa", fontWeight: 600, letterSpacing: "0.5px", marginBottom: "6px" }}>Operational Status</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
-                <span className={`sp ${STATUS_PILL[viewingArtisan.vettingStatus]?.cls || "sp-offline"}`}>
-                  {STATUS_PILL[viewingArtisan.vettingStatus]?.label || viewingArtisan.vettingStatus}
-                </span>
-                <span style={{ fontSize: "11px", color: "#aaa" }}>Joined: {formatDate(viewingArtisan.createdAt)}</span>
-              </div>
-
-              {/* Vetting Management Button */}
-              <Button 
-                variant="outline" 
-                className="w-full text-xs font-bold uppercase tracking-wider mt-2.5 flex items-center justify-center gap-1.5"
-                onClick={() => {
-                  setNewStatus(viewingArtisan.vettingStatus);
-                  setStatusNote("");
-                  setIsStatusModalOpen(true);
-                }}
-              >
-                <UserCheck className="w-4 h-4" /> Update vetting status
-              </Button>
-            </div>
-          </div>
+          <button
+            className="mt-6 bg-transparent border-none cursor-pointer p-0 text-[13px] font-semibold text-[#115746] flex items-center gap-1.5 hover:underline"
+            onClick={() => {
+              setNewStatus(viewingArtisan.vettingStatus);
+              setStatusNote("");
+              setIsStatusModalOpen(true);
+            }}
+          >
+            <UserCheck className="w-4 h-4" /> Change vetting status
+          </button>
         </div>
 
-        {/* Footer Actions */}
-        <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "16px", marginTop: "16px", display: "flex", gap: "10px" }}>
-          <Button variant="outline" className="flex-1 flex items-center justify-center gap-2" onClick={() => viewingArtisan.user.phone && window.open(`tel:${viewingArtisan.user.phone}`)}>
-            <Phone className="w-4 h-4" /> Call Artisan
+        {/* Actions */}
+        <div className="border-t border-[#f0f0f0] p-4 flex gap-2.5 shrink-0">
+          <Button variant="outline" className="flex-1 flex items-center justify-center gap-2" disabled={!phone} onClick={() => phone && window.open(`tel:${phone}`)}>
+            <Phone className="w-4 h-4" /> Call
           </Button>
-          <Button variant="wa" className="flex-1 flex items-center justify-center gap-2" onClick={() => viewingArtisan.user.phone && window.open(`https://wa.me/${viewingArtisan.user.phone.replace(/[^0-9]/g, "")}`)}>
+          <Button variant="wa" className="flex-1 flex items-center justify-center gap-2" disabled={!phone} onClick={() => phone && window.open(`https://wa.me/${phone.replace(/[^0-9]/g, "")}`)}>
             <MessageSquare className="w-4 h-4 text-white" /> WhatsApp
           </Button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-6">
+      <div className="text-[11px] uppercase tracking-wider font-semibold text-[#aaa] mb-2">{title}</div>
+      {children}
+    </div>
+  );
+}
+
+function Chips({ items, empty }: { items: string[]; empty: string }) {
+  if (!items?.length) return <div className="text-[12px] text-[#aaa] italic">{empty}</div>;
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {items.map((item) => (
+        <span key={item} className="text-[12px] bg-[#f0f0f0] text-[#555] px-2.5 py-1 rounded-full font-medium">
+          {item}
+        </span>
+      ))}
     </div>
   );
 }

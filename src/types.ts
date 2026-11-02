@@ -124,6 +124,10 @@ export interface ServiceRequestNote {
 
 export interface ServiceRequestDetail extends ServiceRequest {
   notes: ServiceRequestNote[];
+  /** Set when the patron cancelled it themselves. */
+  cancelledByPatron?: boolean;
+  /** The reason they picked in the app. */
+  cancellationReason?: string | null;
 }
 
 export type ServiceRequestListResponse = PaginatedApiResponse<ServiceRequest>;
@@ -186,6 +190,10 @@ export interface DbPatron {
   bookings?: number;
   joined?: string;
   spent?: string;
+  /** Own cancellations in the last 30 days (patron detail only). */
+  recentCancellations?: number;
+  /** Too many cancellations: can't book until an admin unblocks them. */
+  bookingBlocked?: boolean;
 }
 
 export interface FlagPerson {

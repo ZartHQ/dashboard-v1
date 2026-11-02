@@ -81,6 +81,9 @@ export function useAdminSSE(onEvent?: (event: AdminSSEEvent) => void) {
                 if (eventName.includes("artisan")) {
                   queryClient.invalidateQueries({ queryKey: ["admin", "artisans"] });
                 }
+                if (eventName.startsWith("chat.")) {
+                  queryClient.invalidateQueries({ queryKey: ["admin", "conversations"] });
+                }
 
                 onEventRef.current?.({ event: eventName, data: eventData });
               } catch (err) {
