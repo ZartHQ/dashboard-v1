@@ -204,7 +204,7 @@ export default function ArtisansPage() {
         </div>
 
         {filteredArtisans.length === 0 ? (
-          <div style={{ padding: 40, textAlign: "center", color: "#aaa", fontFamily: "Outfit, sans-serif" }}>
+          <div style={{ padding: 40, textAlign: "center", color: "#aaa" }}>
             No artisans match the selected filters.
           </div>
         ) : (

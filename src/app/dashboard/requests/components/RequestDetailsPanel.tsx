@@ -296,11 +296,11 @@ export function RequestDetailsPanel({
                 <div className="text-[13px] text-[#1a1a1a] font-semibold">{selected.address}</div>
               </div>
               <div className="flex flex-col gap-1">
-                <div className="text-[11px] text-[#aaa] font-medium font-outfit">Requested</div>
+                <div className="text-[11px] text-[#aaa] font-medium">Requested</div>
                 <div className="text-[13px] text-[#1a1a1a] font-semibold">{formatDate(selected.createdAt || new Date())}</div>
               </div>
               <div className="flex flex-col gap-1">
-                <div className="text-[11px] text-[#aaa] font-medium font-outfit">Scheduled For</div>
+                <div className="text-[11px] text-[#aaa] font-medium">Scheduled For</div>
                 <div className="text-[13px] text-[#115746] font-semibold">
                   {selected.scheduledAt ? formatDateTime(selected.scheduledAt) : "Not scheduled"}
                 </div>
@@ -788,7 +788,7 @@ export function RequestDetailsPanel({
                 }
               }}
               placeholder="Add an internal note (e.g. 'called patron, no answer')..."
-              className="w-full bg-[#f9f9f9] border-[1.5px] border-[#e0e0e0] rounded-lg p-[10px_12px] text-[13px] text-[#333] font-outfit resize-none h-[72px] mt-2.5 focus:outline-none focus:border-[#115746]"
+              className="w-full bg-[#f9f9f9] border-[1.5px] border-[#e0e0e0] rounded-lg p-[10px_12px] text-[13px] text-[#333] resize-none h-[72px] mt-2.5 focus:outline-none focus:border-[#115746]"
             />
             <div className="flex justify-end mt-2">
               <Button

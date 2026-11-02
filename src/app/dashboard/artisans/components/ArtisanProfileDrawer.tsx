@@ -70,7 +70,6 @@ export function ArtisanProfileDrawer({
           boxShadow: "-10px 0 25px -5px rgba(0, 0, 0, 0.1)",
           display: "flex",
           flexDirection: "column",
-          fontFamily: "Outfit, sans-serif",
         }}
         onClick={(e) => e.stopPropagation()}
       >

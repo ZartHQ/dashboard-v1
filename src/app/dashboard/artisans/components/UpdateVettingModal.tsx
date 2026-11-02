@@ -53,7 +53,6 @@ export function UpdateVettingModal({
           boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
           background: "#ffffff",
           border: "1px solid #e8e8e8",
-          fontFamily: "Outfit, sans-serif",
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
@@ -99,7 +98,7 @@ export function UpdateVettingModal({
               value={statusNote}
               onChange={(e) => setStatusNote(e.target.value)}
               placeholder="Reason for change, next steps, or feedback..."
-              className="w-full bg-[#f9f9f9] border-[1.5px] border-[#e0e0e0] rounded-lg p-[10px_12px] text-[13px] text-[#333] font-outfit resize-none h-[80px] focus:outline-none focus:border-[#115746]"
+              className="w-full bg-[#f9f9f9] border-[1.5px] border-[#e0e0e0] rounded-lg p-[10px_12px] text-[13px] text-[#333] resize-none h-[80px] focus:outline-none focus:border-[#115746]"
             />
           </div>
 

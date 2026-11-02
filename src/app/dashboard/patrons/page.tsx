@@ -110,7 +110,7 @@ export default function PatronsPage() {
             setIsMobileDetailActive={setIsMobileDetailActive}
           />
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center bg-[#f9f9f9] text-[#bbb] font-outfit p-6">
+          <div className="flex-1 flex flex-col items-center justify-center bg-[#f9f9f9] text-[#bbb] p-6">
             <img 
               src="/zart-logo-green.svg" 
               alt="Zart Logo" 
