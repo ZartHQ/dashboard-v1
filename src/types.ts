@@ -186,6 +186,10 @@ export interface DbPatron {
   bookings?: number;
   joined?: string;
   spent?: string;
+  /** Own cancellations in the last 30 days (patron detail only). */
+  recentCancellations?: number;
+  /** Too many cancellations: can't book until an admin unblocks them. */
+  bookingBlocked?: boolean;
 }
 
 export interface FlagPerson {
