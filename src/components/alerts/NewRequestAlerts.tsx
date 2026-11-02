@@ -11,7 +11,7 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { BellRing, Volume2, VolumeX, X } from "lucide-react";
+import { BellRing, Volume2, VolumeX, X, XCircle } from "lucide-react";
 import { useAdminSSE, AdminSSEEvent } from "@/hooks/useAdminSSE";
 import { PushAlerts, usePushAlerts } from "@/hooks/usePushAlerts";
 import { showSystemNotification } from "@/lib/push";
@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * New service request alerts, mounted once in the dashboard layout:
- * - listens for `service_request.created` on the admin SSE stream
+ * - listens for `service_request.created` / `.cancelled` on the admin SSE stream
  * - shows a stacked toast (top-right) with a View button + plays a chime
  * - shows a system notification when the dashboard isn't in front
  *   (Web Push covers the app being closed; see usePushAlerts + public/sw.js)
@@ -40,8 +40,13 @@ const TOAST_MS = 10_000;
 /** How long a system notification waits for the request's address. */
 const ADDRESS_WAIT_MS = 2_000;
 
+type AlertKind = "new" | "cancelled";
+
 interface RequestAlert {
+  /** Toast key: the request id, suffixed for cancellations. */
   id: string;
+  requestId: string;
+  kind: AlertKind;
   service: string;
   title: string;
   patronFirstName: string;
@@ -95,18 +100,29 @@ function getAudioContext(): AudioContext | null {
   return audioCtx;
 }
 
-/** Soft two-note chime. Silently does nothing until the browser allows audio. */
-function playChime() {
+/**
+ * Two-note chime: rising for a new request, lower and falling for a
+ * cancellation so admins can tell them apart without looking. Silently does
+ * nothing until the browser allows audio.
+ */
+function playChime(kind: AlertKind = "new") {
   const ctx = getAudioContext();
   if (!ctx || ctx.state !== "running") return;
   const now = ctx.currentTime;
-  [
-    { freq: 880, at: 0 }, // A5
-    { freq: 1318.5, at: 0.14 }, // E6
-  ].forEach(({ freq, at }) => {
+  const notes =
+    kind === "cancelled"
+      ? [
+          { freq: 659.25, at: 0 }, // E5
+          { freq: 440, at: 0.18 }, // A4
+        ]
+      : [
+          { freq: 880, at: 0 }, // A5
+          { freq: 1318.5, at: 0.14 }, // E6
+        ];
+  notes.forEach(({ freq, at }) => {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = "sine";
+    osc.type = kind === "cancelled" ? "triangle" : "sine";
     osc.frequency.value = freq;
     gain.gain.setValueAtTime(0.0001, now + at);
     gain.gain.exponentialRampToValueAtTime(0.18, now + at + 0.02);
@@ -194,24 +210,35 @@ export default function NewRequestAlerts({ children }: { children: React.ReactNo
   }, []);
 
   const handleEvent = useCallback(({ event, data }: AdminSSEEvent) => {
-    if (event !== "service_request.created" || data?.id == null) return;
+    const kind: AlertKind | null =
+      event === "service_request.created"
+        ? "new"
+        : event === "service_request.cancelled"
+          ? "cancelled"
+          : null;
+    if (!kind || data?.id == null) return;
+    const requestId = String(data.id);
     const alert: RequestAlert = {
-      id: String(data.id),
+      id: kind === "cancelled" ? `${requestId}-cancelled` : requestId,
+      requestId,
+      kind,
       service: data.artisanType || "Service",
       title: data.title || "",
       patronFirstName: String(data.patronName || "").split(" ")[0],
       createdAt: data.createdAt || new Date().toISOString(),
     };
     setToasts((prev) => [alert, ...prev.filter((t) => t.id !== alert.id)].slice(0, MAX_TOASTS));
-    setUnackedCount((n) => n + 1);
-    if (!mutedRef.current) playChime();
+    // The tab-title count is for new requests only (useAdminSSE already
+    // refreshes the request lists and badge on every event).
+    if (kind === "new") setUnackedCount((n) => n + 1);
+    if (!mutedRef.current) playChime(kind);
 
     // The event has no address; fetch it (into the detail cache, so View
     // opens instantly) so the toast can say where.
     const address = queryClient
       .fetchQuery({
-        queryKey: ["admin", "service-requests", alert.id],
-        queryFn: () => requestsApi.getRequestById(alert.id),
+        queryKey: ["admin", "service-requests", alert.requestId],
+        queryFn: () => requestsApi.getRequestById(alert.requestId),
       })
       .then((detail) => {
         if (detail?.address) {
@@ -227,12 +254,12 @@ export default function NewRequestAlerts({ children }: { children: React.ReactNo
       const timeout = new Promise<undefined>((resolve) => setTimeout(resolve, ADDRESS_WAIT_MS));
       Promise.race([address, timeout]).then((addr) => {
         const area = addr?.split(",")[0]?.trim();
-        const url = `${REQUESTS_PATH}?id=${alert.id}`;
+        const url = `${REQUESTS_PATH}?id=${alert.requestId}`;
         showSystemNotification(
           {
-            title: "New request",
+            title: kind === "cancelled" ? "Request cancelled" : "New request",
             body: [alert.service, area, alert.patronFirstName].filter(Boolean).join(" · "),
-            tag: `request-${alert.id}`,
+            tag: kind === "cancelled" ? `request-${alert.requestId}-cancelled` : `request-${alert.requestId}`,
             url,
           },
           (target) => router.push(target)
@@ -290,8 +317,8 @@ export default function NewRequestAlerts({ children }: { children: React.ReactNo
             alert={t}
             onDismiss={() => dismiss(t.id)}
             onView={() => {
-              markRequestSeen(t.id);
-              router.push(`${REQUESTS_PATH}?id=${t.id}`);
+              markRequestSeen(t.requestId);
+              router.push(`${REQUESTS_PATH}?id=${t.requestId}`);
             }}
           />
         ))}
@@ -317,17 +344,24 @@ function RequestToast({
     hour12: true,
   });
   const area = alert.address?.split(",")[0]?.trim();
-  const headline = ["New request", alert.service, area].filter(Boolean).join(" · ");
+  const cancelled = alert.kind === "cancelled";
+  const headline = [cancelled ? "Request cancelled" : "New request", alert.service, area]
+    .filter(Boolean)
+    .join(" · ");
+  const accent = cancelled ? "#DC2626" : "#FA4812";
 
   return (
     <div
       role="status"
       className="group pointer-events-auto relative overflow-hidden rounded-[14px] bg-white border border-[#e8e8e8] shadow-[0_10px_30px_rgba(0,0,0,0.12)] animate-toast-in"
     >
-      <div className="absolute inset-y-0 left-0 w-[4px] bg-[#FA4812]" />
+      <div className="absolute inset-y-0 left-0 w-[4px]" style={{ backgroundColor: accent }} />
       <div className="flex items-start gap-3 p-[14px_14px_12px_18px]">
-        <div className="w-9 h-9 rounded-full bg-[#fff5f2] text-[#FA4812] flex items-center justify-center shrink-0">
-          <BellRing className="w-[18px] h-[18px]" />
+        <div
+          className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+          style={{ backgroundColor: cancelled ? "#fef2f2" : "#fff5f2", color: accent }}
+        >
+          {cancelled ? <XCircle className="w-[18px] h-[18px]" /> : <BellRing className="w-[18px] h-[18px]" />}
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-[13px] font-semibold text-[#1a1a1a] truncate" title={headline}>
@@ -353,8 +387,8 @@ function RequestToast({
       </div>
       {/* Countdown bar: dismisses when it runs out, pauses while hovered. */}
       <div
-        className="absolute bottom-0 left-0 h-[3px] w-full origin-left bg-[#FA4812]/60 animate-toast-timer group-hover:[animation-play-state:paused]"
-        style={{ animationDuration: `${TOAST_MS}ms` }}
+        className="absolute bottom-0 left-0 h-[3px] w-full origin-left opacity-60 animate-toast-timer group-hover:[animation-play-state:paused]"
+        style={{ animationDuration: `${TOAST_MS}ms`, backgroundColor: accent }}
         onAnimationEnd={onDismiss}
       />
     </div>
