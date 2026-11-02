@@ -23,7 +23,10 @@ import {
   MessageSquare,
   Lock,
   Folder,
-  Info
+  Info,
+  Calendar,
+  MapPin,
+  User
 } from "lucide-react";
 
 interface RequestDetailsPanelProps {
@@ -183,57 +186,13 @@ export function RequestDetailsPanel({
             <div className="flex items-center gap-1.5 flex-wrap">
               <Button
                 variant="outline"
-                className="h-8 text-[11px] font-bold px-3 uppercase tracking-wider border-[#FA4812] text-[#FA4812] hover:bg-[#FA4812] hover:text-white transition-all duration-200"
+                className="h-8 text-[12px] font-semibold px-3 border-transparent shadow-none text-[#FA4812] hover:bg-[#FA4812]/10"
                 onClick={() => handleUpdateStatus('cancelled')}
                 disabled={updateStatusMutation.isPending}
               >
                 Cancel
               </Button>
 
-              {!showAssignDropdown ? (
-                <Button
-                  variant="primary"
-                  className="h-8 text-[11px] font-bold px-3 uppercase tracking-wider"
-                  onClick={() => setShowAssignDropdown(true)}
-                >
-                  Assign
-                </Button>
-              ) : (
-                <div className="flex items-center gap-1.5">
-                  <Select
-                    className="h-8 text-[11px] py-0 w-[180px]"
-                    value={selectedArtisanId}
-                    onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedArtisanId(e.target.value)}
-                  >
-                    <option value="">
-                      {approvedArtisans.length > 0 ? "Select artisan..." : "No approved artisans"}
-                    </option>
-                    {approvedArtisans.map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.user?.firstName} {a.user?.lastName} ({a.artisanType?.name})
-                      </option>
-                    ))}
-                  </Select>
-                  <Button
-                    variant="primary"
-                    className="h-8 text-[11px] font-bold px-3 uppercase tracking-wider"
-                    onClick={() => {
-                      handleAssign();
-                      setShowAssignDropdown(false);
-                    }}
-                    disabled={assignArtisanMutation.isPending || !selectedArtisanId}
-                  >
-                    Confirm
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="h-8 text-[11px] font-bold px-2.5 uppercase tracking-wider"
-                    onClick={() => setShowAssignDropdown(false)}
-                  >
-                    ✕
-                  </Button>
-                </div>
-              )}
             </div>
           )}
 
@@ -241,7 +200,7 @@ export function RequestDetailsPanel({
             <div className="flex items-center gap-1.5">
               <Button
                 variant="outline"
-                className="h-8 text-[11px] font-bold px-3 uppercase tracking-wider border-[#FA4812] text-[#FA4812] hover:bg-[#FA4812] hover:text-white transition-all duration-200"
+                className="h-8 text-[12px] font-semibold px-3 border-transparent shadow-none text-[#FA4812] hover:bg-[#FA4812]/10"
                 onClick={() => handleUpdateStatus('cancelled')}
                 disabled={updateStatusMutation.isPending}
               >
@@ -249,7 +208,7 @@ export function RequestDetailsPanel({
               </Button>
               <Button
                 variant="primary"
-                className="h-8 text-[11px] font-bold px-3 uppercase tracking-wider"
+                className="h-8 text-[12px] font-semibold px-3"
                 onClick={() => handleUpdateStatus('in_progress')}
                 disabled={updateStatusMutation.isPending || invoice?.status !== 'paid'}
                 title={invoice?.status !== 'paid' ? 'Invoice must be paid before starting the job' : undefined}
@@ -263,7 +222,7 @@ export function RequestDetailsPanel({
             <div className="flex items-center gap-1.5">
               <Button
                 variant="outline"
-                className="h-8 text-[11px] font-bold px-3 uppercase tracking-wider border-[#FA4812] text-[#FA4812] hover:bg-[#FA4812] hover:text-white transition-all duration-200"
+                className="h-8 text-[12px] font-semibold px-3 border-transparent shadow-none text-[#FA4812] hover:bg-[#FA4812]/10"
                 onClick={() => handleUpdateStatus('cancelled')}
                 disabled={updateStatusMutation.isPending}
               >
@@ -271,7 +230,7 @@ export function RequestDetailsPanel({
               </Button>
               <Button
                 variant="primary"
-                className="h-8 text-[11px] font-bold px-3 uppercase tracking-wider"
+                className="h-8 text-[12px] font-semibold px-3"
                 onClick={() => handleUpdateStatus('completed')}
                 disabled={updateStatusMutation.isPending}
               >
@@ -283,67 +242,66 @@ export function RequestDetailsPanel({
       </div>
 
       <div className="p-5 overflow-y-auto flex-1 flex flex-col gap-5 min-h-0">
-        {/* Patron */}
+        {/* Request */}
         <Card className="shrink-0">
-          <CardHeader><CardTitle>Patron details</CardTitle></CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3">
-              <div className="flex flex-col gap-1">
-                <div className="text-[11px] text-[#aaa] font-medium">Name</div>
-                <div className="text-[13px] text-[#1a1a1a] font-semibold">{selected.patron?.firstName} {selected.patron?.lastName}</div>
-              </div>
-              <div className="flex flex-col gap-1">
-                <div className="text-[11px] text-[#aaa] font-medium">Phone</div>
-                <div className="text-[13px] text-[#115746] font-semibold underline cursor-pointer">{selected.patron?.phone || "N/A"}</div>
-              </div>
-              <div className="flex flex-col gap-1">
-                <div className="text-[11px] text-[#aaa] font-medium">Location</div>
-                <div className="text-[13px] text-[#1a1a1a] font-semibold">{selected.address}</div>
-              </div>
-              <div className="flex flex-col gap-1">
-                <div className="text-[11px] text-[#aaa] font-medium">Requested</div>
-                <div className="text-[13px] text-[#1a1a1a] font-semibold">{formatDate(selected.createdAt || new Date())}</div>
-              </div>
-              <div className="flex flex-col gap-1">
-                <div className="text-[11px] text-[#aaa] font-medium">Scheduled For</div>
-                <div className="text-[13px] text-[#115746] font-semibold">
-                  {selected.scheduledAt ? formatDateTime(selected.scheduledAt) : "Not scheduled"}
-                </div>
-              </div>
-            </div>
-            <p className="text-[13px] text-[#555] leading-relaxed mb-3">
-              {selected.description}
-            </p>
-            <div className="flex gap-2 mb-3.5 flex-wrap">
-              {selected.media && selected.media.length > 0 ? (
-                selected.media.map((m: any) => (
-                  <a key={m.id} href={m.mediaUrl} target="_blank" rel="noopener noreferrer" className="w-16 h-16 bg-[#f5f5f5] rounded-lg border-[1.5px] border-[#e8e8e8] flex items-center justify-center cursor-pointer overflow-hidden hover:opacity-90 transition-opacity">
+          <CardContent className="pt-5 flex flex-col gap-4">
+            {selected.description && selected.description !== selected.title && (
+              <p className="text-[14px] text-[#333] leading-relaxed">{selected.description}</p>
+            )}
+
+            {selected.media && selected.media.length > 0 && (
+              <div className="flex gap-2 flex-wrap">
+                {selected.media.map((m: any) => (
+                  <a key={m.id} href={m.mediaUrl} target="_blank" rel="noopener noreferrer" className="w-16 h-16 bg-[#f5f5f5] rounded-lg border border-[#e8e8e8] flex items-center justify-center overflow-hidden hover:opacity-90 transition-opacity">
                     {m.mediaType === 'image' ? (
                       <img src={m.mediaUrl} alt="Request media" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="text-[#115746] flex items-center justify-center w-full h-full bg-[#f0fcf9]"><Folder className="w-6 h-6" /></div>
+                      <Folder className="w-6 h-6 text-[#115746]" />
                     )}
                   </a>
-                ))
-              ) : (
-                <div className="text-[12px] text-[#aaa] italic py-2">No media attached</div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex flex-col gap-2.5 text-[13px]">
+              <div className="flex items-center gap-2.5">
+                <Calendar className="w-4 h-4 text-[#aaa] shrink-0" />
+                <span className="font-semibold text-[#1a1a1a]">
+                  {selected.scheduledAt ? formatDateTime(selected.scheduledAt) : "Not scheduled"}
+                </span>
+              </div>
+              {selected.address && (
+                <div className="flex items-center gap-2.5">
+                  <MapPin className="w-4 h-4 text-[#aaa] shrink-0" />
+                  <span className="text-[#1a1a1a]">{selected.address}</span>
+                </div>
               )}
+              <div className="flex items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <User className="w-4 h-4 text-[#aaa] shrink-0" />
+                  <span className="text-[#1a1a1a] truncate">
+                    {selected.patron?.firstName} {selected.patron?.lastName}
+                    {selected.patron?.phone && <span className="text-[#888]"> · {selected.patron.phone}</span>}
+                  </span>
+                </div>
+                <div className="flex gap-1.5 shrink-0">
+                  <Button variant="outline" className="h-8 w-8 p-0" title="Call patron" onClick={() => selected.patron?.phone && window.open(`tel:${selected.patron.phone}`)}>
+                    <Phone className="w-4 h-4" />
+                  </Button>
+                  <Button variant="outline" className="h-8 w-8 p-0" title="Message patron" onClick={() => selected.patronId && router.push(`/dashboard/patrons?patronId=${selected.patronId}`)}>
+                    <MessageSquare className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Button variant="outline" className="flex-1 flex items-center justify-center gap-2 text-xs font-semibold" onClick={() => selected.patron?.phone && window.open(`tel:${selected.patron.phone}`)}>
-                <Phone className="w-4 h-4" /> Call patron
-              </Button>
-              <Button variant="primary" className="flex-1 flex items-center justify-center gap-2 text-xs font-semibold" onClick={() => selected.patronId && router.push(`/dashboard/patrons?patronId=${selected.patronId}`)}>
-                <MessageSquare className="w-4 h-4" /> Message patron
-              </Button>
-            </div>
+
+            <div className="text-[11px] text-[#aaa]">Requested {formatDate(selected.createdAt || new Date())}</div>
           </CardContent>
         </Card>
 
-
         {/* Assign */}
         <Card className="shrink-0">
-          <CardHeader><CardTitle>Assign artisan</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Artisan</CardTitle></CardHeader>
           <CardContent>
             {reqStatus === 'pending' ? (
               <div className="flex flex-col gap-2.5">
@@ -381,7 +339,7 @@ export function RequestDetailsPanel({
                   onClick={handleAssign}
                   disabled={assignArtisanMutation.isPending || !selectedArtisanId}
                 >
-                  {assignArtisanMutation.isPending ? "Assigning..." : "Assign artisan & notify patron via app"}
+                  {assignArtisanMutation.isPending ? "Assigning..." : "Assign"}
                 </Button>
 
                 {/* Surface the backend error instead of failing silently */}
@@ -394,14 +352,12 @@ export function RequestDetailsPanel({
               </div>
             ) : (
               <div className="flex flex-col gap-1.5">
-                <div className="text-[11px] text-[#aaa] font-medium">Assigned Artisan</div>
                 {selected.artisan ? (
                   <div className="bg-[#e8f5f0] border border-[#b2d8cc] rounded-[8px] p-3 flex items-center justify-between">
                     <div>
                       <div className="text-[13px] text-[#115746] font-bold">{`${selected.artisan.firstName} ${selected.artisan.lastName}`}</div>
                       <div className="text-[11px] text-[#888] mt-0.5">{selected.artisan.phone || "No phone"}</div>
                     </div>
-                    <span className="text-[10px] bg-[#115746] text-white font-bold px-2.5 py-0.5 rounded-[10px] uppercase">Assigned</span>
                   </div>
                 ) : (
                   <div className="text-[12px] text-[#888] italic">No artisan assigned.</div>
@@ -411,15 +367,20 @@ export function RequestDetailsPanel({
           </CardContent>
         </Card>
 
-        {/* Invoice */}
+        {/* Invoice: only once an artisan is assigned (or one already exists) */}
+        {(reqStatus !== 'pending' || invoice) && (
         <Card className="shrink-0">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-[#115746]" />
-              <span>Invoice generator</span>
+              <span>Invoice</span>
               {invoice && (
-                <span className="text-[10px] font-extrabold bg-[#e8f5f0] text-[#115746] border border-[#b2d8cc] px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  Generated Previously
+                <span className={cn(
+                  "text-[10px] font-bold px-2.5 py-0.5 rounded-[10px] border uppercase tracking-wider",
+                  invoice.status === 'draft' && "bg-[#fff5f2] text-[#FA4812] border-[#ffd4c7]",
+                  invoice.status === 'sent' && "bg-[#fff9e6] text-[#b27b00] border-[#ffe082]",
+                  invoice.status === 'paid' && "bg-[#e8f5f0] text-[#115746] border-[#b2d8cc]"
+                )}>
+                  {invoice.status}
                 </span>
               )}
             </CardTitle>
@@ -430,50 +391,14 @@ export function RequestDetailsPanel({
                 <div className="w-6 h-6 border-2 border-[#115746] border-t-transparent rounded-full animate-spin" />
               </div>
             ) : (
-              <div className="min-w-[380px] bg-[#fff] border-[1.5px] border-[#e8e8e8] rounded-[12px] p-5 shadow-sm relative overflow-hidden">
-                {/* Generated previously banner */}
-                {invoice ? (
-                  <div className="bg-[#e8f5f0] border border-[#b2d8cc] rounded-lg p-[10px_12px] text-[12.5px] text-[#115746] font-semibold mb-4 flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#115746]" />
-                    <span>This invoice was generated previously. Status: <strong className="uppercase">{invoice.status}</strong></span>
-                  </div>
-                ) : (
-                  <div className="bg-[#fff8e1] border border-[#ffe082] rounded-lg p-[10px_12px] text-[12.5px] text-[#8a6f00] font-semibold mb-4 flex items-center gap-2">
-                    <Info className="w-4 h-4 text-[#8a6f00]" />
-                    <span>No invoice generated previously. Ready to create a draft.</span>
-                  </div>
-                )}
-
-                {/* Status Header */}
-                <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-[#f0f0f0]">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[13px] font-bold text-[#115746] uppercase tracking-wider flex items-center gap-1.5">
-                      <FileText className="w-4 h-4" /> Invoice details
-                    </span>
-                    <span className={cn(
-                      "text-[9px] font-bold px-2.5 py-0.5 rounded-[10px] border uppercase tracking-wider",
-                      !invoice && "bg-[#f5f5f5] text-[#737373] border-[#e5e5e5]",
-                      invoice?.status === 'draft' && "bg-[#fff5f2] text-[#FA4812] border-[#ffd4c7]",
-                      invoice?.status === 'sent' && "bg-[#fff9e6] text-[#b27b00] border-[#ffe082]",
-                      invoice?.status === 'paid' && "bg-[#e8f5f0] text-[#115746] border-[#b2d8cc]"
-                    )}>
-                      {invoice ? invoice.status : 'no invoice'}
-                    </span>
-                  </div>
-                  {invoice?.status === 'paid' && (
-                    <div className="text-[11px] text-[#115746] font-bold flex items-center gap-1 bg-[#e8f5f0] px-2.5 py-1 rounded-[6px]">
-                      <Check className="w-3.5 h-3.5 stroke-[3]" /> PAID
-                    </div>
-                  )}
-                </div>
-
+              <div className="min-w-[380px] relative overflow-hidden">
                 {/* Form: Editable for No Invoice or Draft */}
                 {(!invoice || invoice.status === 'draft') ? (
                   <div className="flex flex-col gap-4">
                     {/* Invoice General Description */}
                     <div>
                       <label className="text-[10px] text-[#888] font-bold uppercase tracking-wider block mb-1">
-                        Invoice Description / Scope
+                        Description
                       </label>
                       <Input
                         value={description}
@@ -538,7 +463,7 @@ export function RequestDetailsPanel({
                           onClick={handleAddItem}
                           className="text-[12px] font-bold text-[#115746] border border-dashed border-[#115746]/30 hover:border-[#115746] rounded-lg py-1.5 text-center bg-transparent cursor-pointer hover:bg-[#115746]/5 transition-all mt-1 flex items-center justify-center gap-1.5"
                         >
-                          <Plus className="w-4 h-4" /> Add Item Row
+                          <Plus className="w-4 h-4" /> Add item
                         </button>
                       </div>
                     </div>
@@ -759,14 +684,17 @@ export function RequestDetailsPanel({
             )}
           </CardContent>
         </Card>
+        )}
 
         {/* Notes */}
         <Card className="shrink-0 mb-5">
-          <CardHeader><CardTitle>Internal notes</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              Internal notes
+              <span className="text-[11px] font-normal text-[#aaa] flex items-center gap-1"><Lock className="w-3 h-3" /> Only admins see these</span>
+            </CardTitle>
+          </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-1.5 bg-[#fff8e1] border border-[#ffe082] rounded-[6px] p-[6px_10px] text-[11px] text-[#8a6f00] font-semibold mb-2">
-              <Lock className="w-3.5 h-3.5 text-[#8a6f00]" /> Internal only — patron cannot see these notes
-            </div>
             <div className="flex flex-col gap-2">
               {((selected as ServiceRequestDetail).notes || []).map((n: any, i: number) => (
                 <div key={n.id || i} className={cn("bg-[#f9f9f9] rounded-lg p-[10px_12px] border-l-[3px] border-[#115746] transition-opacity", n.sending && "opacity-70")}>
