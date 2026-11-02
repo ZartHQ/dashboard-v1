@@ -13,5 +13,11 @@ export const patronsApi = {
     const response = await api.get(`/admin/patrons/${id}`);
 
     return response.data.data;
-  }
+  },
+
+  /** Lets a patron blocked for cancelling too often book again. */
+  unblockBooking: async (id: number) => {
+    const response = await api.post(`/admin/patrons/${id}/unblock-booking`);
+    return response.data.data;
+  },
 };

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, Phone, MapPin, Calendar, Wrench, CreditCard } from "lucide-react";
 import { PatronChat } from "./PatronChat";
+import { BookingBlockBanner } from "./BookingBlockBanner";
 
 interface PatronDetailsPanelProps {
   selected: Patron;
@@ -53,6 +54,8 @@ export function PatronDetailsPanel({
 
       {/* Details Content */}
       <div className="flex-1 p-6 overflow-y-auto bg-[#f9f9f9] flex flex-col gap-6">
+        <BookingBlockBanner patronId={selected.id} />
+
         {/* Profile Overview Card */}
         <Card>
           <CardHeader>
