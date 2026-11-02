@@ -158,6 +158,11 @@ export function RequestDetailsPanel({
             <span className="text-[12px] text-[#aaa]">#{selected.id}</span>
             <span className="text-[10px] px-2 py-0.5 rounded-[6px] font-semibold bg-[#e8f5f0] text-[#115746]">{selected.artisanType?.name}</span>
           </div>
+          {reqStatus === 'cancelled' && selected.cancelledByPatron && (
+            <div className="text-[12px] text-[#737373] mt-1.5">
+              Cancelled by patron{selected.cancellationReason ? `: “${selected.cancellationReason}”` : ""}
+            </div>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {/* Status Indicator */}
