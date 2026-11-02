@@ -11,7 +11,7 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { BellRing, Volume2, VolumeX, X, XCircle } from "lucide-react";
+import { BellRing, MessageSquare, Volume2, VolumeX, X, XCircle } from "lucide-react";
 import { useAdminSSE, AdminSSEEvent } from "@/hooks/useAdminSSE";
 import { PushAlerts, usePushAlerts } from "@/hooks/usePushAlerts";
 import { showSystemNotification } from "@/lib/push";
@@ -22,7 +22,8 @@ import { cn } from "@/lib/utils";
 
 /**
  * New service request alerts, mounted once in the dashboard layout:
- * - listens for `service_request.created` / `.cancelled` on the admin SSE stream
+ * - listens for `service_request.created` / `.cancelled` and patron chat
+ *   messages (`chat.message`) on the admin SSE stream
  * - shows a stacked toast (top-right) with a View button + plays a chime
  * - shows a system notification when the dashboard isn't in front
  *   (Web Push covers the app being closed; see usePushAlerts + public/sw.js)
@@ -32,6 +33,7 @@ import { cn } from "@/lib/utils";
  */
 
 const REQUESTS_PATH = "/dashboard/requests";
+const PATRONS_PATH = "/dashboard/patrons";
 const SEEN_KEY = "zart-seen-requests";
 const MUTE_KEY = "zart-alerts-muted";
 const MAX_SEEN = 500;
@@ -40,7 +42,7 @@ const TOAST_MS = 10_000;
 /** How long a system notification waits for the request's address. */
 const ADDRESS_WAIT_MS = 2_000;
 
-type AlertKind = "new" | "cancelled";
+type AlertKind = "new" | "cancelled" | "message";
 
 interface RequestAlert {
   /** Toast key: the request id, suffixed for cancellations. */
@@ -52,6 +54,9 @@ interface RequestAlert {
   patronFirstName: string;
   createdAt: string;
   address?: string;
+  /** Chat messages: who sent it and what they said. */
+  patronId?: string;
+  preview?: string;
 }
 
 interface NewRequestAlertsValue {
@@ -102,15 +107,21 @@ function getAudioContext(): AudioContext | null {
 
 /**
  * Two-note chime: rising for a new request, lower and falling for a
- * cancellation so admins can tell them apart without looking. Silently does
- * nothing until the browser allows audio.
+ * cancellation, a quick double tap for a chat message, so admins can tell
+ * them apart without looking. Silently does nothing until the browser allows
+ * audio.
  */
 function playChime(kind: AlertKind = "new") {
   const ctx = getAudioContext();
   if (!ctx || ctx.state !== "running") return;
   const now = ctx.currentTime;
   const notes =
-    kind === "cancelled"
+    kind === "message"
+      ? [
+          { freq: 987.77, at: 0 }, // B5
+          { freq: 987.77, at: 0.12 }, // B5
+        ]
+      : kind === "cancelled"
       ? [
           { freq: 659.25, at: 0 }, // E5
           { freq: 440, at: 0.18 }, // A4
@@ -209,7 +220,39 @@ export default function NewRequestAlerts({ children }: { children: React.ReactNo
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
+  const handleMessage = useCallback((data: any) => {
+    if (data?.conversationId == null) return;
+    const patronId = String(data.patronId ?? "");
+    const alert: RequestAlert = {
+      id: `chat-${data.conversationId}`,
+      requestId: "",
+      kind: "message",
+      service: "",
+      title: "",
+      patronFirstName: String(data.patronName || "").split(" ")[0],
+      createdAt: data.createdAt || new Date().toISOString(),
+      patronId,
+      preview: String(data.preview || ""),
+    };
+    // One toast per conversation: a newer message replaces the older one.
+    setToasts((prev) => [alert, ...prev.filter((t) => t.id !== alert.id)].slice(0, MAX_TOASTS));
+    if (!mutedRef.current) playChime("message");
+
+    if (systemOnRef.current && (document.visibilityState !== "visible" || !document.hasFocus())) {
+      showSystemNotification(
+        {
+          title: alert.patronFirstName ? `Message from ${alert.patronFirstName}` : "New message",
+          body: alert.preview || "",
+          tag: alert.id,
+          url: `${PATRONS_PATH}?patronId=${patronId}`,
+        },
+        (target) => router.push(target)
+      );
+    }
+  }, [router]);
+
   const handleEvent = useCallback(({ event, data }: AdminSSEEvent) => {
+    if (event === "chat.message") return handleMessage(data);
     const kind: AlertKind | null =
       event === "service_request.created"
         ? "new"
@@ -266,7 +309,7 @@ export default function NewRequestAlerts({ children }: { children: React.ReactNo
         );
       });
     }
-  }, [queryClient, router]);
+  }, [queryClient, router, handleMessage]);
 
   useAdminSSE(handleEvent);
 
@@ -317,6 +360,11 @@ export default function NewRequestAlerts({ children }: { children: React.ReactNo
             alert={t}
             onDismiss={() => dismiss(t.id)}
             onView={() => {
+              dismiss(t.id);
+              if (t.kind === "message") {
+                router.push(`${PATRONS_PATH}?patronId=${t.patronId}`);
+                return;
+              }
               markRequestSeen(t.requestId);
               router.push(`${REQUESTS_PATH}?id=${t.requestId}`);
             }}
@@ -345,10 +393,13 @@ function RequestToast({
   });
   const area = alert.address?.split(",")[0]?.trim();
   const cancelled = alert.kind === "cancelled";
-  const headline = [cancelled ? "Request cancelled" : "New request", alert.service, area]
-    .filter(Boolean)
-    .join(" · ");
-  const accent = cancelled ? "#DC2626" : "#FA4812";
+  const message = alert.kind === "message";
+  const headline = message
+    ? alert.patronFirstName ? `Message from ${alert.patronFirstName}` : "New message"
+    : [cancelled ? "Request cancelled" : "New request", alert.service, area]
+        .filter(Boolean)
+        .join(" · ");
+  const accent = cancelled ? "#DC2626" : message ? "#115746" : "#FA4812";
 
   return (
     <div
@@ -359,22 +410,31 @@ function RequestToast({
       <div className="flex items-start gap-3 p-[14px_14px_12px_18px]">
         <div
           className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-          style={{ backgroundColor: cancelled ? "#fef2f2" : "#fff5f2", color: accent }}
+          style={{ backgroundColor: cancelled ? "#fef2f2" : message ? "#e8f5f0" : "#fff5f2", color: accent }}
         >
-          {cancelled ? <XCircle className="w-[18px] h-[18px]" /> : <BellRing className="w-[18px] h-[18px]" />}
+          {cancelled ? (
+            <XCircle className="w-[18px] h-[18px]" />
+          ) : message ? (
+            <MessageSquare className="w-[18px] h-[18px]" />
+          ) : (
+            <BellRing className="w-[18px] h-[18px]" />
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-[13px] font-semibold text-[#1a1a1a] truncate" title={headline}>
             {headline}
           </div>
-          {alert.title && alert.title.toLowerCase() !== alert.service.toLowerCase() && (
+          {message && alert.preview && (
+            <div className="text-[12px] text-[#555] line-clamp-2 mt-0.5">{alert.preview}</div>
+          )}
+          {!message && alert.title && alert.title.toLowerCase() !== alert.service.toLowerCase() && (
             <div className="text-[12px] text-[#555] truncate mt-0.5">{alert.title}</div>
           )}
           <div className="text-[11px] text-[#888] mt-0.5 truncate">
-            {[alert.patronFirstName, time].filter(Boolean).join(" · ")}
+            {(message ? [time] : [alert.patronFirstName, time]).filter(Boolean).join(" · ")}
           </div>
           <Button size="sm" className="mt-2.5 h-7 rounded-[8px]" onClick={onView}>
-            View
+            {message ? "Reply" : "View"}
           </Button>
         </div>
         <button
