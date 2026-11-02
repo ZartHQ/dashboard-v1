@@ -124,6 +124,10 @@ export interface ServiceRequestNote {
 
 export interface ServiceRequestDetail extends ServiceRequest {
   notes: ServiceRequestNote[];
+  /** Set when the patron cancelled it themselves. */
+  cancelledByPatron?: boolean;
+  /** The reason they picked in the app. */
+  cancellationReason?: string | null;
 }
 
 export type ServiceRequestListResponse = PaginatedApiResponse<ServiceRequest>;
