@@ -596,3 +596,16 @@ html[data-theme="dark"] .text-\[\#ea580c\] { color: #fb923c !important; }  /* fl
 html[data-theme="dark"] .bg-white\/70 { background-color: rgba(255,255,255,0.06) !important; }
 html[data-theme="dark"] .border-white\/50 { border-color: rgba(255,255,255,0.08) !important; }
 
+
+/* ─── Side panel colour ───
+   Deep ink blue instead of brand green, so the green stays special for
+   buttons and highlights. Cream text + orange accents are unchanged.
+   To try another colour, change these two gradients only. */
+.zart-sidebar {
+  background: linear-gradient(180deg, #1e2338 0%, #151927 100%);
+  box-shadow: 2px 0 20px rgba(21, 25, 39, 0.18);
+}
+html[data-theme="dark"] .zart-sidebar {
+  background: linear-gradient(180deg, #181b24 0%, #121419 100%);
+  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.4);
+}
