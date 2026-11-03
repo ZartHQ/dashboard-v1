@@ -8,9 +8,12 @@ interface ArtisanImageUploadProps {
   onChange: (base64: string | null) => void;
   firstName?: string;
   lastName?: string;
+  /** "sm": a 44px avatar for headers (no remove button; hover to change). */
+  size?: "md" | "sm";
 }
 
-export function ArtisanImageUpload({ value, onChange, firstName = "", lastName = "" }: ArtisanImageUploadProps) {
+export function ArtisanImageUpload({ value, onChange, firstName = "", lastName = "", size = "md" }: ArtisanImageUploadProps) {
+  const small = size === "sm";
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,10 +38,10 @@ export function ArtisanImageUpload({ value, onChange, firstName = "", lastName =
   const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || "A";
 
   return (
-    <div className="flex flex-col items-center gap-2 mb-4">
+    <div className={small ? "flex shrink-0" : "flex flex-col items-center gap-2 mb-4"}>
       <div
         onClick={() => fileInputRef.current?.click()}
-        className="relative group cursor-pointer w-20 h-20 rounded-full overflow-hidden border-2 border-dashed border-[#115746]/30 hover:border-[#115746] flex items-center justify-center transition-all bg-[#fafafa] shadow-inner"
+        className={`relative group cursor-pointer ${small ? "w-11 h-11" : "w-20 h-20"} rounded-full overflow-hidden border-2 border-dashed border-[#115746]/30 hover:border-[#115746] flex items-center justify-center transition-all bg-[#fafafa] shadow-inner`}
       >
         {value ? (
           <img
@@ -48,19 +51,19 @@ export function ArtisanImageUpload({ value, onChange, firstName = "", lastName =
           />
         ) : (
           <div className="flex flex-col items-center justify-center text-center p-2">
-            <span className="text-[18px] font-bold text-[#115746]">{initials}</span>
-            <span className="text-[8px] text-[#aaa] font-semibold tracking-wider mt-0.5">ADD PHOTO</span>
+            <span className={small ? "text-[13px] font-bold text-[#115746]" : "text-[18px] font-bold text-[#115746]"}>{initials}</span>
+            {!small && <span className="text-[8px] text-[#aaa] font-semibold tracking-wider mt-0.5">ADD PHOTO</span>}
           </div>
         )}
         
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-[#115746]/80 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-white">
           <CameraIcon className="w-5 h-5 text-white" />
-          <span className="text-[8px] font-bold uppercase tracking-wider mt-1">Upload</span>
+          {!small && <span className="text-[8px] font-bold uppercase tracking-wider mt-1">Upload</span>}
         </div>
       </div>
       
-      {value && (
+      {value && !small && (
         <button
           type="button"
           onClick={handleRemove}

@@ -128,7 +128,9 @@ export function RequestDetailsPanel({
   const subtotal = items.reduce((acc, it) => acc + (it.qty * it.unitPrice), 0);
   const feePercent = subtotal >= 400000 ? 0.08 : 0.1;
   const fee = Math.round(subtotal * feePercent);
-  const total = Math.max(0, subtotal + fee - discount);
+  // Fees from the patron's earlier cancels, put on the invoice by the API.
+  const cancellationFee = invoice?.cancellationFeeAmount ?? 0;
+  const total = Math.max(0, subtotal + fee - discount) + cancellationFee;
 
   // Only approved artisans can be assigned (the backend rejects any other status).
   const approvedArtisans = (artisansList || []).filter((a) => a.vettingStatus === "approved");
@@ -500,6 +502,12 @@ export function RequestDetailsPanel({
                           <span className="font-semibold">-{formatCurrency(discount)}</span>
                         </div>
                       )}
+                      {cancellationFee > 0 && (
+                        <div className="flex justify-between text-[13px]">
+                          <span className="text-[#666]">Cancellation fee (earlier cancels)</span>
+                          <span className="font-semibold text-[#1a1a1a]">{formatCurrency(cancellationFee)}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between border-t-2 border-[#115746]/10 pt-2.5 mt-1">
                         <span className="text-[14px] font-bold text-[#1a1a1a]">Total due</span>
                         <span className="text-[18px] font-bold text-[#115746]">{formatCurrency(total)}</span>
@@ -614,6 +622,12 @@ export function RequestDetailsPanel({
                           <span className="font-medium">
                             -{formatCurrency(invoice.discountAmount ?? parseFloat(invoice.discount as any))}
                           </span>
+                        </div>
+                      )}
+                      {cancellationFee > 0 && (
+                        <div className="flex justify-between text-[12px]">
+                          <span className="text-[#888]">Cancellation fee</span>
+                          <span className="font-medium text-[#1a1a1a]">{formatCurrency(cancellationFee)}</span>
                         </div>
                       )}
                       <div className="flex justify-between border-t-2 border-[#115746]/10 pt-2 mt-1">

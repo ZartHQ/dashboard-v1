@@ -10,9 +10,9 @@ import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { Select } from "@/components/ui/Select";
 import { PageLoader } from "@/components/ui/PageLoader";
-import { ArtisanCard } from "./components/ArtisanCard";
+import { ArtisanListItem } from "./components/ArtisanListItem";
 import { AddArtisanModal } from "./components/AddArtisanModal";
-import { ArtisanProfileDrawer } from "./components/ArtisanProfileDrawer";
+import { ArtisanDetailsPanel } from "./components/ArtisanDetailsPanel";
 import { UpdateVettingModal } from "./components/UpdateVettingModal";
 import { Artisan, VettingStatus } from "@/types";
 import { Search, Plus } from "lucide-react";
@@ -25,6 +25,7 @@ export default function ArtisansPage() {
     "all" | "approved" | "pending" | "under_review" | "requires_action" | "suspended" | "rejected"
   >("all");
   const [viewingArtisan, setViewingArtisan] = useState<Artisan | null>(null);
+  const [isMobileDetailActive, setIsMobileDetailActive] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [newStatus, setNewStatus] = useState<VettingStatus>("pending");
   const [statusNote, setStatusNote] = useState("");
@@ -127,97 +128,115 @@ export default function ArtisansPage() {
     return matchesSearch;
   });
 
+  const statusTabs = [
+    ["all", "All statuses"],
+    ["approved", "Approved"],
+    ["pending", "Pending"],
+    ["under_review", "Under review"],
+    ["requires_action", "Action required"],
+    ["suspended", "Suspended"],
+    ["rejected", "Rejected"],
+  ] as const;
+
   return (
     <>
-      <div className="topbar">
-        <div className="topbar-title">
-          Artisans{" "}
-          <span style={{ color: "#aaa", fontWeight: 400, fontSize: 13, marginLeft: 6 }}>
-            {filteredArtisans.length} shown · {artisans?.length || 0} total
-          </span>
-          {isLoading && (
-            <span style={{ color: "#115746", fontSize: 11, marginLeft: 8, fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 4 }}>
-              <span className="w-3.5 h-3.5 border-2 border-[#115746] border-t-transparent rounded-full animate-spin inline-block" />
-              Syncing...
+      <div className="flex flex-col h-screen overflow-hidden">
+        {/* Topbar */}
+        <div className="bg-white border-b border-[#e8e8e8] p-[14px_24px] flex items-center justify-between shrink-0">
+          <div className="text-[16px] font-bold text-[#115746] flex items-center">
+            Artisans
+            <span className="text-[#aaa] font-normal text-[13px] ml-1.5">
+              {filteredArtisans.length} shown · {artisans?.length || 0} total
             </span>
+            {isLoading && (
+              <span className="w-3.5 h-3.5 border-2 border-[#115746] border-t-transparent rounded-full animate-spin inline-block ml-2" />
+            )}
+          </div>
+          <Button variant="primary" onClick={() => setIsModalOpen(true)} className="flex items-center gap-1.5">
+            <Plus className="w-4 h-4" /> Add artisan
+          </Button>
+        </div>
+
+        <div className="flex flex-1 overflow-hidden">
+          {/* Artisan list */}
+          <div
+            className={
+              "w-full md:w-[320px] flex-shrink-0 border-r border-[#e8e8e8] bg-white overflow-y-auto " +
+              (isMobileDetailActive ? "hidden md:block" : "block")
+            }
+          >
+            <div className="p-3 flex flex-col gap-2 border-b border-[#f0f0f0]">
+              <div className="relative">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#aaa]" />
+                <Input
+                  className="h-9 pl-9 w-full"
+                  placeholder="Search name, trade or area..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-1.5">
+                <Select className="h-8 text-[11px] py-0" value={category} onChange={(e) => setCategory(e.target.value)}>
+                  <option value="all">All trades</option>
+                  <option value="plumber">Plumber</option>
+                  <option value="electrician">Electrician</option>
+                  <option value="carpenter">Carpenter</option>
+                  <option value="cleaner">Cleaner</option>
+                </Select>
+                <Select className="h-8 text-[11px] py-0" value={location} onChange={(e) => setLocation(e.target.value)}>
+                  <option value="all">All areas</option>
+                  <option value="Lekki">Lekki</option>
+                  <option value="Victoria Island">Victoria Island</option>
+                  <option value="Ikeja">Ikeja</option>
+                  <option value="Surulere">Surulere</option>
+                  <option value="Ajah">Ajah</option>
+                </Select>
+                <Select
+                  className="h-8 text-[11px] py-0"
+                  value={selectedTab}
+                  onChange={(e) => setSelectedTab(e.target.value as typeof selectedTab)}
+                >
+                  {statusTabs.map(([value, label]) => (
+                    <option key={value} value={value}>{label}</option>
+                  ))}
+                </Select>
+              </div>
+            </div>
+            {filteredArtisans.length === 0 ? (
+              <div className="p-8 text-center text-[13px] text-[#aaa]">No artisans match these filters.</div>
+            ) : (
+              filteredArtisans.map((a) => (
+                <ArtisanListItem
+                  key={a.id}
+                  artisan={a}
+                  isSelected={viewingArtisan?.id === a.id}
+                  onClick={() => {
+                    setViewingArtisan(a);
+                    setIsMobileDetailActive(true);
+                  }}
+                />
+              ))
+            )}
+          </div>
+
+          {/* Detail split */}
+          {viewingArtisan ? (
+            <ArtisanDetailsPanel
+              viewingArtisan={viewingArtisan}
+              setViewingArtisan={setViewingArtisan}
+              isMobileDetailActive={isMobileDetailActive}
+              onBack={() => setIsMobileDetailActive(false)}
+              setNewStatus={setNewStatus}
+              setStatusNote={setStatusNote}
+              setIsStatusModalOpen={setIsStatusModalOpen}
+            />
+          ) : (
+            <div className="flex-1 hidden md:flex flex-col items-center justify-center bg-[#f9f9f9] p-6">
+              <img src="/zart-logo-green.svg" alt="Zart Logo" className="w-16 h-16 object-contain mb-4" />
+              <div className="text-[14px] font-semibold text-[#888] tracking-wide">Select an artisan to view details</div>
+            </div>
           )}
         </div>
-        <Button variant="primary" onClick={() => setIsModalOpen(true)} className="flex items-center gap-1.5">
-          <Plus className="w-4 h-4" /> Add artisan
-        </Button>
-      </div>
-
-      <div className="content">
-        <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#aaa]" />
-            <Input
-              className="pl-9 w-full"
-              placeholder="Search by name, category or location..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-          <Select className="w-auto" value={category} onChange={(e) => setCategory(e.target.value)}>
-            <option value="all">All categories</option>
-            <option value="plumber">Plumber</option>
-            <option value="electrician">Electrician</option>
-            <option value="carpenter">Carpenter</option>
-            <option value="cleaner">Cleaner</option>
-          </Select>
-          <Select className="w-auto" value={location} onChange={(e) => setLocation(e.target.value)}>
-            <option value="all">All locations</option>
-            <option value="Lekki">Lekki</option>
-            <option value="Victoria Island">Victoria Island</option>
-            <option value="Ikeja">Ikeja</option>
-            <option value="Surulere">Surulere</option>
-            <option value="Ajah">Ajah</option>
-          </Select>
-        </div>
-
-        <div className="chips" style={{ marginBottom: 18, display: "flex", gap: 6, flexWrap: "wrap" }}>
-          {(["all", "approved", "pending", "under_review", "requires_action", "suspended", "rejected"] as const).map((tab) => {
-            const label =
-              tab === "all"
-                ? "All"
-                : tab === "approved"
-                  ? "Approved"
-                  : tab === "pending"
-                    ? "Pending"
-                    : tab === "under_review"
-                      ? "Under Review"
-                      : tab === "requires_action"
-                        ? "Action Required"
-                        : tab === "suspended"
-                          ? "Suspended"
-                          : "Rejected";
-            return (
-              <button
-                key={tab}
-                className={`chip${selectedTab === tab ? " active" : ""}`}
-                onClick={() => setSelectedTab(tab)}
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
-
-        {filteredArtisans.length === 0 ? (
-          <div style={{ padding: 40, textAlign: "center", color: "#aaa" }}>
-            No artisans match the selected filters.
-          </div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 14 }}>
-            {filteredArtisans.map((a) => (
-              <ArtisanCard
-                key={a.id}
-                artisan={a}
-                setViewingArtisan={setViewingArtisan}
-              />
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Premium Add Artisan Modal */}
@@ -242,15 +261,6 @@ export default function ArtisansPage() {
         setImage={setImage}
         handleCreateArtisan={handleCreateArtisan}
         isPending={createArtisanMutation.isPending}
-      />
-
-      {/* Artisan Profile Details Drawer */}
-      <ArtisanProfileDrawer
-        viewingArtisan={viewingArtisan}
-        setViewingArtisan={setViewingArtisan}
-        setNewStatus={setNewStatus}
-        setStatusNote={setStatusNote}
-        setIsStatusModalOpen={setIsStatusModalOpen}
       />
 
       {/* Vetting Status Update Modal */}

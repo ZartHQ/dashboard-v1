@@ -42,7 +42,7 @@ const TOAST_MS = 10_000;
 /** How long a system notification waits for the request's address. */
 const ADDRESS_WAIT_MS = 2_000;
 
-type AlertKind = "new" | "cancelled" | "message";
+type AlertKind = "new" | "cancelled" | "merged" | "message";
 
 interface RequestAlert {
   /** Toast key: the request id, suffixed for cancellations. */
@@ -258,14 +258,17 @@ export default function NewRequestAlerts({ children }: { children: React.ReactNo
         ? "new"
         : event === "service_request.cancelled"
           ? "cancelled"
-          : null;
+          : event === "service_request.merged"
+            ? "merged"
+            : null;
     if (!kind || data?.id == null) return;
     const requestId = String(data.id);
     const alert: RequestAlert = {
-      id: kind === "cancelled" ? `${requestId}-cancelled` : requestId,
+      id: kind === "new" ? requestId : `${requestId}-${kind}`,
       requestId,
       kind,
-      service: data.artisanType || "Service",
+      // For an added job, name the job that was added.
+      service: (kind === "merged" ? data.addedType : null) || data.artisanType || "Service",
       title: data.title || "",
       patronFirstName: String(data.patronName || "").split(" ")[0],
       createdAt: data.createdAt || new Date().toISOString(),
@@ -274,7 +277,7 @@ export default function NewRequestAlerts({ children }: { children: React.ReactNo
     // The tab-title count is for new requests only (useAdminSSE already
     // refreshes the request lists and badge on every event).
     if (kind === "new") setUnackedCount((n) => n + 1);
-    if (!mutedRef.current) playChime(kind);
+    if (!mutedRef.current) playChime(kind === "merged" ? "new" : kind);
 
     // The event has no address; fetch it (into the detail cache, so View
     // opens instantly) so the toast can say where.
@@ -300,9 +303,9 @@ export default function NewRequestAlerts({ children }: { children: React.ReactNo
         const url = `${REQUESTS_PATH}?id=${alert.requestId}`;
         showSystemNotification(
           {
-            title: kind === "cancelled" ? "Request cancelled" : "New request",
+            title: kind === "cancelled" ? "Request cancelled" : kind === "merged" ? "Added to a request" : "New request",
             body: [alert.service, area, alert.patronFirstName].filter(Boolean).join(" · "),
-            tag: kind === "cancelled" ? `request-${alert.requestId}-cancelled` : `request-${alert.requestId}`,
+            tag: kind === "new" ? `request-${alert.requestId}` : `request-${alert.requestId}-${kind}`,
             url,
           },
           (target) => router.push(target)
@@ -394,12 +397,13 @@ function RequestToast({
   const area = alert.address?.split(",")[0]?.trim();
   const cancelled = alert.kind === "cancelled";
   const message = alert.kind === "message";
+  const merged = alert.kind === "merged";
   const headline = message
     ? alert.patronFirstName ? `Message from ${alert.patronFirstName}` : "New message"
-    : [cancelled ? "Request cancelled" : "New request", alert.service, area]
+    : [cancelled ? "Request cancelled" : merged ? "Added to a request" : "New request", alert.service, area]
         .filter(Boolean)
         .join(" · ");
-  const accent = cancelled ? "#DC2626" : message ? "#115746" : "#FA4812";
+  const accent = cancelled ? "#DC2626" : message ? "#115746" : merged ? "#b27b00" : "#FA4812";
 
   return (
     <div
@@ -410,7 +414,7 @@ function RequestToast({
       <div className="flex items-start gap-3 p-[14px_14px_12px_18px]">
         <div
           className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-          style={{ backgroundColor: cancelled ? "#fef2f2" : message ? "#e8f5f0" : "#fff5f2", color: accent }}
+          style={{ backgroundColor: cancelled ? "#fef2f2" : message ? "#e8f5f0" : merged ? "#fff9e6" : "#fff5f2", color: accent }}
         >
           {cancelled ? (
             <XCircle className="w-[18px] h-[18px]" />

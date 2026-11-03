@@ -252,6 +252,8 @@ export interface InvoiceItem {
 }
 
 export interface Invoice {
+  /** Fees from the patron's earlier cancels, charged on this invoice. */
+  cancellationFeeAmount?: number;
   id: number;
   description: string;
   discount: string | number;
