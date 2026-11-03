@@ -598,14 +598,13 @@ html[data-theme="dark"] .border-white\/50 { border-color: rgba(255,255,255,0.08)
 
 
 /* ─── Side panel colour ───
-   Deep ink blue instead of brand green, so the green stays special for
-   buttons and highlights. Cream text + orange accents are unchanged.
-   To try another colour, change these two gradients only. */
+   Zart green. Cream text + orange accents. To try another colour, change
+   these two gradients only. */
 .zart-sidebar {
-  background: linear-gradient(180deg, #1e2338 0%, #151927 100%);
-  box-shadow: 2px 0 20px rgba(21, 25, 39, 0.18);
+  background: linear-gradient(180deg, #13624e 0%, #0d3d31 100%);
+  box-shadow: 2px 0 20px rgba(13, 64, 53, 0.14);
 }
 html[data-theme="dark"] .zart-sidebar {
-  background: linear-gradient(180deg, #181b24 0%, #121419 100%);
+  background: linear-gradient(180deg, #13624e 0%, #0d3d31 100%);
   box-shadow: 2px 0 20px rgba(0, 0, 0, 0.4);
 }
