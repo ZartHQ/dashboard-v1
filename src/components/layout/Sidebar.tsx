@@ -144,12 +144,12 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
 
       <aside 
         className={cn(
-          "zart-sidebar w-[220px] flex flex-col flex-shrink-0 min-h-screen fixed top-0 z-[100] transition-all duration-300 md:left-0",
+          "w-[220px] bg-white border-r border-[#e8e8e8] flex flex-col flex-shrink-0 min-h-screen fixed top-0 z-[100] transition-all duration-300 md:left-0",
           isOpen ? "left-0" : "-left-[220px]"
         )}
       >
         {/* Logo and Mobile Close Toggle */}
-        <div className="p-[20px_20px_18px] border-b border-white/10 flex items-center justify-between">
+        <div className="p-[20px_20px_18px] border-b border-[#f0f0f0] flex items-center justify-between">
           <div>
             <div className="flex items-center gap-[10px]">
               <img
@@ -157,13 +157,13 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
                 alt="Zart"
                 className="w-[28px] h-[28px] object-contain flex-shrink-0"
               />
-              <span className="text-[20px] font-bold text-[#FDF4D7] tracking-[-0.5px]">Zart</span>
+              <span className="text-[20px] font-bold text-[#115746] tracking-[-0.5px]">Zart</span>
             </div>
-            <div className="text-[10px] mt-[3px] pl-[38px] text-[#FDF4D7]/50">Operations dashboard</div>
+            <div className="text-[10px] mt-[3px] pl-[38px] text-[#aaa]">Operations dashboard</div>
           </div>
-          <button 
+          <button
             onClick={onClose}
-            className="md:hidden bg-transparent border-none text-[#FDF4D7]/60 hover:text-white cursor-pointer p-1 flex items-center justify-center"
+            className="md:hidden bg-transparent border-none text-[#888] hover:text-[#115746] cursor-pointer p-1 flex items-center justify-center"
             aria-label="Close sidebar"
           >
             <X className="w-5 h-5" />
@@ -180,19 +180,22 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
             return (
               <div key={i}>
                 {showSection && typeof item.section === 'string' && (
-                  <div className="p-[16px_16px_6px] text-[10px] text-[#FDF4D7]/40 uppercase tracking-[0.6px] font-semibold">
+                  <div className="px-4 pt-4 pb-1.5 text-[10px] text-[#aaa] uppercase tracking-[0.7px] font-bold">
                     {item.section}
                   </div>
                 )}
-                <Link 
-                  href={item.href} 
+                <Link
+                  href={item.href}
                   onClick={onClose}
                   className={cn(
-                    "flex items-center gap-[10px] p-[9px_16px] text-[13px] text-[#FDF4D7]/75 cursor-pointer border-l-[3px] border-transparent transition-all hover:bg-white/5 hover:text-[#FDF4D7] no-underline",
-                    isActive && "bg-white/12 text-[#FDF4D7] border-l-[#FA4812] font-semibold"
+                    "relative flex items-center gap-[10px] mx-2 my-[2px] px-3 py-[9px] rounded-[10px] text-[13px] text-[#555] cursor-pointer transition-all hover:bg-[#f5f5f5] hover:text-[#115746] no-underline",
+                    isActive && "bg-[#e8f5f0] text-[#115746] font-semibold"
                   )}
                 >
-                  <Icon className={cn("w-4 h-4 text-[#FDF4D7]/65 shrink-0", isActive && "text-[#FDF4D7]")} />
+                  {isActive && (
+                    <span className="absolute -left-2 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-[#115746]" />
+                  )}
+                  <Icon className={cn("w-4 h-4 text-[#888] shrink-0", isActive && "text-[#115746]")} />
                   <span>{item.label}</span>
                   {item.badge && (
                     <span
@@ -213,28 +216,28 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
         </div>
 
         {/* Theme toggle */}
-        <div className="mt-auto border-t border-white/10 pt-1">
+        <div className="mt-auto border-t border-[#f0f0f0] pt-1">
           <ThemeToggle />
           <AlertSoundToggle />
           <PushAlertsToggle />
         </div>
 
         {/* Admin footer */}
-        <div className="p-[16px] border-t border-white/10">
+        <div className="p-[16px] border-t border-[#f0f0f0]">
           <div className="flex items-center gap-[10px]">
             <Link
               href="/dashboard/profile"
               onClick={onClose}
               className={cn(
-                "flex items-center gap-[10px] flex-1 hover:bg-white/5 transition-all no-underline group min-w-0 p-1.5 -m-1.5 rounded-lg",
-                pathname === "/dashboard/profile" && "bg-white/10 font-semibold"
+                "flex items-center gap-[10px] flex-1 hover:bg-[#f5f5f5] transition-all no-underline group min-w-0 p-1.5 -m-1.5 rounded-lg",
+                pathname === "/dashboard/profile" && "bg-[#e8f5f0] font-semibold"
               )}
             >
               {admin?.image ? (
                 <img
                   src={admin.image}
                   alt={admin.name || "Admin"}
-                  className="w-[34px] h-[34px] rounded-full object-cover flex-shrink-0 border border-white/10"
+                  className="w-[34px] h-[34px] rounded-full object-cover flex-shrink-0 border border-[#e8e8e8]"
                 />
               ) : (
                 <div
@@ -245,13 +248,13 @@ export default function Sidebar({ admin, isOpen, onClose }: SidebarProps) {
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <div className="text-[13px] font-semibold text-[#FDF4D7] truncate group-hover:underline">{admin?.name || "Admin"}</div>
-                <div className="text-[10px] text-[#FDF4D7]/50 truncate">{admin?.role || "Admin"}</div>
+                <div className="text-[13px] font-semibold text-[#1a1a1a] truncate group-hover:underline">{admin?.name || "Admin"}</div>
+                <div className="text-[10px] text-[#888] truncate">{admin?.role || "Admin"}</div>
               </div>
             </Link>
             <button
               onClick={logout}
-              className="bg-none border-none text-[#FDF4D7]/50 hover:text-white cursor-pointer flex-shrink-0 pl-1 transition-colors flex items-center justify-center p-1"
+              className="bg-none border-none text-[#888] hover:text-[#115746] cursor-pointer flex-shrink-0 pl-1 transition-colors flex items-center justify-center p-1"
               title="Log out"
             >
               <LogOut className="w-4 h-4" />
